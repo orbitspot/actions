@@ -35,7 +35,7 @@ runs:
     run: aws codeartifact login --tool npm --repository packages --domain seidor --namespace @seidor --dry-run > co_login_commands.txt
 
   - name: Upload Artifact
-    uses: actions/upload-artifact@v3
+    uses: actions/upload-artifact@v4
     with:
       name: co_login
       path: co_login_commands.txt
