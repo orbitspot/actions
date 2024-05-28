@@ -1,0 +1,42 @@
+name: 'Terraform Apply'
+description: 'terraform apply commands'
+inputs:
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+  aws_role_name:
+    description: 'Aws role with polices to deploy'
+    required: true
+  aws_region: 
+    description: 'Aws region'
+    required: true
+runs:
+  using: composite
+  steps:
+
+  - uses: actions/checkout@v4
+    with:
+      ref: ${{ inputs.git_ref }}
+      fetch-depth: 0
+
+  - name: configure aws credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
+      role-session-name: ${{ inputs.aws_role_name }}
+      aws-region: ${{ inputs.aws_region }}
+
+  - name: Verify AWS Identity
+    shell: bash
+    run: aws sts get-caller-identity
+
+  - name: Log in to CodeArtifact
+    shell: bash
+    run: aws codeartifact login --tool npm --repository packages --domain seidor --namespace @seidor --dry-run > co_login_commands.txt
+
+  - name: Upload Artifact
+    uses: actions/upload-artifact@v3
+    with:
+      name: co_login
+      path: co_login_commands.txt
+      retention-days: 1
