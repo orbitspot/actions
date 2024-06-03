@@ -1,0 +1,40 @@
+name: 'Npm Ci'
+description: 'npm install and building'
+runs:
+  using: composite
+  steps:
+
+  - uses: actions/checkout@v4
+    name: Checkout
+    with:
+        ref: ${{ inputs.git_ref }}
+        fetch-depth: 0
+
+  - name: Cache dependences
+    uses: actions/cache@v4
+    with:
+        path: ~/.npm
+        key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+  - name: Npm Ci
+    shell: bash
+    run: |
+        npm ci
+        npm run build
+        npm prune --production
+
+  - name: Zip Docker Content
+    shell: bash
+    run: |
+        mkdir -p building
+        mv dist building/dist
+        mv package.json building/package.json
+        mv .github/docker building/docker
+        zip -r building/node_modules.zip node_modules
+
+  - name: Upload Artifacts
+    uses: actions/upload-artifact@v4
+    with:
+        name: building
+        path: building
+        retention-days: 1

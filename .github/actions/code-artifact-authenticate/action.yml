@@ -1,5 +1,5 @@
-name: 'Terraform Apply'
-description: 'terraform apply commands'
+name: 'Code Artifact'
+description: 'code artifact login'
 inputs:
   aws_account_number:
     description: 'Account Number'
