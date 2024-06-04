@@ -1,0 +1,38 @@
+import sys
+import re
+
+def replace_properties_in_yaml(properties_path, yaml_path, prefix):
+    # Carregar o arquivo properties em um dicionário
+    properties = {}
+    with open(properties_path, 'r') as prop_file:
+        for line in prop_file:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                key, value = line.split('=', 1)
+                properties[key.strip()] = value.strip()
+
+    # Ler o conteúdo do arquivo YAML
+    with open(yaml_path, 'r') as yaml_file:
+        yaml_content = yaml_file.read()
+
+    # Substituir as chaves no YAML pelos valores do properties
+    for key, value in properties.items():
+        placeholder = f"${{{prefix}.{key}}}"
+        yaml_content = re.sub(re.escape(placeholder), value, yaml_content)
+
+    # Escrever o conteúdo modificado de volta ao arquivo YAML
+    with open(yaml_path, 'w') as yaml_file:
+        yaml_file.write(yaml_content)
+
+    print(f"Substituições concluídas e salvas em {yaml_path}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 4:
+        print("Uso: python script.py <properties_path> <yaml_path> <prefix>")
+        sys.exit(1)
+
+    properties_path = sys.argv[1]
+    yaml_path = sys.argv[2]
+    prefix = sys.argv[3]
+
+    replace_properties_in_yaml(properties_path, yaml_path, prefix)
