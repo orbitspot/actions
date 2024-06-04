@@ -1,34 +1,15 @@
-name: 'Code Artifact'
-description: 'code artifact login'
+name: 'Create Registry Docker Repository'
+description: 'Create Registry Docker Repository'
 inputs:
-  role:
+  repository:
     description: 'Aws role to be created'
-    required: true
-  cluster_oidc_issuer_url_without_https:
-    description: 'Cluster OIDC issuer URL without https'
-    required: true
-  namespace:
-    description: 'Application name'
-    required: true
-  service_account_name:
-    description: 'Service Account name'
     required: true
 runs:
   using: composite
   steps:
 
-  - name: Verificar se a role existe
-    shell: bash
-    id: check-role
-    run: |
-      if aws iam get-role --role-name ${{ inputs.role }}; then
-        echo "role_exists=true" >> $GITHUB_OUTPUT
-      else
-        echo "role_exists=false" >> $GITHUB_OUTPUT
-      fi
-
-  - name: Ação com base na existência da role
-    if: steps.check-role.outputs.role_exists == 'true'
+  - name: Create ECR
+    if: steps.check-role.outputs.repository_exists == 'false'
     shell: bash
     run: |
       aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{

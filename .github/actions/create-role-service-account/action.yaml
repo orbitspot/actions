@@ -1,0 +1,40 @@
+name: 'Create Service Account Role'
+description: 'create service account role'
+inputs:
+  role:
+    description: 'Aws role to be created'
+    required: true
+  cluster_oidc_issuer_url_without_https:
+    description: 'Cluster OIDC issuer URL without https'
+    required: true
+  namespace:
+    description: 'Application name'
+    required: true
+  service_account_name:
+    description: 'Service Account name'
+    required: true
+runs:
+  using: composite
+  steps:
+
+  - name: Ação com base na existência da role
+    shell: bash
+    run: |
+      aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer_url_without_https }}"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+              "StringEquals": {
+                "${{ inputs.cluster_oidc_issuer_url_without_https }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+              }
+            }
+          }
+        ]
+      }'
+
