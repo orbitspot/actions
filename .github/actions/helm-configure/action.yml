@@ -44,11 +44,6 @@ runs:
       chmod +x ./aws-iam-authenticator
       sudo mv ./aws-iam-authenticator /usr/local/bin/
 
-  - name: Update kubeconfig
-    shell: bash
-    run: |
-      aws eks update-kubeconfig --region ${{ inputs.aws_region }} --name ${{ inputs.cluster_name }}
-
   - name: Set up Helm
     uses: azure/setup-helm@v4
 
