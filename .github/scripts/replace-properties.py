@@ -18,7 +18,9 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix):
     # Substituir as chaves no YAML pelos valores do properties
     for key, value in properties.items():
         placeholder = f"${{{prefix}.{key}}}"
-        yaml_content = re.sub(re.escape(placeholder), value, yaml_content)
+        if placeholder in yaml_content:
+            print(f"Substituindo {placeholder} por {value}")
+            yaml_content = re.sub(re.escape(placeholder), value, yaml_content)
 
     # Escrever o conteúdo modificado de volta ao arquivo YAML
     with open(yaml_path, 'w') as yaml_file:
