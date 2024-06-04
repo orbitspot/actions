@@ -54,12 +54,13 @@ runs:
       restore-keys: |
         ${{ runner.os }}-helm-plugins-
 
-  - name: Install Plugins
+  - name: Install Plugins Helm Git
     shell: bash
-    run: |
-      helm plugin install https://github.com/aslafy-z/helm-git.git
-      helm plugin install https://github.com/hypnoglow/helm-s3.git
+    run: helm plugin install https://github.com/aslafy-z/helm-git.git
 
+  - name: Install Plugins Helm s3
+    shell: bash
+    run: helm plugin install https://github.com/hypnoglow/helm-s3.git
 
   - name: Add Helm repository
     shell: bash
