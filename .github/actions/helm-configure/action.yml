@@ -50,7 +50,7 @@ runs:
       aws eks update-kubeconfig --region ${{ inputs.aws_region }} --name ${{ inputs.cluster_name }}
 
   - name: Set up Helm
-    uses: azure/setup-helm@v1
+    uses: azure/setup-helm@v4
 
   - name: Add Helm repository
     shell: bash
