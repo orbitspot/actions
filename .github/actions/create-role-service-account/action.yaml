@@ -10,7 +10,7 @@ inputs:
   aws_region: 
     description: 'Aws region'
     required: true
-  namespace:
+  role:
     description: 'Aws role to be created'
     required: true
   cluster_oidc_issuer_url_without_https:
@@ -26,6 +26,16 @@ runs:
   using: composite
   steps:
 
+  - name: Verificar se a role existe
+    shell: bash
+    id: check-role
+    run: |
+        if aws iam get-role --role-name gh-${{ inputs.role }}; then
+          echo "role_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "role_exists=false" >> $GITHUB_OUTPUT
+        fi
+
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
@@ -34,10 +44,10 @@ runs:
       aws-region: ${{ inputs.aws_region }}
 
   - name: Ação com base na existência da role
-    if: steps.check-role.outputs.role_exists == 'true'
+    if: steps.check-role.outputs.role_exists == 'false'
     shell: bash
     run: |
-      aws iam create-role --role-name "${{ inputs.namespace }}" --assume-role-policy-document '{
+      aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
         "Version": "2012-10-17",
         "Statement": [
           {

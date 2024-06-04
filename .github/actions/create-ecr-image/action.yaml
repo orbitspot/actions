@@ -10,7 +10,7 @@ inputs:
   aws_region: 
     description: 'Aws region'
     required: true
-  role:
+  repository:
     description: 'Aws role to be created'
     required: true
   cluster_oidc_issuer_url_without_https:
@@ -30,10 +30,10 @@ runs:
     shell: bash
     id: check-role
     run: |
-        if aws iam get-role --role-name gh-${{ inputs.role }}; then
-          echo "role_exists=true" >> $GITHUB_OUTPUT
+        if aws iam get-role --role-name gh-${{ inputs.repository }}; then
+          echo "repository_exists=true" >> $GITHUB_OUTPUT
         else
-          echo "role_exists=false" >> $GITHUB_OUTPUT
+          echo "repository_exists=false" >> $GITHUB_OUTPUT
         fi
 
   - name: configure aws credentials
@@ -43,8 +43,8 @@ runs:
       role-session-name: ${{ inputs.aws_role_name }}
       aws-region: ${{ inputs.aws_region }}
 
-  - name: Ação com base na existência da role
-    if: steps.check-role.outputs.role_exists == 'true'
+  - name: Create ECR
+    if: steps.check-role.outputs.repository_exists == 'false'
     shell: bash
     run: |
       aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
