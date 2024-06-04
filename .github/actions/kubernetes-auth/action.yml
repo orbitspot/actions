@@ -80,9 +80,3 @@ runs:
   - name: update-k8s-config
     shell: bash
     run: aws eks update-kubeconfig --region ${{ inputs.aws_region }} --name ${{ inputs.cluster_name }}
-
-  - name: Upload Artifact
-    uses: actions/upload-artifact@v4
-    with:
-      name: kube
-      path: ~/.kube/config
