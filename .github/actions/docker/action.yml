@@ -1,10 +1,6 @@
 name: 'Generate Docker Image on Ecr'
 description: 'Create and publish docker image'
 inputs:
-  s3_chart_location:
-    description: 'S3 template location'
-    required: false
-    default: 's3://devops.orbitspot.com/charts/'
   aws_account_number:
     description: 'Account Number'
     required: true
@@ -14,26 +10,18 @@ inputs:
   aws_region: 
     description: 'Aws region'
     required: true
-  cluster_name: 
-    description: 'Cluster Name'
-    required: true
-
   content:
     description: 'Content to download'
     required: false
-
   image:
     description: 'Image Name'
     required: true
-
   tag:
     description: 'Image Tag'
     required: true
-
   before_building:
     description: 'Before image callback'
     required: false
-
   build_args: 
     description: 'Building docker args'
     required: false
