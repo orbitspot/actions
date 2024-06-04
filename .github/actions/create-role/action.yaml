@@ -17,30 +17,36 @@ runs:
   using: composite
   steps:
 
-  - name: Create or update IAM role
+  - name: Verificar se a role existe
+    shell: bash
+    id: check-role
+    run: |
+      ROLE_NAME="nome-da-sua-role"
+      if aws iam get-role --role-name $ROLE_NAME; then
+        echo "role_exists=true" >> $GITHUB_OUTPUT
+      else
+        echo "role_exists=false" >> $GITHUB_OUTPUT
+      fi
+
+  - name: Ação com base na existência da role
+    if: steps.check-role.outputs.role_exists == 'false'
     shell: bash
     run: |
-      ROLE_EXISTS=$(aws iam get-role --role-name "${{ inputs.role }}" --query 'Role.RoleName' --output text || echo 'RoleNotFound')
-      if [ "$ROLE_EXISTS" == "RoleNotFound" ]; then
-        echo "Creating role ${{ inputs.role }}"
-        aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer_url_without_https }}"
-              },
-              "Action": "sts:AssumeRoleWithWebIdentity",
-              "Condition": {
-                "StringEquals": {
-                  "${{ inputs.cluster_oidc_issuer_url_without_https }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
-                }
+      aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer_url_without_https }}"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+              "StringEquals": {
+                "${{ inputs.cluster_oidc_issuer_url_without_https }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
               }
             }
-          ]
-        }'
-      else
-        echo "Role ${{ inputs.role }} already exists"
-      fi
+          }
+        ]
+      }'
 
