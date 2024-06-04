@@ -52,6 +52,22 @@ runs:
   - name: Set up Helm
     uses: azure/setup-helm@v4
 
+  - name: Cache Helm plugins
+    id: cache-helm-plugins
+    uses: actions/cache@v4
+    with:
+      path: ~/.local/share/helm/plugins/
+      key: ${{ runner.os }}-helm-plugins-${{ hashFiles('role.json') }}
+      restore-keys: |
+        ${{ runner.os }}-helm-plugins-
+
+  - name: Install Plugins
+    shell: bash
+    run: |
+      helm plugin install https://github.com/aslafy-z/helm-git.git
+      helm plugin install https://github.com/hypnoglow/helm-s3.git
+
+
   - name: Add Helm repository
     shell: bash
     run: helm repo add orbitspot ${{ inputs.s3_chart_location }}
