@@ -30,6 +30,7 @@ runs:
         mv dist building/dist
         mv package.json building/package.json
         mv .github/docker building/docker
+        mv .github/scripts building/scripts
         zip -r building/node_modules.zip node_modules
 
   - name: Upload Artifacts
