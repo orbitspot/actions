@@ -1,14 +1,32 @@
-name: 'Helm Upgrade'
-description: 'helm upgrade or install'
+name: 'Kubernetes authenticate'
+description: 'Generate kube config file'
 inputs:
   s3_chart_location:
     description: 'S3 template location'
     required: false
     default: 's3://devops.orbitspot.com/charts/'
-
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+  aws_role_name:
+    description: 'Aws role with polices to deploy'
+    required: true
+  aws_region: 
+    description: 'Aws region'
+    required: true
+  cluster_name: 
+    description: 'Cluster Name'
+    required: true
 runs:
   using: composite
   steps:
+
+  - name: configure aws credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
+      role-session-name: ${{ inputs.aws_role_name }}
+      aws-region: ${{ inputs.aws_region }}
 
   - name: Install kubectl
     shell: bash
@@ -46,3 +64,14 @@ runs:
   - name: Add Helm repository
     shell: bash
     run: helm repo add orbitspot ${{ inputs.s3_chart_location }}
+
+
+  - name: update-k8s-config
+    shell: bash
+    run: aws eks update-kubeconfig --region ${{ inputs.aws_region }} --name ${{ inputs.cluster_name }}
+
+  - name: Upload Artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: kube
+      path: ~/.kube/config
