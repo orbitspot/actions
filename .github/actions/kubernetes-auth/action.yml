@@ -21,13 +21,6 @@ runs:
   using: composite
   steps:
 
-  - name: configure aws credentials
-    uses: aws-actions/configure-aws-credentials@v4
-    with:
-      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
-      role-session-name: ${{ inputs.aws_role_name }}
-      aws-region: ${{ inputs.aws_region }}
-
   - name: Install kubectl
     shell: bash
     run: |
@@ -60,11 +53,16 @@ runs:
       helm plugin install https://github.com/aslafy-z/helm-git.git
       helm plugin install https://github.com/hypnoglow/helm-s3.git
 
+  - name: configure aws credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
+      role-session-name: ${{ inputs.aws_role_name }}
+      aws-region: ${{ inputs.aws_region }}
 
   - name: Add Helm repository
     shell: bash
     run: helm repo add orbitspot ${{ inputs.s3_chart_location }}
-
 
   - name: update-k8s-config
     shell: bash
