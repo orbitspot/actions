@@ -56,11 +56,21 @@ runs:
 
   - name: Install Plugins Helm Git
     shell: bash
-    run: helm plugin install https://github.com/aslafy-z/helm-git.git
+    run: |
+      if ! helm plugin list | grep -q "helm-git"; then
+        helm plugin install https://github.com/aslafy-z/helm-git.git
+      else
+        echo "helm-git plugin already installed"
+      fi
 
   - name: Install Plugins Helm s3
     shell: bash
-    run: helm plugin install https://github.com/hypnoglow/helm-s3.git
+    run: |
+      if ! helm plugin list | grep -q "helm-s3"; then
+        helm plugin install https://github.com/hypnoglow/helm-s3.git
+      else
+        echo "helm-s3 plugin already installed"
+      fi
 
   - name: Add Helm repository
     shell: bash
