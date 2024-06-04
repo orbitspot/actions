@@ -1,15 +1,6 @@
 name: 'Create Service Account Role'
 description: 'create service account role'
 inputs:
-  aws_account_number:
-    description: 'Account Number'
-    required: true
-  aws_role_name:
-    description: 'Aws role with polices to deploy'
-    required: true
-  aws_region: 
-    description: 'Aws region'
-    required: true
   role:
     description: 'Aws role to be created'
     required: true
