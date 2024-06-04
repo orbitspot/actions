@@ -1,0 +1,61 @@
+name: 'Code Artifact'
+description: 'code artifact login'
+inputs:
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+  aws_role_name:
+    description: 'Aws role with policies to deploy'
+    required: true
+  aws_region:
+    description: 'Aws region'
+    required: true
+  role:
+    description: 'Aws role to be created'
+    required: true
+  cluster_oidc_issuer_url_without_https:
+    description: 'Cluster OIDC issuer URL without https'
+    required: true
+  namespace:
+    description: 'Application name'
+    required: true
+  service_account_name:
+    description: 'Service Account name'
+    required: true
+runs:
+  using: composite
+  steps:
+  - name: configure aws credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
+      role-session-name: ${{ inputs.aws_role_name }}
+      aws-region: ${{ inputs.aws_region }}
+
+  - name: Create or update IAM role
+    shell: bash
+    run: |
+      ROLE_EXISTS=$(aws iam get-role --role-name "${{ inputs.role }}" --query 'Role.RoleName' --output text || echo 'RoleNotFound')
+      if [ "$ROLE_EXISTS" == "RoleNotFound" ]; then
+        echo "Creating role ${{ inputs.role }}"
+        aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer_url_without_https }}"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "${{ inputs.cluster_oidc_issuer_url_without_https }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+                }
+              }
+            }
+          ]
+        }'
+      else
+        echo "Role ${{ inputs.role }} already exists"
+      fi
+
