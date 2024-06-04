@@ -1,0 +1,74 @@
+name: 'Generate Docker Image on Ecr'
+description: 'Create and publish docker image'
+inputs:
+  s3_chart_location:
+    description: 'S3 template location'
+    required: false
+    default: 's3://devops.orbitspot.com/charts/'
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+  aws_role_name:
+    description: 'Aws role with polices to deploy'
+    required: true
+  aws_region: 
+    description: 'Aws region'
+    required: true
+  cluster_name: 
+    description: 'Cluster Name'
+    required: true
+
+  content:
+    description: 'Content to download'
+    required: false
+
+  image:
+    description: 'Image Name'
+    required: true
+
+  tag:
+    description: 'Image Tag'
+    required: true
+
+  before_building:
+    description: 'Before image callback'
+    required: false
+
+  build_args: 
+    description: 'Building docker args'
+    required: false
+
+runs:
+  using: composite
+  steps:
+  - name: configure aws credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
+      role-session-name: ${{ inputs.aws_role_name }}
+      aws-region: ${{ inputs.aws_region }}
+
+  - name: Set up Docker Buildx
+    uses: docker/setup-buildx-action@v3
+
+  - name: Login to Amazon ECR
+    id: login-ecr
+    uses: aws-actions/amazon-ecr-login@v2
+
+  - name: Download Building files
+    uses: actions/download-artifact@v4
+    if: ${{ inputs.content != '' }}
+    with:
+        name: ${{ inputs.content }}
+
+  - name: Before Image Building
+    shell: bash
+    if: ${{ inputs.before_building != '' }}
+    run: ${{ inputs.before_building }}
+
+  - name: "Building Image ${{ matrix.artifacts }}"
+    shell: bash
+    run: |
+      docker build -t ${{ inputs.image }}:${{ inputs.tag }} ${{ inputs.build_args }} .
+      docker tag ${{ inputs.image }}:${{ inputs.tag }} ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }}:${{ inputs.tag }}
+      docker push ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }}:${{ inputs.tag }}
