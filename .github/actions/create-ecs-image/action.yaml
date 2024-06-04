@@ -1,6 +1,15 @@
-name: 'Code Artifact'
-description: 'code artifact login'
+name: 'Create Registry Docker Repository'
+description: 'Create Registry Docker Repository'
 inputs:
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+  aws_role_name:
+    description: 'Aws role with polices to deploy'
+    required: true
+  aws_region: 
+    description: 'Aws region'
+    required: true
   role:
     description: 'Aws role to be created'
     required: true
@@ -21,11 +30,18 @@ runs:
     shell: bash
     id: check-role
     run: |
-      if aws iam get-role --role-name ${{ inputs.role }}; then
-        echo "role_exists=true" >> $GITHUB_OUTPUT
-      else
-        echo "role_exists=false" >> $GITHUB_OUTPUT
-      fi
+        if aws iam get-role --role-name gh-${{ inputs.role }}; then
+          echo "role_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "role_exists=false" >> $GITHUB_OUTPUT
+        fi
+
+  - name: configure aws credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
+      role-session-name: ${{ inputs.aws_role_name }}
+      aws-region: ${{ inputs.aws_region }}
 
   - name: Ação com base na existência da role
     if: steps.check-role.outputs.role_exists == 'true'
