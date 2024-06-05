@@ -1,0 +1,45 @@
+name: 'Kubernetes authenticate'
+description: 'Generate kube config file'
+inputs:
+  namespace:
+    description: 'Helm namespace'
+    required: true
+  release:
+    description: 'Release'
+    required: true
+  chart_name:
+    description: 'Chart Name'
+    required: true
+  chart_version:
+    description: 'Chart Version'
+    required: true
+  aws_region:
+    description: 'Aws Region'
+    required: true
+  aws_account_number:
+    description: 'Aws Account number'
+    required: true
+  sets:
+    description: 'Set values'
+    required: true
+  helm_values:
+    description: 'Helm Values'
+    required: true
+runs:
+  using: composite
+  steps:
+
+  - name: Download Building files
+    uses: actions/download-artifact@v4
+    with:
+        name: ${{ inputs.helm_values }}
+
+  - name: Check Files
+    shell: bash
+    run: |
+      ls -ltra
+
+#  - name: Helm Install
+#    shell: bash
+#    run: |
+#      helm upgrade ${{ inputs.release}}  --install --create-namespace --namespace ${{ inputs.namespace}} ${{ inputs.chart_name }} --version ${{ inputs.chart_version }} --set region=${{ inputs.aws_region }} ${{ inputs.sets }} -f .github/helm/api/values.yaml
