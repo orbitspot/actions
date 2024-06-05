@@ -1,6 +1,6 @@
 import sys
 import re
-
+import os
 def replace_properties_in_yaml(properties_path, yaml_path, prefix):
     # Carregar o arquivo properties em um dicionário
     properties = {}
@@ -26,15 +26,16 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix):
     with open(yaml_path, 'w') as yaml_file:
         yaml_file.write(yaml_content)
 
-    print(f"Substituições concluídas e salvas em {yaml_path}")
+    print(f"Substituicoes concluidas e salvas em {yaml_path}")
 
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Uso: python script.py <properties_path> <yaml_path> <prefix>")
-        sys.exit(1)
 
-    properties_path = sys.argv[1]
-    yaml_path = sys.argv[2]
-    prefix = sys.argv[3]
+properties_path = os.getenv('PROPERTIES_PATH')
+yaml_path = os.getenv('YAML_PATH')
+prefix = os.getenv('PREFIX')
 
-    replace_properties_in_yaml(properties_path, yaml_path, prefix)
+
+print(f"Properties: {properties_path}")
+print(f"Yaml: {yaml_path}")
+print(f"Prefix: {prefix}")
+
+replace_properties_in_yaml(properties_path, yaml_path, prefix)
