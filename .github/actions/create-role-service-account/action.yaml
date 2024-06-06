@@ -103,10 +103,10 @@ runs:
         ]
       }'
 
-  - name: Put Policy
-    shell: bash
-    run: |
-      echo "${{ inputs.policy }}"
+#  - name: Put Policy
+#    shell: bash
+#    run: |
+#      echo "${{ inputs.policy }}"
 
 
 
