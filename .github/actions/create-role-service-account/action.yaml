@@ -4,6 +4,9 @@ inputs:
   role:
     description: 'Aws role to be created'
     required: true
+  cluster_oidc_issuer_url_without_https:
+    description: 'Cluster OIDC issuer URL without https'
+    required: true
   namespace:
     description: 'Application name'
     required: true
@@ -37,14 +40,6 @@ runs:
       role-session-name: ${{ inputs.aws_role_name }}
       aws-region: ${{ inputs.aws_region }}
 
-
-  - name: Get identity provider iam
-    shell: bash
-    id: issuer_key
-    run: |
-      UPPER_REF_NAME=$(echo "${{ github.ref_name }}" | tr '[:lower:]' '[:upper:]')
-      echo "value=${UPPER_REF_NAME}_OIDC_ISSUER" >> $GITHUB_OUTPUT
-
   - name: Verificar se a role existe
     shell: bash
     id: check-role
@@ -66,12 +61,12 @@ runs:
           {
             "Effect": "Allow",
             "Principal": {
-              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ secrets[steps.issuer_key.outputs.value] }}"
+              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer }}"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
               "StringEquals": {
-                "${{ secrets[steps.issuer_key.outputs.value] }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+                "${{ inputs.cluster_oidc_issuer }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
               }
             }
           }
@@ -88,12 +83,12 @@ runs:
           {
             "Effect": "Allow",
             "Principal": {
-              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ secrets[steps.issuer_key.outputs.value] }}"
+              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer }}"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
               "StringEquals": {
-                "${{ secrets[steps.issuer_key.outputs.value] }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+                "${{ inputs.cluster_oidc_issuer }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
               }
             }
           }
