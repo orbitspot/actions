@@ -24,6 +24,11 @@ inputs:
     description: 'Aws region'
     required: true
 
+  policy:
+    description: 'Policy Role'
+    required: true
+
+
 runs:
   using: composite
   steps:
