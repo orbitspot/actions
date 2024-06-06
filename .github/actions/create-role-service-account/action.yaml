@@ -13,12 +13,50 @@ inputs:
   service_account_name:
     description: 'Service Account name'
     required: true
+
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+  aws_role_name:
+    description: 'Aws role with polices to deploy'
+    required: true
+  aws_region:
+    description: 'Aws region'
+    required: true
+
 runs:
   using: composite
   steps:
 
-  - name: Ação com base na existência da role
+  - name: configure aws credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
+      role-session-name: ${{ inputs.aws_role_name }}
+      aws-region: ${{ inputs.aws_region }}
+
+
+  - name: Get identity provider iam
     shell: bash
+    id: issuer_key
+    run: |
+      UPPER_REF_NAME=$(echo "${{ github.ref_name }}" | tr '[:lower:]' '[:upper:]')
+      echo "value=${UPPER_REF_NAME}_OIDC_ISSUER" >> $GITHUB_OUTPUT
+
+  - name: Verificar se a role existe
+    shell: bash
+    id: check-role
+    run: |
+        if aws iam get-role --role-name ${{ github.event.repository.name }}-${{ github.ref_name }}; then
+          echo "role_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "role_exists=false" >> $GITHUB_OUTPUT
+        fi
+
+
+  - name: Criar role
+    shell: bash
+    if: steps.check-role.outputs.role_exists == 'false'
     run: |
       aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
         "Version": "2012-10-17",
@@ -37,4 +75,34 @@ runs:
           }
         ]
       }'
+
+  - name: Atualizar Role
+    shell: bash
+    if: steps.check-role.outputs.role_exists == 'true'
+    run: |
+      aws iam update-assume-role-policy --role-name "${{ inputs.role }}" --policy-document '{
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer_url_without_https }}"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+              "StringEquals": {
+                "${{ inputs.cluster_oidc_issuer_url_without_https }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+              }
+            }
+          }
+        ]
+      }'
+
+  - name: Put Policy
+    shell: bash
+    run: |
+      echo "${{ inputs.policy }}"
+
+
+
 
