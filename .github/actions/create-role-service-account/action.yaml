@@ -69,12 +69,12 @@ runs:
           {
             "Effect": "Allow",
             "Principal": {
-              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer_url_without_https }}"
+              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ secrets[steps.issuer_key.outputs.value] }}"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
               "StringEquals": {
-                "${{ inputs.cluster_oidc_issuer_url_without_https }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+                "${{ secrets[steps.issuer_key.outputs.value] }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
               }
             }
           }
@@ -91,12 +91,12 @@ runs:
           {
             "Effect": "Allow",
             "Principal": {
-              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer_url_without_https }}"
+              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ secrets[steps.issuer_key.outputs.value] }}"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
               "StringEquals": {
-                "${{ inputs.cluster_oidc_issuer_url_without_https }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+                "${{ secrets[steps.issuer_key.outputs.value] }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
               }
             }
           }
