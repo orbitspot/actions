@@ -98,7 +98,7 @@ runs:
   - name: Put Policy
     shell: bash
     run: |
-      echo "${{ fromJson(inputs.policy) }}"
+      echo "${{ inputs.policy }}"
 
 
 
