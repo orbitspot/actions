@@ -38,8 +38,11 @@ runs:
   - name: create-namespace
     shell: bash
     run: |
-        kubectl create ns ${{ inputs.namespace }}
-
+        if ! kubectl get ns ${{ inputs.namespace }} &>/dev/null; then
+            kubectl create ns ${{ inputs.namespace }}
+        else
+            echo "Namespace ${{ inputs.namespace }} already exists."
+        fi
   - name: create service account yaml
     shell: bash
     run: |
