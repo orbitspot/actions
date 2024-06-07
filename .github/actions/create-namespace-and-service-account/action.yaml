@@ -10,9 +10,30 @@ inputs:
   service_account_name:
     description: 'Service Account name'
     required: true
+
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+  aws_role_name:
+    description: 'Aws role with polices to deploy'
+    required: true
+  aws_region:
+    description: 'Aws region'
+    required: true
+  cluster_name:
+    description: 'Cluster Name'
+    required: true
 runs:
   using: composite
   steps:
+
+  - name: configure
+    uses: orbitspot/actions/.github/actions/kubernetes-auth@master
+    with:
+        aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+        aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+        aws_region: ${{ vars.CLUSTER_REGION }}
+        cluster_name: ${{ vars.CLUSTER_NAME }}
 
   - name: create-namespace
     shell: bash
