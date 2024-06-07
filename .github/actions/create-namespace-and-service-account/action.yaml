@@ -10,9 +10,31 @@ inputs:
   service_account_name:
     description: 'Service Account name'
     required: true
+
+  aws_account_number:
+    description: 'Account number'
+    required: true
+  aws_role_name:
+    description: 'Github Actions Role'
+    required: true
+  aws_region:
+    description: 'Region'
+    required: true
+  cluster_name:
+    description: 'Cluster Name'
+    required: true
+
 runs:
   using: composite
   steps:
+
+  - name: configure
+    uses: orbitspot/actions/.github/actions/kubernetes-auth@master
+    with:
+        aws_account_number: ${{ inputs.aws_account_number }}
+        aws_role_name: ${{ inputs.aws_role_name }}
+        aws_region: ${{ inputs.aws_region }}
+        cluster_name: ${{ inputs.cluster_name }}
 
   - name: create-namespace
     shell: bash
