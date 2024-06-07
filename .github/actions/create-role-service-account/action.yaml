@@ -28,6 +28,10 @@ inputs:
     description: 'Policy Role'
     required: true
 
+  policy_name:
+    description: 'Policy Role'
+    required: true
+    default: 'default'
 
 runs:
   using: composite
