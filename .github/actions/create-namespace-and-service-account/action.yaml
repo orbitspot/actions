@@ -36,6 +36,13 @@ runs:
         aws_region: ${{ inputs.aws_region }}
         cluster_name: ${{ inputs.cluster_name }}
 
+  - name: Install kubectl
+    shell: bash
+    run: |
+      curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.20.7/2021-07-05/bin/linux/amd64/kubectl
+      chmod +x ./kubectl
+      sudo mv ./kubectl /usr/local/bin/
+
   - name: create-namespace
     shell: bash
     run: |
