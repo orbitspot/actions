@@ -4,7 +4,7 @@ inputs:
   role:
     description: 'Aws role to be created'
     required: true
-  cluster_oidc_issuer_url_without_https:
+  cluster_oidc_issuer:
     description: 'Cluster OIDC issuer URL without https'
     required: true
   namespace:
