@@ -14,8 +14,7 @@ def filter_parameters(data, prefix):
 def main(yaml_file, prefix):
     data = read_yaml(yaml_file)
     filtered_params = filter_parameters(data, prefix)
-    return json.dumps(filtered_params, indent=4)
-
+    return json.dumps(filtered_params)
 
 yaml_file_path = os.getenv('PARAMETERS_FILE')
 prefix = os.getenv('PREFIX')
