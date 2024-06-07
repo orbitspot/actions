@@ -34,7 +34,7 @@ runs:
       aws s3 cp s3://continuous-integration-files/binaries/kubectl/1.21/bin ./kubectl
       chmod +x ./kubectl
       sudo mv ./kubectl /usr/local/bin/
-      kubectl -version
+      kubectl version
 
   - name: Install aws-iam-authenticator
     shell: bash
