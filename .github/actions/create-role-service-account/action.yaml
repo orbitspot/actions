@@ -95,11 +95,9 @@ runs:
         ]
       }'
 
-  - name: Put Policy
+  - name: Adicionar Policy à Role
     shell: bash
     run: |
-      echo "${{ inputs.policy }}"
-
-
+      aws iam put-role-policy --role-name "${{ inputs.role }}" --policy-name "${{ inputs.policy_name }}" --policy-document "${{ inputs.policy }}"
 
 
