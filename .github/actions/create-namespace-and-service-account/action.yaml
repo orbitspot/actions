@@ -10,20 +10,6 @@ inputs:
   service_account_name:
     description: 'Service Account name'
     required: true
-
-  aws_account_number:
-    description: 'Account number'
-    required: true
-  aws_role_name:
-    description: 'Github Actions Role'
-    required: true
-  aws_region:
-    description: 'Region'
-    required: true
-  cluster_name:
-    description: 'Cluster Name'
-    required: true
-
 runs:
   using: composite
   steps:
@@ -31,22 +17,15 @@ runs:
   - name: configure
     uses: orbitspot/actions/.github/actions/kubernetes-auth@master
     with:
-        aws_account_number: ${{ inputs.aws_account_number }}
-        aws_role_name: ${{ inputs.aws_role_name }}
-        aws_region: ${{ inputs.aws_region }}
-        cluster_name: ${{ inputs.cluster_name }}
+        aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+        aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+        aws_region: ${{ vars.CLUSTER_REGION }}
+        cluster_name: ${{ vars.CLUSTER_NAME }}
 
-  - name: Install kubectl
+  - name: create-namespace
     shell: bash
     run: |
-      curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.20.7/2021-07-05/bin/linux/amd64/kubectl
-      chmod +x ./kubectl
-      sudo mv ./kubectl /usr/local/bin/
-
-#  - name: create-namespace
-#    shell: bash
-#    run: |
-#        kubectl create namespace ${{ inputs.namespace }}
+        kubectl create ns ${{ inputs.namespace }}
 
   - name: create service account yaml
     shell: bash
