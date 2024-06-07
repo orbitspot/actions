@@ -1,0 +1,38 @@
+name: 'Create Namespace And Service Account'
+description: 'creating k8s resources'
+inputs:
+  role_arn:
+    description: 'Aws role arn'
+    required: true
+  namespace:
+    description: 'Application name'
+    required: true
+  service_account_name:
+    description: 'Service Account name'
+    required: true
+runs:
+  using: composite
+  steps:
+
+  - name: create-namespace
+    shell: bash
+    run: |
+        kubectl create ns ${{ inputs.namespace }}
+
+  - name: create service account yaml
+    shell: bash
+    run: |
+      cat <<EOT > service-account.yaml
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        annotations:
+          eks.amazonaws.com/role-arn: ${{ inputs.role_arn }}
+        name: ${{ inputs.service_account_name }}
+        namespace: ${{ inputs.namespace }}
+      EOT
+
+  - name: apply service account
+    shell: bash
+    run: |
+      kubectl apply -f service-account.yaml
