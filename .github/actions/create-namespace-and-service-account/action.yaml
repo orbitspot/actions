@@ -30,10 +30,10 @@ runs:
   - name: configure
     uses: orbitspot/actions/.github/actions/kubernetes-auth@master
     with:
-        aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-        aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-        aws_region: ${{ vars.CLUSTER_REGION }}
-        cluster_name: ${{ vars.CLUSTER_NAME }}
+        aws_account_number: ${{ inputs.aws_account_number }}
+        aws_role_name: ${{ inputs.aws_role_name }}
+        aws_region: ${{ inputs.aws_region }}
+        cluster_name: ${{ inputs.cluster_name }}
 
   - name: create-namespace
     shell: bash
