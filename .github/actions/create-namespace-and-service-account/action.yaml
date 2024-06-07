@@ -43,10 +43,10 @@ runs:
       chmod +x ./kubectl
       sudo mv ./kubectl /usr/local/bin/
 
-  - name: create-namespace
-    shell: bash
-    run: |
-        kubectl create ns ${{ inputs.namespace }}
+#  - name: create-namespace
+#    shell: bash
+#    run: |
+#        kubectl create namespace ${{ inputs.namespace }}
 
   - name: create service account yaml
     shell: bash
