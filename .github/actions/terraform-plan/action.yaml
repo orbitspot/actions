@@ -35,10 +35,8 @@ runs:
     shell: bash
     run: |
       chmod -R +x .
-      ls -ltra
-      pwd
 
   - name: Terraform Apply
     shell: bash
     run: |
-      terraform plan -auto-approve
+      terraform plan
