@@ -31,7 +31,9 @@ runs:
   steps:
   - name: Checkout code
     uses: actions/checkout@v4
-
+    with:
+        ref: ${{ inputs.git_ref }}
+        fetch-depth: 0
   - name: Print
     shell: bash
     run: |
