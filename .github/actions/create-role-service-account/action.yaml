@@ -44,7 +44,7 @@ runs:
     shell: bash
     id: check-role
     run: |
-        if aws iam get-role --role-name ${{ github.event.repository.name }}-${{ github.ref_name }}; then
+        if aws iam get-role --role-name ${{ inputs.role }}; then
           echo "role_exists=true" >> $GITHUB_OUTPUT
         else
           echo "role_exists=false" >> $GITHUB_OUTPUT
