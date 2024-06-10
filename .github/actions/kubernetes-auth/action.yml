@@ -31,14 +31,14 @@ runs:
   - name: Install kubectl
     shell: bash
     run: |
-      curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.20.7/2021-07-05/bin/linux/amd64/kubectl
+      aws s3 cp s3://continuous-integration-files/binaries/kubectl/1.21/bin ./kubectl
       chmod +x ./kubectl
       sudo mv ./kubectl /usr/local/bin/
 
   - name: Install aws-iam-authenticator
     shell: bash
     run: |
-      curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.20.7/2021-07-05/bin/linux/amd64/aws-iam-authenticator
+      aws s3 cp s3://continuous-integration-files/binaries/aws-iam-authenticator/bin ./aws-iam-authenticator
       chmod +x ./aws-iam-authenticator
       sudo mv ./aws-iam-authenticator /usr/local/bin/
 
