@@ -76,6 +76,10 @@ runs:
     shell: bash
     run: helm repo add orbitspot ${{ inputs.s3_chart_location }}
 
+  - name: Authenticate on cluster
+    run: |
+      echo "ClusterName: ${{ inputs.cluster_name }}"
+      echo "Region: ${{ inputs.aws_region }}"
 
   - name: update-k8s-config
     shell: bash
