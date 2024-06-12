@@ -76,7 +76,12 @@ runs:
     shell: bash
     run: helm repo add orbitspot ${{ inputs.s3_chart_location }}
 
-
   - name: update-k8s-config
     shell: bash
-    run: aws eks update-kubeconfig --region ${{ inputs.aws_region }} --name ${{ inputs.cluster_name }}
+    env:
+      AWS_REGION: ${{ inputs.aws_region }}
+      CLUSTER_NAME: ${{ inputs.cluster_name }}
+    run: |
+      echo "ClusterName: $CLUSTER_NAME"
+      echo "Region: $AWS_REGION"
+       aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME

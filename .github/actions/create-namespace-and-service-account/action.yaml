@@ -27,6 +27,14 @@ runs:
   using: composite
   steps:
 
+  - name: check-values
+    shell: bash
+    run: |
+      echo "AccountNumber: ${{ inputs.aws_account_number }}"
+      echo "Region: ${{ inputs.aws_region }}"
+      echo "Role: ${{ inputs.aws_role_name }}"
+      echo "Cluster: ${{ inputs.cluster_name }}"
+
   - name: configure
     uses: orbitspot/actions/.github/actions/kubernetes-auth@master
     with:
