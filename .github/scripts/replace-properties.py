@@ -8,8 +8,11 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix):
         for line in prop_file:
             line = line.strip()
             if line and not line.startswith('#'):
-                key, value = line.split('=', 1)
-                properties[key.strip()] = value.strip()
+                try:
+                    key, value = line.split('=', 1)
+                    properties[key.strip()] = value.strip()
+                except ValueError as e:
+                    print(f"Erro ao processar linha: {line} - {e}")
 
     # Ler o conteúdo do arquivo YAML
     with open(yaml_path, 'r') as yaml_file:
