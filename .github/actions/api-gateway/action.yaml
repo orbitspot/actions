@@ -42,17 +42,12 @@ runs:
 
   - name: Terraform Plan
     shell: bash
-    env:
-      TF_VAR_branch: ${{ github.ref_name }}
     run: |
       cd code/terraform/api-gateway
       terraform plan -no-color
 
   - name: Terraform Apply
     shell: bash
-    env:
-      TF_VAR_branch: ${{ github.ref_name }}
-      TF_VAR_api_gateway: ${{ vars.API_GATEWAY }}
     run: |
       cd code/terraform/api-gateway
       terraform apply -auto-approve -no-color
