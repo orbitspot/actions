@@ -14,7 +14,7 @@
 #  }
 #  integration = {
 #    integration_http_method = "GET"
-#    uri = "https://${var.load_balancer}/api-json"
+#    uri = "${var.load_balancer}api-json"
 #    type = "HTTP"
 #    request_parameters = {
 #      "integration.request.header.target" = "'${var.path}'"

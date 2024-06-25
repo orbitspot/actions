@@ -13,7 +13,7 @@ locals {
             }
         }
         integration = {
-            uri = "https://${var.load_balancer}/{proxy}"
+            uri = "${var.load_balancer}{proxy}"
             type = "HTTP_PROXY"
             request_parameters = {
                 "integration.request.header.auths" = "context.authorizer.auths"

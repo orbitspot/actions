@@ -13,7 +13,7 @@ module "default-get" {
     request_parameters = {}
   }
   integration = {
-    uri = "https://${var.load_balancer}/"
+    uri = var.load_balancer
     type = "HTTP"
     integration_http_method = "GET"
     request_parameters = {
