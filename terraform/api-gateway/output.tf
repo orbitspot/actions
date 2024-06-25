@@ -26,6 +26,6 @@ output "path" {
   value = local.api_gateway_resource
 }
 
-#output "module" {
-#  value = module.api-gateway
-#}
+output "module" {
+  value = module.api-gateway
+}
