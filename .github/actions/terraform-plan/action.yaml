@@ -45,7 +45,7 @@ runs:
   - name: Terraform Apply
     shell: bash
     run: |
-      terraform plan | tee terraform_plan.log
+      terraform plan -no-color | tee terraform_plan.log
 
   - name: Upload Terraform Plan Log
     if: failure()

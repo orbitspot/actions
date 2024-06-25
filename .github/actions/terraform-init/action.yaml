@@ -51,14 +51,14 @@ runs:
     shell: bash
     run: |
       cd ${{ inputs.terraform_directory }}
-      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1
+      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
       ls -ltra
 
   - name: Terraform Init
     if: ${{ inputs.terraform_directory == '' }} # Executa apenas se terraform_directory não estiver vazio
     shell: bash
     run: |
-      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1
+      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
       ls -ltra
       
   - name: Upload artifact
