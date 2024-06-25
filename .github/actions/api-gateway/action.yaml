@@ -21,18 +21,18 @@ runs:
   using: composite
   steps:
 
-  - name: Checkout code
-    uses: actions/checkout@v4
-    with:
-        repository: 'orbitspot/actions'
-        path: code
-
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
       role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
       role-session-name: ${{ inputs.aws_role_name }}
       aws-region: ${{ inputs.aws_region }}
+
+  - name: Checkout code
+    uses: actions/checkout@v4
+    with:
+        repository: 'orbitspot/actions'
+        path: code
 
   - name: Terraform Init
     shell: bash
