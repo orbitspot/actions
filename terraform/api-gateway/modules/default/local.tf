@@ -3,7 +3,7 @@ locals {
     proxy = {
         method = {
             authorization = "CUSTOM"
-            authorizer_id = var.api_data.rest_api_id
+            authorizer_id = var.api_data.custom_authorizer
             request_method_api_key_required = false
             request_parameters = {
                 "method.request.path.proxy" = true
