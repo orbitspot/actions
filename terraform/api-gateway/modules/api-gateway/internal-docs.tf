@@ -1,10 +1,4 @@
-#
-#resource "aws_api_gateway_resource" "internal_docs" {
-#  for_each    = var.api_data
-#  parent_id   = data.aws_api_gateway_resource.internal_docs[each.key].id
-#  path_part   = var.path
-#  rest_api_id = each.value["rest_api_id"]
-#}
+
 #
 #//noinspection MissingModule
 #module "internal_docs_get" {

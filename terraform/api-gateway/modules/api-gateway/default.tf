@@ -1,9 +1,4 @@
-#resource "aws_api_gateway_resource" "default" {
-#  for_each      = var.api_data
-#  parent_id     = each.value["parent_id"]
-#  path_part     = var.path
-#  rest_api_id   = each.value["rest_api_id"]
-#}
+
 #
 #//noinspection MissingModule
 #module "default-get" {
