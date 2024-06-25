@@ -48,3 +48,11 @@ runs:
       cd code/terraform/api-gateway
       terraform plan -no-color
 
+  - name: Terraform Apply
+    shell: bash
+    env:
+      TF_VAR_branch: ${{ github.ref_name }}
+    run: |
+      cd code/terraform/api-gateway
+      terraform apply -auto-approve -no-color
+
