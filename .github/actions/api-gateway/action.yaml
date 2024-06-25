@@ -40,7 +40,6 @@ runs:
       cd code/terraform/api-gateway
       ls -ltra
       terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
-      terraform plan -no-color
 
   - name: Terraform Check
     shell: bash
