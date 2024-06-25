@@ -26,6 +26,10 @@ output "path" {
   value = local.api_gateway_resource
 }
 
-output "module" {
-  value = local.api_data
+output "first_api" {
+  value = local.api_data[0]
+}
+
+output "second_api" {
+  value = local.api_data[1]
 }
