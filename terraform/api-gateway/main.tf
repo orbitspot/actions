@@ -6,9 +6,7 @@ locals {
 
 module "api-gateway-first" {
     source = "./modules/default"
-    api_data = {
-      for k, v in local.current_api_gateway[0] : v["rest_api_id"] => v
-    }
+    api_data = local.current_api_gateway[0]
     load_balancer = local.uri
     path = local.api_gateway_resource
 }

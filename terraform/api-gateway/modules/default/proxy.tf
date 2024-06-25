@@ -1,75 +1,69 @@
 module "proxy-get" {
-  for_each                    = aws_api_gateway_resource.proxy
   source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
-  rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
+  rest_api_id                 = aws_api_gateway_resource.proxy.rest_api_id
   http_method                 = "GET"
-  method                      = local.proxy.method[each.key]
+  method = local.proxy.method
   integration                 = merge(local.proxy.integration, {integration_http_method = "GET"})
   integration_response        = local.proxy.integration_response
   method_response             = local.proxy.method_response
-  resource_id                 = each.value.id
+  resource_id                 = aws_api_gateway_resource.proxy.id
 }
 
 module "proxy-post" {
-  for_each                    = aws_api_gateway_resource.proxy
   source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
-  rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
+  rest_api_id                 = aws_api_gateway_resource.proxy.rest_api_id
   http_method                 = "POST"
-  method = local.proxy.method[each.key]
+  method = local.proxy.method
   integration = merge(local.proxy.integration, {integration_http_method = "POST"})
   integration_response = local.proxy.integration_response
   method_response = local.proxy.method_response
-  resource_id = each.value.id
+  resource_id = aws_api_gateway_resource.proxy.id
 }
 
 module "proxy-put" {
-  for_each                    = aws_api_gateway_resource.proxy
   source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
-  rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
+  rest_api_id                 = aws_api_gateway_resource.proxy.rest_api_id
   http_method                 = "PUT"
-  method = local.proxy.method[each.key]
+  method = local.proxy.method
   integration = merge(local.proxy.integration, {integration_http_method = "PUT"})
   integration_response = local.proxy.integration_response
   method_response = local.proxy.method_response
-  resource_id = each.value.id
+  resource_id = aws_api_gateway_resource.proxy.id
 }
 
 module "proxy-patch" {
-  for_each                    = aws_api_gateway_resource.proxy
   source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
-  rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
+  rest_api_id                 = aws_api_gateway_resource.proxy.rest_api_id
   http_method                 = "PATCH"
-  method = local.proxy.method[each.key]
+  method = local.proxy.method
   integration = merge(local.proxy.integration, {integration_http_method = "PATCH"})
   integration_response = local.proxy.integration_response
   method_response = local.proxy.method_response
-  resource_id = each.value.id
+  resource_id = aws_api_gateway_resource.proxy.id
 }
 
 module "proxy-delete" {
-  for_each                    = aws_api_gateway_resource.proxy
   source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
-  rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
+  rest_api_id                 = aws_api_gateway_resource.proxy.rest_api_id
   http_method                 = "DELETE"
-  method = local.proxy.method[each.key]
+  method = local.proxy.method
   integration = merge(local.proxy.integration, {integration_http_method = "DELETE"})
   integration_response = local.proxy.integration_response
   method_response = local.proxy.method_response
-  resource_id = each.value.id
+  resource_id = aws_api_gateway_resource.proxy.id
 }
 
 module "proxy-option" {
-  for_each                    = aws_api_gateway_resource.proxy
   source                      = "../api-gateway-resources"
   depends_on                  = [
     aws_api_gateway_resource.proxy
   ]
-  rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
+  rest_api_id                 = aws_api_gateway_resource.proxy.rest_api_id
   http_method                 = "OPTIONS"
   method = {
     authorization  = "NONE"
@@ -104,5 +98,5 @@ module "proxy-option" {
       "method.response.header.Access-Control-Allow-Origin" = true
     }
   }
-  resource_id = each.value.id
+  resource_id = aws_api_gateway_resource.proxy.id
 }

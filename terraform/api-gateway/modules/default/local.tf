@@ -2,14 +2,12 @@ locals {
 
     proxy = {
         method = {
-            for k, v in var.api_data : v["rest_api_id"] => {
-                authorization = "CUSTOM"
-                authorizer_id = v["custom_authorizer"]
-                request_method_api_key_required = false
-                request_parameters = {
-                    "method.request.path.proxy" = true
-                    "method.request.header.token" = true
-                }
+            authorization = "CUSTOM"
+            authorizer_id = var.api_data.rest_api_id
+            request_method_api_key_required = false
+            request_parameters = {
+                "method.request.path.proxy" = true
+                "method.request.header.token" = true
             }
         }
         integration = {

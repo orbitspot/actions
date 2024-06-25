@@ -1,21 +1,18 @@
 resource "aws_api_gateway_resource" "default" {
-  for_each      = var.api_data
-  parent_id     = each.value["parent_id"]
+  parent_id     = var.api_data.parent_id
   path_part     = var.path
-  rest_api_id   = each.value["rest_api_id"]
+  rest_api_id   = var.api_data.rest_api_id
 }
 
 resource "aws_api_gateway_resource" "proxy" {
-  for_each      = var.api_data
-  parent_id     = aws_api_gateway_resource.default[each.key].id
+  parent_id   = aws_api_gateway_resource.default.id
   path_part   = "{proxy+}"
-  rest_api_id   = each.value["rest_api_id"]
-  depends_on = [aws_api_gateway_resource.default]
+  rest_api_id = var.api_data.rest_api_id
+  depends_on  = [aws_api_gateway_resource.default]
 }
 
 resource "aws_api_gateway_resource" "internal_docs" {
-  for_each    = data.aws_api_gateway_resource.internal_docs
-  parent_id   = each.value.parent_id
+  parent_id   = data.aws_api_gateway_resource.internal_docs.id
   path_part   = var.path
-  rest_api_id = each.value["rest_api_id"]
+  rest_api_id = var.api_data.rest_api_id
 }

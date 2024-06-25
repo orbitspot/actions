@@ -1,9 +1,9 @@
 variable "api_data" {
-  type = map(object({
+  type = object({
     parent_id = string
     rest_api_id = string
     custom_authorizer = string
-  }))
+  })
 }
 
 variable "path" {
