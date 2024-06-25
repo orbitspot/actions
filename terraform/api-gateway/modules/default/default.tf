@@ -1,55 +1,49 @@
-//noinspection MissingModule
-module "internal_docs_get" {
-  for_each                    = data.aws_api_gateway_resource.internal_docs
-  source                      = "git::https://github.com/orbitspot/infra-aws-api-gateway//terraform/modules/resource_definition?ref=v1.1.4"
+module "default-get" {
+  for_each                    = aws_api_gateway_resource.default
+  source                      = "../api-gateway-resources"
   depends_on                  = [
     aws_api_gateway_resource.default
   ]
   rest_api_id                 = each.value.rest_api_id
   http_method                 = "GET"
   method = {
-    authorization  = "NONE"
-    authorizer_id   = ""
+    authorization = "NONE"
+    authorizer_id = ""
     request_method_api_key_required = false
     request_parameters = {}
   }
   integration = {
-    integration_http_method = "GET"
-    uri = "https://${var.load_balancer}/api-json"
+    uri = "https://${var.load_balancer}/"
     type = "HTTP"
+    integration_http_method = "GET"
     request_parameters = {
       "integration.request.header.target" = "'${var.path}'"
     }
-    request_templates = {}
+    request_templates = {
+      "application/json" = ""
+    }
   }
   integration_response = {
     integration_response_status_code = "200"
-    response_templates = {
-      "application/json" = ""
-    }
-    response_parameters = {
-      "method.response.header.Access-Control-Allow-Origin"  = "'*'",
-    }
+    response_templates = {}
+    response_parameters = {}
   }
   method_response = {
     response_models = {
       "application/json" = "Empty"
     }
-    response_parameters = {
-      "method.response.header.Access-Control-Allow-Origin" = true
-    }
+    response_parameters = {}
     status_code = "200"
   }
-  resource_id = data.aws_api_gateway_resource.internal_docs.id
+  resource_id = each.value.id
 }
 
-//noinspection MissingModule
-module "internal_docs_options" {
-  for_each                    = data.aws_api_gateway_resource.internal_docs
-  source                      = "git::https://github.com/orbitspot/infra-aws-api-gateway//terraform/modules/resource_definition?ref=v1.1.4"
+
+module "default-option" {
+  for_each                    = aws_api_gateway_resource.default
+  source                      = "../api-gateway-resources"
   depends_on                  = [
-    aws_api_gateway_resource.internal_docs,
-    module.internal_docs_get,
+    aws_api_gateway_resource.default
   ]
   rest_api_id                 = each.value.rest_api_id
   http_method                 = "OPTIONS"
@@ -60,9 +54,9 @@ module "internal_docs_options" {
     request_parameters = {}
   }
   integration = {
-    integration_http_method = "OPTIONS"
     uri = ""
     type = "MOCK"
+    integration_http_method = "OPTIONS"
     request_parameters = {}
     request_templates = {
       "application/json" = "{ statusCode: 200 }"
@@ -86,5 +80,6 @@ module "internal_docs_options" {
       "method.response.header.Access-Control-Allow-Origin" = true
     }
   }
-  resource_id = data.aws_api_gateway_resource.internal_docs.id
+  resource_id = each.value.id
 }
+

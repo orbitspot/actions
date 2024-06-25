@@ -1,7 +1,6 @@
-//noinspection MissingModule
 module "proxy-get" {
   for_each                    = aws_api_gateway_resource.proxy
-  source                      = "git::https://github.com/orbitspot/infra-aws-api-gateway//terraform/modules/resource_definition?ref=v1.1.4"
+  source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
   rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
   http_method                 = "GET"
@@ -12,10 +11,9 @@ module "proxy-get" {
   resource_id                 = each.value.id
 }
 
-//noinspection MissingModule
 module "proxy-post" {
   for_each                    = aws_api_gateway_resource.proxy
-  source                      = "git::https://github.com/orbitspot/infra-aws-api-gateway//terraform/modules/resource_definition?ref=v1.1.4"
+  source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
   rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
   http_method                 = "POST"
@@ -26,10 +24,9 @@ module "proxy-post" {
   resource_id = each.value.id
 }
 
-//noinspection MissingModule
 module "proxy-put" {
   for_each                    = aws_api_gateway_resource.proxy
-  source                      = "git::https://github.com/orbitspot/infra-aws-api-gateway//terraform/modules/resource_definition?ref=v1.1.4"
+  source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
   rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
   http_method                 = "PUT"
@@ -40,10 +37,9 @@ module "proxy-put" {
   resource_id = each.value.id
 }
 
-//noinspection MissingModule
 module "proxy-patch" {
   for_each                    = aws_api_gateway_resource.proxy
-  source                      = "git::https://github.com/orbitspot/infra-aws-api-gateway//terraform/modules/resource_definition?ref=v1.1.4"
+  source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
   rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
   http_method                 = "PATCH"
@@ -54,10 +50,9 @@ module "proxy-patch" {
   resource_id = each.value.id
 }
 
-//noinspection MissingModule
 module "proxy-delete" {
   for_each                    = aws_api_gateway_resource.proxy
-  source                      = "git::https://github.com/orbitspot/infra-aws-api-gateway//terraform/modules/resource_definition?ref=v1.1.4"
+  source                      = "../api-gateway-resources"
   depends_on                  = [ aws_api_gateway_resource.proxy ]
   rest_api_id                 = aws_api_gateway_resource.proxy[each.key].rest_api_id
   http_method                 = "DELETE"
@@ -68,10 +63,9 @@ module "proxy-delete" {
   resource_id = each.value.id
 }
 
-//noinspection MissingModule
 module "proxy-option" {
   for_each                    = aws_api_gateway_resource.proxy
-  source                      = "git::https://github.com/orbitspot/infra-aws-api-gateway//terraform/modules/resource_definition?ref=v1.1.4"
+  source                      = "../api-gateway-resources"
   depends_on                  = [
     aws_api_gateway_resource.proxy
   ]

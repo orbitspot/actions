@@ -1,5 +1,5 @@
 module "api-gateway" {
-    source = "./modules/api-gateway"
+    source = "./modules/default"
     api_data = {
       for k, v in local.current_api_gateway : v["rest_api_id"] => v
     }
