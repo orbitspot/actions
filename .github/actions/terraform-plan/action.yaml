@@ -19,10 +19,10 @@ runs:
   using: composite
   steps:
 
-  - name: Setup Terraform
-    uses: hashicorp/setup-terraform@v3
-    with:
-      terraform_version: 1.5.0
+#  - name: Setup Terraform
+#    uses: hashicorp/setup-terraform@v3
+#    with:
+#      terraform_version: 1.5.0
 
 
   - name: configure aws credentials
