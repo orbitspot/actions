@@ -4,11 +4,11 @@ locals {
     }
 }
 
-#module "api-gateway-first" {
-#    source = "./modules/default"
-#    api_data = {
-#        for index, value in local.api_data[0] : value["rest_api_id"] => value
-#    }
-#    load_balancer = local.uri
-#    path = local.api_gateway_resource
-#}
+module "api-gateway-first" {
+    source = "./modules/default"
+    api_data = {
+      for k, v in local.current_api_gateway[0] : v["rest_api_id"] => v
+    }
+    load_balancer = local.uri
+    path = local.api_gateway_resource
+}
