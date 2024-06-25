@@ -1,0 +1,48 @@
+name: 'Terraform Init'
+description: 'terraform init commands'
+inputs:
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+    default: '931670397156'
+  aws_role_name:
+    description: 'Aws role with polices to deploy'
+    required: true
+    default: 'github-actions'
+  aws_region:
+    description: 'Aws region'
+    required: true
+    default: 'us-east-1'
+  terraform_bucket_name:
+    description: 'Bucket'
+    required: true
+    default: 'terraform-orbit'
+runs:
+  using: composite
+  steps:
+
+  - name: Checkout code
+    uses: actions/checkout@v4
+    with:
+        repository: 'orbitspot/actions'
+        path: code
+
+  - name: configure aws credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
+      role-session-name: ${{ inputs.aws_role_name }}
+      aws-region: ${{ inputs.aws_region }}
+
+  - name: Terraform Init
+    shell: bash
+    run: |
+      cd code/terraform/api-gateway
+      ls -ltra
+      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
+
+  - name: Terraform Check
+    shell: bash
+    run: |
+      ls -ltra
+
