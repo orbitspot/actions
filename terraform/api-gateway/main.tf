@@ -10,3 +10,10 @@ module "api-gateway-first" {
     load_balancer = local.uri
     path = local.api_gateway_resource
 }
+
+module "api-gateway-second" {
+    source = "./modules/default"
+    api_data = local.current_api_gateway[1]
+    load_balancer = local.uri
+    path = local.api_gateway_resource
+}
