@@ -17,3 +17,4 @@ module "api-gateway-second" {
     load_balancer = local.uri
     path = local.api_gateway_resource
 }
+
