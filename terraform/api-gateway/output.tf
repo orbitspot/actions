@@ -34,6 +34,6 @@ output "second_api" {
   value = local.api_data[1]
 }
 
-output "module" {
-  value = module.api-gateway-first
-}
+# output "module" {
+#   value = module.api-gateway-first
+# }
