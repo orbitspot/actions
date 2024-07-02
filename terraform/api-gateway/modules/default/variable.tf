@@ -14,3 +14,7 @@ variable "load_balancer" {
   type = string
 }
 
+
+variable "istio_enabled" {
+  type = bool
+}
