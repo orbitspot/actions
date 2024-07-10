@@ -46,3 +46,8 @@ variable "istio_enabled" {
   type = bool
   default = true
 }
+
+variable "docs" {
+  type = string
+  default = "api-json"
+}

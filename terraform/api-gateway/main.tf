@@ -9,6 +9,8 @@ module "api-gateway-first" {
     api_data = local.current_api_gateway[0]
     load_balancer = local.uri
     path = local.api_gateway_resource
+    istio_enabled = var.istio_enabled
+    docs = var.docs
 }
 
 module "api-gateway-second" {
@@ -16,5 +18,7 @@ module "api-gateway-second" {
     api_data = local.current_api_gateway[1]
     load_balancer = local.uri
     path = local.api_gateway_resource
+    istio_enabled = var.istio_enabled
+    docs = var.docs
 }
 

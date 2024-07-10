@@ -39,6 +39,11 @@ runs:
     run: |
       ls -ltra
 
+  - name: CheckValues
+    shell: bash
+    run: |
+      cat values.yaml
+
   - name: Helm Install
     shell: bash
     run: |
