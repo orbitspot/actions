@@ -39,12 +39,6 @@ runs:
     run: |
       echo "Region: ${{ inputs.aws_region }}"
 
-  - uses: hashicorp/setup-terraform@v3
-    name: setup
-    with:
-        terraform_version: "1.5.0"
-
-
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
@@ -52,23 +46,29 @@ runs:
       role-session-name: ${{ inputs.aws_role_name }}
       aws-region: ${{ inputs.aws_region }}
 
+  - uses: hashicorp/setup-terraform@v3
+    name: setup
+    with:
+        terraform_version: "1.5.0"
+
   - name: Terraform Init
-    if: ${{ inputs.terraform_directory != '' }} # Executa apenas se terraform_directory não estiver vazio
+    if: ${{ inputs.terraform_directory != '' }}
     shell: bash
     run: |
       cd ${{ inputs.terraform_directory }}
-      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
       ls -ltra
+      terraform version
+      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
 
   - name: Terraform Init
-    if: ${{ inputs.terraform_directory == '' }} # Executa apenas se terraform_directory não estiver vazio
+    if: ${{ inputs.terraform_directory == '' }}
     shell: bash
     run: |
-      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
       ls -ltra
-      
+      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
+
   - name: Upload artifact
-    if: ${{ inputs.terraform_directory == '' }} # Executa apenas se terraform_directory não estiver vazio
+    if: ${{ inputs.terraform_directory == '' }}
     uses: actions/upload-artifact@v4
     with:
       name: ${{ inputs.artifact_name }}
