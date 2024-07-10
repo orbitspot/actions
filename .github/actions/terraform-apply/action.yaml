@@ -26,6 +26,16 @@ runs:
       role-session-name: ${{ inputs.aws_role_name }}
       aws-region: ${{ inputs.aws_region }}
 
+  - name: Set up Node.js
+    uses: actions/setup-node@v4
+    with:
+        node-version: '20'
+
+  - uses: hashicorp/setup-terraform@v3
+    name: setup
+    with:
+        terraform_version: "1.5.0"
+
   - name: Download Artifact
     uses: actions/download-artifact@v4
     with:
