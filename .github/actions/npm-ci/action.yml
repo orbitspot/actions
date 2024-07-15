@@ -48,14 +48,16 @@ runs:
     shell: bash
     run: |
         mkdir -p building
+        mkdir -p deps
         mv dist building/dist
         mv package.json building/package.json
         mv .github/docker building/docker
         mv .github/scripts building/scripts
+        mv node_modules deps/node_modules
 
   - uses: vimtor/action-zip@v1.2
     with:
-      files: node_modules
+      files: deps
       dest: building/node_modules.zip
 
 
