@@ -1,0 +1,34 @@
+name: Protection
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository_name:
+        description: "Nome do Repositório que será protegido"
+        required: true
+        type: string
+
+      branch_name:
+        description: "Nome da branch que será utilizada na proteção"
+        required: true
+        default: master
+        type: choice
+        options:
+          - master
+          - develop
+          - homolog
+
+
+concurrency:
+  group: '${{ github.workflow }}'
+  cancel-in-progress: true
+
+jobs:
+  init-terraform:
+    name: "init"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Init"
+        run: |
+          echo "O Repositório escolhido foi: ${{ github.event.input.repository_name }}"
+          echo "A branch escolhida foi: ${{ github.event.input.branch_name }}"
