@@ -48,7 +48,7 @@ jobs:
         run: |
           pwd
           cd /opt/actions-runner/_work/actions/actions/infra-github-protections/terraform/
-          
+
       - name: Init terraform
         uses: orbitspot/actions/.github/actions/terraform-init@v9.2
         with:
@@ -61,7 +61,7 @@ jobs:
             terraform_directory: '/opt/actions-runner/_work/actions/actions/infra-github-protections/terraform/'
       
             
-            terraform-plan:
+  terraform-plan:
     name: plan
     runs-on: [timeflow, linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
@@ -71,16 +71,16 @@ jobs:
       contents: read
     steps:
       - name: apply terraform
-          uses: orbitspot/actions/.github/actions/terraform-plan@v9.2
-          with:
-              aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-              aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-              aws_region: 'us-east-1'
-          env:
-              TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
-              TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
-              TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-              TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
+        uses: orbitspot/actions/.github/actions/terraform-plan@v9.2
+        with:
+            aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+            aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+            aws_region: 'us-east-1'
+        env:
+            TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
+            TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
+            TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
+            TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
 
   terraform-apply:
       name: apply
