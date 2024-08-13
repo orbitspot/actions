@@ -39,8 +39,8 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}
-          role-session-name: ${{ vars.AWS_ROLE_NAME }}
+          role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
+          role-session-name: "${{ vars.AWS_ROLE_NAME }}"
           aws-region: "us-east-1"
           
       - name: Checkout code
@@ -58,9 +58,9 @@ jobs:
       - name: Terraform Init
         shell: bash
         env:
-          TF_VAR_repository_name: ${{ github.event.inputs.branch_name }}
-          TF_VAR_branch_pattern: ${{ github.event.inputs.repository_name }}
-          TF_VAR_token: ${{ secrets.GIT_TOKEN }}
+          TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
+          TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
 
         run: |
           cd infra-github-protections/terraform/
