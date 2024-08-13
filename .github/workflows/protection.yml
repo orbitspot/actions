@@ -46,8 +46,9 @@ jobs:
       - name: checando pasta
         shell: bash
         run: |
-          pwd
-          cd /opt/actions-runner/_work/actions/actions/infra-github-protections/terraform/
+          pwd 
+          ls
+          cd /opt/actions-runner/_work/actions/actions/infra-github-protections
 
       - name: Init terraform
         uses: orbitspot/actions/.github/actions/terraform-init@v9.2
