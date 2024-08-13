@@ -27,7 +27,7 @@ jobs:
   terraform-init:
     name: init
     environment: ${{ github.ref_name }}
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
     permissions:
         id-token: write
         contents: read
