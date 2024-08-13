@@ -24,11 +24,51 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  init-terraform:
-    name: "init"
-    runs-on: ubuntu-latest
+  terraform-init:
+    name: init
+    environment: ${{ github.event.inputs.branch_name }}
+    runs-on: [commom, linux, self-hosted, x64]
+    permissions:
+        id-token: write
+        contents: read
     steps:
-      - name: "Init"
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ inputs.AWS_ACCOUNT_NUMBER }}:role/${{ inputs.AWS_ROLE_NAME }}
+          role-session-name: ${{ inputs.AWS_ROLE_NAME }}
+          aws-region: "us-east-1"
+          
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+            repository: orbitspot/infra-github-protections
+            path: infra-github-protections # nome na pasta de destino dentro do runner
+      
+      - name: Checking folder
         run: |
-          echo "O Repositório escolhido foi: ${{ github.event.input.repository_name }}"
-          echo "A branch escolhida foi: ${{ github.event.input.branch_name }}"
+          echo ${{ github.workspace }}
+          echo $GITHUB_WORKSPACE
+          cd infra-github-protections && ls
+    
+      - name: Terraform Init
+        shell: bash
+        env:
+          TF_VAR_repository_name: ${{ github.event.inputs.branch_name }}
+          TF_VAR_branch_pattern: ${{ github.event.inputs.repository_name }}
+          TF_VAR_token: ${{ secrets.GIT_TOKEN }}
+
+        run: |
+          cd infra-github-protections/terraform/
+          terraform init -backend-config=bucket=terraform-orbit -backend-config=key=branch-protections/${{  github.event.inputs.repository_name }}/${{ github.event.inputs.branch_name }}.tfstate -backend-config=region=us-east-1 -no-color
+    
+      - name: Terraform Plan
+        shell: bash
+        run: |
+          cd infra-github-protections/terraform/
+          terraform plan -no-color
+    
+      - name: Terraform Apply
+        shell: bash
+        run: |
+          cd infra-github-protections/terraform/
