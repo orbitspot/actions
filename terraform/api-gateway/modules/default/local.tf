@@ -12,7 +12,7 @@ locals {
         }
         integration = {
             uri = "${var.load_balancer}/{proxy}"
-            type = "HTTP_PROXY"
+            type = "HTTP"
             request_parameters = {
                 "integration.request.header.auths" = "context.authorizer.auths"
                 "integration.request.header.clienttenantid" = "context.authorizer.clienttenantid"
