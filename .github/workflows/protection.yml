@@ -47,8 +47,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-            repository: orbitspot/infra-github-protections
-            path: infra-github-protections # nome na pasta de destino dentro do runner
+          repository: orbitspot/infra-github-protections
+          path: infra-github-protections # nome na pasta de destino dentro do runner
+          token: "${{ secrets.GIT_TOKEN }}"
             # ref: "master"
       
       - name: Checking folder
