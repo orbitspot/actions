@@ -26,8 +26,8 @@ on:
 jobs:
   terraform-init:
     name: init
-    # environment: ${{ github.event.inputs.branch_name }}
-    runs-on: [outbound, linux, self-hosted, x64]
+    environment: ${{ github.ref_name }}
+    runs-on: ubuntu-lastest
     permissions:
         id-token: write
         contents: read
