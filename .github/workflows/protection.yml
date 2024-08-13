@@ -88,7 +88,7 @@ jobs:
           TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
           TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
         run: |
-          cd infra-github-protections/terraform/
+          cd /opt/actions-runner/_work/actions/actions/infra-github-protections/terraform/
           terraform plan -no-color
 
   terraform-apply:
@@ -108,5 +108,5 @@ jobs:
           TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
           TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
         run: |
-          cd infra-github-protections/terraform/
+          cd /opt/actions-runner/_work/actions/actions/infra-github-protections/terraform/
           terraform apply -auto-approve -no-color
