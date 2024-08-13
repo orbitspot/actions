@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   terraform-init:
-    name: terraform init
+    name: init
     environment: ${{ github.ref_name }}
     runs-on: [timeflow, linux, self-hosted, x64]
     permissions:
@@ -36,7 +36,7 @@ jobs:
           echo "O Repositório escolhido foi: ${{ github.event.inputs.repository_name }}"
           echo "A branch escolhida foi: ${{ github.event.inputs.branch_name }}"
 
-      - name: Configure aws credentials
+      - name: Configure Aws Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
@@ -48,8 +48,8 @@ jobs:
         with:
             node-version: '20'
   
-      - uses: hashicorp/setup-terraform@v3
-        name: setup
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
             terraform_version: "1.5.0"
 
@@ -71,6 +71,14 @@ jobs:
           cd infra-github-protections/terraform/
           terraform init -backend-config=bucket=terraform-orbit -backend-config=key=branch-protections/${{  github.event.inputs.repository_name }}/${{ github.event.inputs.branch_name }}.tfstate -backend-config=region=us-east-1 -no-color
     
+  terraform-plan:
+    name: plan
+    environment: ${{ github.ref_name }}
+    runs-on: [timeflow, linux, self-hosted, x64]
+    permissions:
+        id-token: write
+        contents: read
+    steps:
       - name: Terraform Plan
         shell: bash
         env:
@@ -81,7 +89,15 @@ jobs:
         run: |
           cd infra-github-protections/terraform/
           terraform plan -no-color
-    
+
+  terraform-apply:
+    name: apply
+    environment: ${{ github.ref_name }}
+    runs-on: [timeflow, linux, self-hosted, x64]
+    permissions:
+        id-token: write
+        contents: read
+    steps:
       - name: Terraform Apply
         shell: bash
         env:
