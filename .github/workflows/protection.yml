@@ -43,6 +43,12 @@ jobs:
           path: infra-github-protections # nome na pasta de destino dentro do runner
           token: "${{ secrets.GIT_TOKEN }}"
   
+      - name: checando pasta
+        shell: bash
+        run: |
+          pwd
+          cd /opt/actions-runner/_work/actions/actions/infra-github-protections/terraform/
+          
       - name: Init terraform
         uses: orbitspot/actions/.github/actions/terraform-init@v9.2
         with:
@@ -53,17 +59,18 @@ jobs:
             aws_region: 'us-east-1'
             artifact_name: 'terraform'
             terraform_directory: '/opt/actions-runner/_work/actions/actions/infra-github-protections/terraform/'
-    
-  terraform-plan:
+      
+            
+            terraform-plan:
     name: plan
     runs-on: [timeflow, linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [terraform-init]
     permissions:
-        id-token: write
-        contents: read
+      id-token: write
+      contents: read
     steps:
-        - name: apply terraform
+      - name: apply terraform
           uses: orbitspot/actions/.github/actions/terraform-plan@v9.2
           with:
               aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
