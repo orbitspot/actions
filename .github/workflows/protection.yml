@@ -19,19 +19,23 @@ on:
           - homolog
 
 
-concurrency:
-  group: '${{ github.workflow }}'
-  cancel-in-progress: true
+# concurrency:
+#   group: '${{ github.workflow }}'
+#   cancel-in-progress: true
 
 jobs:
   terraform-init:
     name: init
-    environment: ${{ github.event.inputs.branch_name }}
+    # environment: ${{ github.event.inputs.branch_name }}
     runs-on: [commom, linux, self-hosted, x64]
     permissions:
         id-token: write
         contents: read
     steps:
+      - name: Set OAuth Token
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
