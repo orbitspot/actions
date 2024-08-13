@@ -35,105 +35,62 @@ jobs:
         run: |
           echo "O Repositório escolhido foi: ${{ github.event.inputs.repository_name }}"
           echo "A branch escolhida foi: ${{ github.event.inputs.branch_name }}"
+
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
+          role-session-name: "${{ vars.AWS_ROLE_NAME }}"
+          aws-region: "us-east-1"
           
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+            node-version: '20'
+  
+      - uses: hashicorp/setup-terraform@v3
+        name: setup
+        with:
+            terraform_version: "1.5.0"
+            
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           repository: orbitspot/infra-github-protections
           path: infra-github-protections # nome na pasta de destino dentro do runner
           token: "${{ secrets.GIT_TOKEN }}"
-  
-      - name: checando pasta
-        shell: bash
-        run: |
-          pwd 
-          ls
-          cd /opt/actions-runner/_work/actions/actions/infra-github-protections
-
-      - name: Init terraform
-        uses: orbitspot/actions/.github/actions/terraform-init@v9.2
-        with:
-            terraform_bucket_name: 'terraform-orbit'
-            terraform_state_file: 'branch-protections/${{  github.event.inputs.repository_name }}/${{ github.event.inputs.branch_name }}.tfstate'
-            aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-            aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-            aws_region: 'us-east-1'
-            artifact_name: 'terraform'
-            terraform_directory: '/opt/actions-runner/_work/actions/actions/infra-github-protections/terraform/'
       
-            
-  terraform-plan:
-    name: plan
-    runs-on: [timeflow, linux, self-hosted, x64]
-    environment: ${{ github.ref_name }}
-    needs: [terraform-init]
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: apply terraform
-        uses: orbitspot/actions/.github/actions/terraform-plan@v9.2
-        with:
-            aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-            aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-            aws_region: 'us-east-1'
+      
+    
+      - name: Terraform Init
+        shell: bash
         env:
-            TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
-            TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
-            TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-            TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
-
-  terraform-apply:
-      name: apply
-      runs-on: [timeflow, linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
-      needs: [terraform-plan]
-      permissions:
-          id-token: write
-          contents: read
-      steps:
-          - name: apply terraform
-            uses: orbitspot/actions/.github/actions/terraform-apply@v9.2
-            with:
-                aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-                aws_region: 'us-east-1'
-            env:
-                TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
-                TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
-                TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-                TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
-
-
-      # - name: Terraform Init
-      #   shell: bash
-      #   env:
-      #     TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
-      #     TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
-      #     TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-      #     TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
-      #   run: |
-      #     cd infra-github-protections/terraform/
-      #     terraform init -backend-config=bucket=terraform-orbit -backend-config=key=branch-protections/${{  github.event.inputs.repository_name }}/${{ github.event.inputs.branch_name }}.tfstate -backend-config=region=us-east-1 -no-color
+          TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
+          TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
+          TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
+        run: |
+          cd infra-github-protections/terraform/
+          terraform init -backend-config=bucket=terraform-orbit -backend-config=key=branch-protections/${{  github.event.inputs.repository_name }}/${{ github.event.inputs.branch_name }}.tfstate -backend-config=region=us-east-1 -no-color
     
-      # - name: Terraform Plan
-      #   shell: bash
-      #   env:
-      #     TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
-      #     TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
-      #     TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-      #     TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
-      #   run: |
-      #     cd infra-github-protections/terraform/
-      #     terraform plan -no-color
+      - name: Terraform Plan
+        shell: bash
+        env:
+          TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
+          TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
+          TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
+        run: |
+          cd infra-github-protections/terraform/
+          terraform plan -no-color
     
-      # - name: Terraform Apply
-      #   shell: bash
-      #   env:
-      #     TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
-      #     TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
-      #     TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-      #     TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
-      #   run: |
-      #     cd infra-github-protections/terraform/
-      #     terraform apply -auto-approve -no-color
+      - name: Terraform Apply
+        shell: bash
+        env:
+          TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
+          TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
+          TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
+        run: |
+          cd infra-github-protections/terraform/
+          terraform apply -auto-approve -no-color
