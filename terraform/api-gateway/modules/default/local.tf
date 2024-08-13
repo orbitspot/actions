@@ -27,28 +27,28 @@ locals {
             }
             request_templates = {
                 "application/json" = <<EOF
-                #set($allParams = $input.params())
-                #set($inputRoot = $input.path('$'))
-                {
-                #foreach($key in $inputRoot.keySet())
-                    "$key": "$inputRoot.get($key)"#if($foreach.hasNext()),#end
-                #end,
-                "api-gateway-params" : {
-                "context" : {
-                    "authorizations": "$context.authorizer.authorizations"
-                    },
-                #foreach($type in $allParams.keySet())
-                    #set($params = $allParams.get($type))
-                "$type" : {
-                    #foreach($paramName in $params.keySet())
-                    "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
-                        #if($foreach.hasNext),#end
-                    #end
-                }
-                    #if($foreach.hasNext),#end
-                #end
-                }
-                }
+#set($allParams = $input.params())
+#set($inputRoot = $input.path('$'))
+{
+#foreach($key in $inputRoot.keySet())
+    "$key": "$inputRoot.get($key)"#if($foreach.hasNext()),#end
+#end,
+"api-gateway-params" : {
+"context" : {
+    "authorizations": "$context.authorizer.authorizations"
+    },
+#foreach($type in $allParams.keySet())
+    #set($params = $allParams.get($type))
+"$type" : {
+    #foreach($paramName in $params.keySet())
+    "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+        #if($foreach.hasNext),#end
+    #end
+}
+    #if($foreach.hasNext),#end
+#end
+}
+}
                 EOF
             }
         }
