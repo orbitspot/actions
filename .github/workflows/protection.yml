@@ -23,19 +23,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  terraform-init:
-    name: init
+  terraform:
+    name: terraform
     environment: ${{ github.ref_name }}
     runs-on: ubuntu-latest
     permissions:
         id-token: write
         contents: read
     steps:
-      - name: Set OAuth Token
+      - name: Checking parameters
         run: |
-          git config --global url."https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/".insteadOf "https://github.com/"
+          echo "O Repositório escolhido foi: ${{ github.event.input.repository_name }}"
+          echo "A branch escolhida foi: ${{ github.event.input.branch_name }}"
 
-      - name: configure aws credentials
+      - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
