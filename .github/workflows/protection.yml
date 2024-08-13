@@ -64,18 +64,29 @@ jobs:
           TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
           TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
           TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-
+          TF_VAR_GITHUB_OWNER: "orbitspot"
         run: |
           cd infra-github-protections/terraform/
           terraform init -backend-config=bucket=terraform-orbit -backend-config=key=branch-protections/${{  github.event.inputs.repository_name }}/${{ github.event.inputs.branch_name }}.tfstate -backend-config=region=us-east-1 -no-color
     
       - name: Terraform Plan
         shell: bash
+        env:
+          TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
+          TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
+          TF_VAR_GITHUB_OWNER: "orbitspot"
         run: |
           cd infra-github-protections/terraform/
           terraform plan -no-color
     
       - name: Terraform Apply
         shell: bash
+        env:
+          TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
+          TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
+          TF_VAR_GITHUB_OWNER: "orbitspot"
         run: |
           cd infra-github-protections/terraform/
+          terraform apply -auto-approve -no-color
