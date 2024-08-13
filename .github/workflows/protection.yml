@@ -72,8 +72,8 @@ jobs:
       - name: Terraform Plan
         shell: bash
         env:
-          TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
-          TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
           TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
           TF_VAR_GITHUB_OWNER: "orbitspot"
         run: |
@@ -83,8 +83,8 @@ jobs:
       - name: Terraform Apply
         shell: bash
         env:
-          TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
-          TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
+          TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
           TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
           TF_VAR_GITHUB_OWNER: "orbitspot"
         run: |
