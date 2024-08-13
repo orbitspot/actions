@@ -48,12 +48,6 @@ jobs:
           repository: orbitspot/infra-github-protections
           path: infra-github-protections # nome na pasta de destino dentro do runner
           token: "${{ secrets.GIT_TOKEN }}"
-      
-      - name: Checking folder
-        run: |
-          echo ${{ github.workspace }}
-          echo $GITHUB_WORKSPACE
-          cd infra-github-protections && ls
     
       - name: Terraform Init
         shell: bash
