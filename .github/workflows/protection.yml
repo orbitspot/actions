@@ -75,6 +75,7 @@ jobs:
     name: plan
     environment: ${{ github.ref_name }}
     runs-on: [timeflow, linux, self-hosted, x64]
+    needs: [terraform-init]
     permissions:
         id-token: write
         contents: read
@@ -94,6 +95,7 @@ jobs:
     name: apply
     environment: ${{ github.ref_name }}
     runs-on: [timeflow, linux, self-hosted, x64]
+    needs: [terraform-plan]
     permissions:
         id-token: write
         contents: read
