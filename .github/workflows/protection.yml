@@ -49,7 +49,7 @@ jobs:
         with:
             repository: orbitspot/infra-github-protections
             path: infra-github-protections # nome na pasta de destino dentro do runner
-            ref: "master"
+            # ref: "master"
       
       - name: Checking folder
         run: |
