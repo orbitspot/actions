@@ -27,7 +27,7 @@ jobs:
   terraform-init:
     name: init
     # environment: ${{ github.event.inputs.branch_name }}
-    runs-on: [commom, linux, self-hosted, x64]
+    runs-on: [outbound, linux, self-hosted, x64]
     permissions:
         id-token: write
         contents: read
