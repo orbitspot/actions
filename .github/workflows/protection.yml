@@ -18,11 +18,11 @@ on:
           - develop
           - homolog
 
-permissions:
-  contents: read
-# concurrency:
-#   group: '${{ github.workflow }}'
-#   cancel-in-progress: true
+# permissions:
+#   contents: read
+# # concurrency:
+# #   group: '${{ github.workflow }}'
+# #   cancel-in-progress: true
 
 jobs:
   terraform-init:
@@ -50,7 +50,6 @@ jobs:
           repository: orbitspot/infra-github-protections
           path: infra-github-protections # nome na pasta de destino dentro do runner
           token: "${{ secrets.GIT_TOKEN }}"
-            # ref: "master"
       
       - name: Checking folder
         run: |
@@ -64,7 +63,7 @@ jobs:
           TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
           TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
           TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-          TF_VAR_GITHUB_OWNER: "orbitspot"
+          TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }} }}"
         run: |
           cd infra-github-protections/terraform/
           terraform init -backend-config=bucket=terraform-orbit -backend-config=key=branch-protections/${{  github.event.inputs.repository_name }}/${{ github.event.inputs.branch_name }}.tfstate -backend-config=region=us-east-1 -no-color
@@ -75,7 +74,7 @@ jobs:
           TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
           TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
           TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-          TF_VAR_GITHUB_OWNER: "orbitspot"
+          TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }} }}"
         run: |
           cd infra-github-protections/terraform/
           terraform plan -no-color
@@ -86,7 +85,7 @@ jobs:
           TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
           TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
           TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-          TF_VAR_GITHUB_OWNER: "orbitspot"
+          TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }} }}"
         run: |
           cd infra-github-protections/terraform/
           terraform apply -auto-approve -no-color
