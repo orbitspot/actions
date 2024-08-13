@@ -52,7 +52,7 @@ jobs:
             aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
             aws_region: 'us-east-1'
             artifact_name: 'terraform'
-            terraform_directory: 'infra-github-protections/terraform/'
+            terraform_directory: '/opt/actions-runner/_work/actions/actions/infra-github-protections/terraform/'
     
   terraform-plan:
     name: plan
