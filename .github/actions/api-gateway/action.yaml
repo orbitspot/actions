@@ -34,6 +34,11 @@ runs:
         repository: 'orbitspot/actions'
         path: code
 
+  - name: Setup
+    uses: hashicorp/setup-terraform@v3
+    with:
+        terraform_version: "1.5.0"
+
   - name: Terraform Init
     shell: bash
     run: |
