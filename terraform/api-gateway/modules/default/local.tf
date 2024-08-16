@@ -55,14 +55,19 @@ locals {
         integration_response = {
             integration_response_status_code = "200"
             response_templates = {}
-            response_parameters = {}
+            response_parameters = {
+                "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token,token,X-Requested-With,Cache-Control,accesstoken'",
+                "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin"  = "'*'",
         }
         method_response = {
-            response_models = {
-                "application/json" = "Empty"
-            }
-            response_parameters = {}
             status_code = "200"
+            response_models = {}
+            response_parameters = {
+                "method.response.header.Access-Control-Allow-Headers" = true,
+                "method.response.header.Access-Control-Allow-Methods" = true,
+                "method.response.header.Access-Control-Allow-Origin" = true
+            }
         }
     }
 }
