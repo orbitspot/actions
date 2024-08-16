@@ -59,6 +59,7 @@ locals {
                 "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token,token,X-Requested-With,Cache-Control,accesstoken'",
                 "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
                 "method.response.header.Access-Control-Allow-Origin"  = "'*'",
+            }
         }
         method_response = {
             status_code = "200"
