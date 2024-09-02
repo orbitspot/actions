@@ -14,6 +14,10 @@ inputs:
     description: 'Artifact Name'
     required: true
     default: 'terraform'
+  terraform_directory:
+    description: 'Directory containing Terraform files'
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -37,6 +41,7 @@ runs:
       aws-region: ${{ inputs.aws_region }}
 
   - name: Download Artifact
+    if: ${{ inputs.artifact_name != '' }}
     uses: actions/download-artifact@v4
     with:
       name: ${{ inputs.artifact_name }}
@@ -52,9 +57,17 @@ runs:
     run: |
       chmod -R +x .
 
-  - name: Terraform Apply
+  - name: Terraform Plan
     shell: bash
+    if: ${{ inputs.terraform_directory == '' }}
     run: |
+      terraform plan -no-color | tee terraform_plan.log
+
+  - name: Terraform Plan
+    shell: bash
+    if: ${{ inputs.terraform_directory != '' }}
+    run: |
+      cd ${{ inputs.terraform_directory }}
       terraform plan -no-color | tee terraform_plan.log
 
   - name: Upload Terraform Plan Log
