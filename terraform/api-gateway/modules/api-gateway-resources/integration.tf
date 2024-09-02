@@ -11,4 +11,5 @@ resource "aws_api_gateway_integration" "default" {
     request_parameters        = var.integration.request_parameters
     request_templates         = var.integration.request_templates
     timeout_milliseconds      = var.timeout_milliseconds
+    passthrough_behavior      = "WHEN_NO_TEMPLATES"
 }

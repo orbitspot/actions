@@ -51,7 +51,6 @@ runs:
     with:
         node-version: '20'
 
-
   - uses: hashicorp/setup-terraform@v3
     name: setup
     with:
