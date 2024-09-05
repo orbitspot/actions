@@ -40,6 +40,12 @@ runs:
       cd code/terraform/api-gateway
       terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
 
+  - name: Terraform Destroy
+    shell: bash
+    run: |
+      ls -ltra
+      terraform destroy -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color -auto-approve
+  
   - name: Terraform Plan
     shell: bash
     run: |
