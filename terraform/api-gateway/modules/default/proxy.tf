@@ -4,7 +4,7 @@ module "proxy-get" {
   rest_api_id          = var.api_data.rest_api_id
   http_method          = "GET"
   method               = local.proxy.method
-  integration          = merge(local.proxy.integration, {integration_http_method = "POST"})
+  integration          = merge(local.proxy.integration_get, {integration_http_method = "POST"})
   integration_response = local.proxy.integration_response
   method_response      = local.proxy.method_response
   resource_id          = aws_api_gateway_resource.default.id
