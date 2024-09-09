@@ -27,24 +27,24 @@ locals {
             }
             request_templates = {
                 "application/json" = <<EOF
-#set($allParams = $input.params())
-#set($inputRoot = $input.path('$'))
-{
-"body-json" : $input.json('$'),
-"api-gateway-params" : {
-"context" : {
-    "authorizations": "$context.authorizer.authorizations"
-    },
-#foreach($type in $allParams.keySet())
-    #set($params = $allParams.get($type))
-"$type" : {
-    #foreach($paramName in $params.keySet())
-    "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
-        #if($foreach.hasNext),#end
-    #end
-}
-    #if($foreach.hasNext),#end
-#end
+#set($allParams = $input.params()) 
+#set($inputRoot = $input.path('$')) 
+{ 
+"body-json" : $input.json('$'), 
+"api-gateway-params" : { 
+"context" : { 
+     "authorizations": $context.authorizer.authorizations 
+    }, 
+#foreach($type in $allParams.keySet()) 
+    #set($params = $allParams.get($type)) 
+"$type" : { 
+    #foreach($paramName in $params.keySet()) 
+    "$paramName" : "$util.escapeJavaScript($params.get($paramName))" 
+        #if($foreach.hasNext),#end 
+    #end 
+} 
+    #if($foreach.hasNext),#end 
+#end 
 }
 }
                 EOF
@@ -53,17 +53,15 @@ locals {
         integration_response = {
             response_templates = {}
             response_parameters = {
-                "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token,token,X-Requested-With,Cache-Control,accesstoken'",
-                "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
                 "method.response.header.Access-Control-Allow-Origin"  = "'*'",
+                "method.response.header.content-type"                 = "'integration.response.header.Content-Type'",
             }
         }
         method_response = {
             response_models = {}
             response_parameters = {
-                "method.response.header.Access-Control-Allow-Headers" = true,
-                "method.response.header.Access-Control-Allow-Methods" = true,
                 "method.response.header.Access-Control-Allow-Origin" = true
+                "method.response.header.content-type" = true,
             }
         }
     }
