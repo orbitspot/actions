@@ -21,7 +21,7 @@ module "internal_docs_get" {
     request_templates = {}
   }
   integration_response = {
-    status_code = {"200" :  "*"}
+    status_code = {"200" :  ".*"}
     response_templates = {
       "application/json" = ""
     }
@@ -36,7 +36,7 @@ module "internal_docs_get" {
     response_parameters = {
       "method.response.header.Access-Control-Allow-Origin" = true
     }
-    status_code = {"200" :  "*"}
+    status_code = {"200" :  ".*"}
   }
   resource_id = aws_api_gateway_resource.internal_docs.id
 }
@@ -64,7 +64,7 @@ module "internal_docs_options" {
     }
   }
   integration_response = {
-    status_code = {"200" :  "*"}
+    status_code = {"200" :  ".*"}
     response_templates = {}
     response_parameters = {
       "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token,token,X-Requested-With,Cache-Control,accesstoken'",
@@ -73,7 +73,7 @@ module "internal_docs_options" {
     }
   }
   method_response = {
-    status_code = {"200" :  "*"}
+    status_code = {"200" :  ".*"}
     response_models = {}
     response_parameters = {
       "method.response.header.Access-Control-Allow-Headers" = true,
