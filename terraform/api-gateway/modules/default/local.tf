@@ -54,14 +54,14 @@ locals {
                 EOF
             }
         }
-        integration_response = {
+        integration_response_proxy = {
             response_templates = {}
             response_parameters = {
                 "method.response.header.Access-Control-Allow-Origin"  = "'*'",
                 "method.response.header.content-type"                 = "integration.response.header.Content-Type",
             }
         }
-        method_response = {
+        method_response_proxy = {
             response_models = {}
             response_parameters = {
                 "method.response.header.Access-Control-Allow-Origin" = true

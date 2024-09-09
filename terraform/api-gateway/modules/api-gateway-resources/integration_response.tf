@@ -17,8 +17,8 @@ resource "aws_api_gateway_integration_response" "proxy" {
     resource_id               = var.resource_id
     rest_api_id               = var.rest_api_id
     status_code               = each.key
-    response_templates        = var.integration_response.response_templates
-    response_parameters       = var.integration_response.response_parameters
+    response_templates        = var.integration_response_proxy.response_templates
+    response_parameters       = var.integration_response_proxy.response_parameters
     selection_pattern         = each.value
 }
 
