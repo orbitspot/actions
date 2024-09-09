@@ -21,7 +21,7 @@ module "internal_docs_get" {
     request_templates = {}
   }
   integration_response = {
-    integration_response_status_code = "200"
+    status_code = "200"
     response_templates = {
       "application/json" = ""
     }
@@ -64,7 +64,7 @@ module "internal_docs_options" {
     }
   }
   integration_response = {
-    integration_response_status_code = "200"
+    status_code = "200"
     response_templates = {}
     response_parameters = {
       "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token,token,X-Requested-With,Cache-Control,accesstoken'",
