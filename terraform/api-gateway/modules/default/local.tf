@@ -55,7 +55,7 @@ locals {
             }
         }
         integration_response = {
-            integration_response_status_code = 200
+            status_code = 200
             response_templates = {}
             response_parameters = {
                 "method.response.header.Access-Control-Allow-Origin"  = "'*'",
@@ -63,7 +63,7 @@ locals {
             }
         }
         method_response = {
-            method_response_status_code = 200
+            status_code = 200
             response_models = {}
             response_parameters = {
                 "method.response.header.Access-Control-Allow-Origin" = true
