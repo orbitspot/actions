@@ -30,9 +30,7 @@ locals {
 #set($allParams = $input.params())
 #set($inputRoot = $input.path('$'))
 {
-#foreach($key in $inputRoot.keySet())
-    "$key": "$inputRoot.get($key)"#if($foreach.hasNext()),#end
-#end,
+"body-json" : $input.json('$'),
 "api-gateway-params" : {
 "context" : {
     "authorizations": "$context.authorizer.authorizations"
