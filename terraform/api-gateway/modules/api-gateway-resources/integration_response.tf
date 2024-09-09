@@ -10,6 +10,7 @@ resource "aws_api_gateway_integration_response" "default" {
 }
 
 resource "aws_api_gateway_integration_response" "proxy" {
+    count                     = var.integration_response_proxy != "" ? 1 : 0
     for_each                  = var.regex_mapping
     
     depends_on                = [ aws_api_gateway_integration.default, aws_api_gateway_method.default, aws_api_gateway_method_response.default ]
