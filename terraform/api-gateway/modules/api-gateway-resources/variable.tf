@@ -23,13 +23,27 @@ variable "integration" {
     request_templates = map(string)
   })
 }
-variable "integration_response" {
+variable "integration_response_default" {
+  type = object({
+    integration_response_status_code = string
+    response_templates = map(string)
+    response_parameters = map(string)
+  })
+}
+variable "integration_response_proxy" {
   type = object({
     response_templates = map(string)
     response_parameters = map(string)
   })
 }
-variable "method_response" {
+variable "method_response_default" {
+  type = object({
+    method_response_status_code = string
+    response_models = map(string)
+    response_parameters = map(string)
+  })
+}
+variable "method_response_proxy" {
   type = object({
     response_models = map(string)
     response_parameters = map(string)

@@ -17,7 +17,7 @@ locals {
                 "integration.request.header.user-id" = "context.authorizer.userId"
                 "integration.request.header.token" = "''"
                 "integration.request.header.Accept-Encoding" = "identity"
-                "integration.request.header.x-http-method-override" = "integration.request.header.method"
+                "integration.request.header.x-http-method-override" = "'${var.path}'"
                 "integration.request.header.auths" = "context.authorizer.auths"
                 "integration.request.header.clienttenantid" = "context.authorizer.clienttenantid"
                 "integration.request.header.issupplier" = "context.authorizer.isSupplier"

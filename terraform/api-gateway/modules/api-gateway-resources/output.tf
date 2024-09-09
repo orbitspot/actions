@@ -6,13 +6,21 @@ output "integration" {
     value = aws_api_gateway_integration.default
 }
 
-output "method_response" {
+output "method_response_default" {
     value = aws_api_gateway_method_response.default
 }
+output "method_response_proxy" {
+    value = aws_api_gateway_method_response.proxy
+}
 
-output "integration_response" {
+output "integration_response_default" {
     value = aws_api_gateway_integration_response.default
 }
+
+output "integration_response_proxy" {
+    value = aws_api_gateway_integration_response.proxy
+}
+
 
 
 
