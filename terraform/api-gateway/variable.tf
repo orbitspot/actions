@@ -54,4 +54,5 @@ variable "docs" {
 
 variable "resource_name" {
   type = string
+  default = null
 }

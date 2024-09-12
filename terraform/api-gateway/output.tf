@@ -10,9 +10,6 @@ output "repository_name" {
   value = var.repository_name
 }
 
-output "resource_name" {
-  value = var.resource_name
-}
 
 output "hosts" {
   value = var.hosts
