@@ -23,7 +23,7 @@ variable "docs" {
   type = string
 }
 
-variable "resource_path" {
+variable "resource_name" {
   type = string
   default = null
 }
