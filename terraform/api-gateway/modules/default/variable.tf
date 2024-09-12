@@ -22,3 +22,8 @@ variable "istio_enabled" {
 variable "docs" {
   type = string
 }
+
+variable "resource_path" {
+  type = string
+  default = null
+}

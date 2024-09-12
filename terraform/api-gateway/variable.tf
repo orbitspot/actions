@@ -2,11 +2,6 @@ variable "branch" {
   type = string
 }
 
-variable "resource_name" {
-  type = string
-  default = null
-}
-
 variable "repository_name" {
   type = string
 }
