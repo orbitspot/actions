@@ -51,3 +51,8 @@ variable "docs" {
   type = string
   default = "api-json"
 }
+
+variable "resource_name" {
+  type = string
+  default = null
+}
