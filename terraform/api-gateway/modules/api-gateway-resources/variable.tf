@@ -38,18 +38,6 @@ variable "method_response" {
   })
 }
 
-# variable "regex_mapping" {
-#   type = map(string)
-#   default = {
-#     "200" = "20[0-35-9]",
-#     "201" = "201",
-#     "204" = "204" ,
-#     "400" = "40[0-25-9]",
-#     "403" = "403",
-#     "404" = "404",
-#     "500" = "5*"
-#   }
-# }
 variable "resource_id" {
   type = string
 }
