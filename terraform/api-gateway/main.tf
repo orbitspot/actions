@@ -11,6 +11,7 @@ module "api-gateway-first" {
     path = local.api_gateway_resource
     istio_enabled = var.istio_enabled
     docs = var.docs
+    resource_name = var.resource_name
 }
 
 module "api-gateway-second" {
@@ -20,5 +21,6 @@ module "api-gateway-second" {
     path = local.api_gateway_resource
     istio_enabled = var.istio_enabled
     docs = var.docs
+    resource_name = var.resource_name
 }
 
