@@ -10,6 +10,12 @@ inputs:
   aws_region: 
     description: 'Aws region'
     required: true
+  co_login_file_name:
+    description: 'co login file name'
+    required: false
+    default: 'co_login_commands.txt'
+
+
 runs:
   using: composite
   steps:
@@ -27,5 +33,12 @@ runs:
 
   - name: Log in to CodeArtifact
     shell: bash
-    run: aws codeartifact login --tool npm --repository packages --domain seidor --namespace @seidor --dry-run > co_login_commands.txt
+    if: inputs.co_login_file_name != ''
+    run: aws codeartifact login --tool npm --repository packages --domain seidor --namespace @seidor --dry-run > ${{ inputs.co_login_file_name }}
+
+
+  - name: Log in to CodeArtifact without file
+    shell: bash
+    if: inputs.co_login_file_name == ''
+    run: aws codeartifact login --tool npm --repository packages --domain seidor --namespace @seidor --dry-run
 
