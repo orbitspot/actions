@@ -14,6 +14,10 @@ inputs:
     description: 'Artifact Name'
     required: true
     default: 'terraform'
+  terraform_directory:
+    description: 'Directory containing Terraform files'
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -46,6 +50,14 @@ runs:
     run: chmod -R +x .
 
   - name: Terraform Apply
+    shell: bash
+    if: ${{ inputs.terraform_directory != '' }}
+    run: |
+      cd ${{ inputs.terraform_directory }}
+      terraform apply -auto-approve -no-color
+
+  - name: Terraform Apply
+    if: ${{ inputs.terraform_directory == '' }}
     shell: bash
     run: |
       terraform apply -auto-approve -no-color
