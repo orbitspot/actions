@@ -58,7 +58,6 @@ runs:
       chmod -R +x .
 
   - name: Terraform Init
-    if: ${{ inputs.terraform_directory != '' }}
     shell: bash
     run: |
       cd ${{ inputs.terraform_directory }}
