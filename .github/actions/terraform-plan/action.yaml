@@ -57,6 +57,15 @@ runs:
     run: |
       chmod -R +x .
 
+  - name: Terraform Init
+    if: ${{ inputs.terraform_directory != '' }}
+    shell: bash
+    run: |
+      cd ${{ inputs.terraform_directory }}
+      ls -ltra
+      terraform version
+      terraform init -reconfigure -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
+
   - name: Terraform Plan
     shell: bash
     if: ${{ inputs.terraform_directory == '' }}
