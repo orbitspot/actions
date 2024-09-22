@@ -60,10 +60,9 @@ runs:
   - name: Terraform Init
     shell: bash
     run: |
-      cd ${{ inputs.terraform_directory }}
       ls -ltra
       terraform version
-      terraform init -reconfigure -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
+      terraform init -reconfigure -backend-config=bucket=terraform-orbit -backend-config=key=development/pdf-service/infrastructure.tfstate -backend-config=region=us-east-1 -no-color
 
   - name: Terraform Plan
     shell: bash
