@@ -45,10 +45,23 @@ runs:
     with:
       name: ${{ inputs.artifact_name }}
 
+  - name: Show Files
+    shell: bash
+    run: |
+      ls -ltra
+  
+
   - name: Set permissions for Terraform providers
     shell: bash
     run: chmod -R +x .
 
+  - name: Terraform Init
+    shell: bash
+    run: |
+      ls -ltra
+      terraform version
+      terraform init -reconfigure -backend-config=bucket=terraform-orbit -backend-config=key=development/pdf-service/infrastructure.tfstate -backend-config=region=us-east-1 -no-color
+      
   - name: Terraform Apply
     shell: bash
     if: ${{ inputs.terraform_directory != '' }}
