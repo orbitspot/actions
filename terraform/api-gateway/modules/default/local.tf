@@ -109,8 +109,12 @@ locals {
             }
             response_templates = {}
             response_parameters = {
-                "method.response.header.Access-Control-Allow-Origin"  = "'*'",
-                "method.response.header.content-type"                 = "integration.response.header.Content-Type",
+                "method.response.header.Access-Control-Allow-Origin" = "'*'",
+                "method.response.header.content-type"                = "integration.response.header.Content-Type",
+                "method.response.header.Content-Encoding"            = "integration.response.header.Content-Encoding",
+                "method.response.header.Vary"                        = "integration.response.header.Vary",
+                "method.response.header.Transfer-Encoding"           = "integration.response.header.Transfer-Encoding",
+                "method.response.header.Content-Disposition"         = "integration.response.header.Content-Disposition",
             }
         }
         method_response = {
@@ -126,7 +130,11 @@ locals {
             response_models = {}
             response_parameters = {
                 "method.response.header.Access-Control-Allow-Origin" = true
-                "method.response.header.content-type" = true,
+                "method.response.header.content-type"                = true,
+                "method.response.header.Content-Encoding"            = true,
+                "method.response.header.Vary"                        = true,
+                "method.response.header.Transfer-Encoding"           = true,
+                "method.response.header.Content-Disposition"         = true,
             }
         }
     }
