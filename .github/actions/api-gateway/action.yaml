@@ -17,6 +17,11 @@ inputs:
     description: 'Bucket'
     required: true
     default: 'terraform-orbit'
+  tag:
+    description: 'Bucket'
+    required: true
+    default: ''
+
 runs:
   using: composite
   steps:
@@ -30,9 +35,19 @@ runs:
 
   - name: Checkout code
     uses: actions/checkout@v4
+    if: inputs.tag != ''
     with:
         repository: 'orbitspot/actions'
         path: code
+        ref: '${{ inputs.tag }}'
+
+  - name: Checkout code
+    uses: actions/checkout@v4
+    if: inputs.tag == ''
+    with:
+        repository: 'orbitspot/actions'
+        path: code
+
 
   - name: Terraform Init
     shell: bash
