@@ -56,3 +56,8 @@ variable "resource_name" {
   type = string
   default = null
 }
+
+variable "refactory_name_service" {
+  type = bool
+  default = false
+}
