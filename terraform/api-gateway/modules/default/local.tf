@@ -14,7 +14,7 @@ locals {
             uri = "${var.load_balancer}/{proxy}"
             type = "HTTP"
             request_parameters = {
-                "integration.request.header.user-id" = "context.authorizer.userId"
+                "integration.request.header.userid" = "context.authorizer.userId"
                 "integration.request.header.token" = "''"
                 "integration.request.header.Accept-Encoding" = "'identity'"
                 "integration.request.header.auths" = "context.authorizer.auths"
@@ -57,7 +57,7 @@ locals {
             uri = "${var.load_balancer}/{proxy}"
             type = "HTTP"
             request_parameters = {
-                "integration.request.header.user-id" = "context.authorizer.userId"
+                "integration.request.header.userid" = "context.authorizer.userId"
                 "integration.request.header.token" = "''"
                 "integration.request.header.Accept-Encoding" = "'identity'"
                 "integration.request.header.x-http-method-override" = "'GET'"
