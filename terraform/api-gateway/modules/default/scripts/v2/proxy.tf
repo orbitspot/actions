@@ -82,7 +82,7 @@ module "proxy-option" {
     }
   }
   method_response = {
-    status_code = "200"
+    status_code = {"200" : ""}
     response_models = {}
     response_parameters = {
       "method.response.header.Access-Control-Allow-Headers" = true,

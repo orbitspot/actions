@@ -39,7 +39,7 @@ locals {
                 "application/json" = "Empty"
             }
             response_parameters = {}
-            status_code = "200"
+            status_code = {"200" : ""}
         }
     }
 }
