@@ -11,6 +11,3 @@ output "rest_api_id" {
   value = var.api_data.rest_api_id
 }
 
-output "resource_data" {
-    value = module.proxy-delete
-}
