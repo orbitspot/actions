@@ -1,19 +1,17 @@
 locals {
 
     proxy = {
-        method = var.apply_response_script ? local.proxy_with_scripts.method : local.proxy_without_scripts.method
-        integration_get = var.apply_response_script ? local.proxy_with_scripts.integration_get : local.proxy_without_scripts.integration
-        integration = var.apply_response_script ? local.proxy_with_scripts.integration : local.proxy_without_scripts.integration
+        method               = var.apply_response_script ? local.proxy_with_scripts.method : local.proxy_without_scripts.method
+        integration_get      = var.apply_response_script ? local.proxy_with_scripts.integration_get : local.proxy_without_scripts.integration
+        integration          = var.apply_response_script ? local.proxy_with_scripts.integration : local.proxy_without_scripts.integration
 
-        # Garantindo que response_parameters tenha a mesma estrutura nos dois casos
         integration_response = var.apply_response_script ?
-          merge(local.proxy_with_scripts.integration_response, { response_parameters = merge(local.proxy_without_scripts.integration_response.response_parameters, {}) }) :
-          merge(local.proxy_without_scripts.integration_response, { response_parameters = merge(local.proxy_with_scripts.integration_response.response_parameters, {}) })
+          merge(local.proxy_with_scripts.integration_response, { response_parameters = local.proxy_with_scripts.integration_response.response_parameters }) :
+          merge(local.proxy_without_scripts.integration_response, { response_parameters = { "method.response.header.Access-Control-Allow-Origin" = "*" } })
 
-        # Garantindo que response_models tenha a mesma estrutura nos dois casos
         method_response = var.apply_response_script ?
-          merge(local.proxy_with_scripts.method_response, { response_models = merge(local.proxy_without_scripts.method_response.response_models, {}) }) :
-          merge(local.proxy_without_scripts.method_response, { response_models = merge(local.proxy_with_scripts.method_response.response_models, {}) })
+          merge(local.proxy_with_scripts.method_response, { response_models = local.proxy_with_scripts.method_response.response_models }) :
+          merge(local.proxy_without_scripts.method_response, { response_models = { "application/json" = "Empty" } })
     }
     proxy_without_scripts = {
         method = {
