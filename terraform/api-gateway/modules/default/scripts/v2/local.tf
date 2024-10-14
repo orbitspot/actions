@@ -30,6 +30,7 @@ locals {
             }
         }
         integration_response = {
+            status_code = {"200" : ""}
             integration_response_status_code = "200"
             response_templates = {}
             response_parameters = {}
