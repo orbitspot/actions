@@ -1,6 +1,12 @@
 locals {
 
-    proxy = var.apply_response_script ? local.proxy_with_scripts : local.proxy_without_scripts
+    proxy = {
+        method = var.apply_response_script ? local.proxy_with_scripts.method : local.proxy_without_scripts.method
+        integration_get = var.apply_response_script ? local.proxy_with_scripts.integration_get : local.proxy_without_scripts.integration
+        integration = var.apply_response_script ? local.proxy_with_scripts.integration : local.proxy_without_scripts.integration
+        integration_response = var.apply_response_script ? local.proxy_with_scripts.integration_response : local.proxy_without_scripts.integration_response
+        method_response = var.apply_response_script ? local.proxy_with_scripts.method_response : local.proxy_without_scripts.method_response
+    }
 
     proxy_without_scripts = {
         method = {
