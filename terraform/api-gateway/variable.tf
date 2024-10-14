@@ -61,3 +61,8 @@ variable "refactory_name_service" {
   type = bool
   default = false
 }
+
+variable "apply_response_script" {
+  type = bool
+  default = true
+}

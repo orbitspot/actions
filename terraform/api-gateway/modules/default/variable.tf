@@ -25,3 +25,7 @@ variable "docs" {
 variable "resource_name" {
   type = string
 }
+
+variable "apply_response_script" {
+  type = bool
+}

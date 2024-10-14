@@ -21,6 +21,9 @@ inputs:
     description: 'Bucket'
     required: true
     default: ''
+  apply_response_script:
+    description: 'Apply new scripts on integration'
+    required: false
 
 runs:
   using: composite
@@ -57,12 +60,16 @@ runs:
       
   - name: Terraform Plan
     shell: bash
+    env:
+      TF_VAR_apply_response_script: ${{ inputs.apply_response_script }}
     run: |
       cd code/terraform/api-gateway
       terraform plan -no-color
 
   - name: Terraform Apply
     shell: bash
+    env:
+      TF_VAR_apply_response_script: ${{ inputs.apply_response_script }}
     run: |
       cd code/terraform/api-gateway
       terraform apply -auto-approve -no-color

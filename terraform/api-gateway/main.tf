@@ -12,6 +12,7 @@ module "api-gateway-first" {
     istio_enabled = var.istio_enabled
     docs = var.docs
     resource_name = var.resource_name
+    apply_response_script = var.apply_response_script
 }
 
 module "api-gateway-second" {
@@ -22,5 +23,6 @@ module "api-gateway-second" {
     istio_enabled = var.istio_enabled
     docs = var.docs
     resource_name = var.resource_name
+    apply_response_script = var.apply_response_script
 }
 
