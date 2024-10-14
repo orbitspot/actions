@@ -1,26 +1,9 @@
-module "v1" {
-    count = var.apply_response_script ? 1 : 0
-    source = "./scripts/v1"
-    load_balancer = var.load_balancer
-    path = var.path
-    custom_authorizer = var.api_data.custom_authorizer
-}
-
-module "v2" {
-    count = var.apply_response_script ? 0 : 1
-    source = "./scripts/v2"
-    load_balancer = var.load_balancer
-    path = var.path
-    custom_authorizer = var.api_data.custom_authorizer
-}
-
-
 locals {
 
     proxy = {
         method = {
             authorization = "CUSTOM"
-            authorizer_id = var.api_data.custom_authorizer
+            authorizer_id = var.custom_authorizer
             request_method_api_key_required = false
             request_parameters = {
                 "method.request.path.proxy" = true
