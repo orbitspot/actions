@@ -4,10 +4,9 @@ locals {
         method = var.apply_response_script ? local.proxy_with_scripts.method : local.proxy_without_scripts.method
         integration_get = var.apply_response_script ? local.proxy_with_scripts.integration_get : local.proxy_without_scripts.integration
         integration = var.apply_response_script ? local.proxy_with_scripts.integration : local.proxy_without_scripts.integration
-        integration_response = var.apply_response_script ? local.proxy_with_scripts.integration_response : local.proxy_without_scripts.integration_response
-        method_response = var.apply_response_script ? local.proxy_with_scripts.method_response : local.proxy_without_scripts.method_response
+        integration_response = var.apply_response_script ? merge(local.proxy_with_scripts.integration_response, { response_parameters = {} }) : merge(local.proxy_without_scripts.integration_response, { response_parameters = { "method.response.header.Access-Control-Allow-Origin" = null } })
+        method_response = var.apply_response_script ? merge(local.proxy_with_scripts.method_response, { response_models = {} }) : merge(local.proxy_without_scripts.method_response, { response_models = { "application/json" = null } })
     }
-
     proxy_without_scripts = {
         method = {
             authorization = "CUSTOM"
