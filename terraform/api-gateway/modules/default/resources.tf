@@ -1,6 +1,6 @@
 resource "aws_api_gateway_resource" "default" {
   parent_id     = var.api_data.parent_id
-  path_part     = var.resource_name != null ? var.resource_name : var.path
+  path_part     = var.path
   rest_api_id   = var.api_data.rest_api_id
 }
 
@@ -13,6 +13,6 @@ resource "aws_api_gateway_resource" "proxy" {
 
 resource "aws_api_gateway_resource" "internal_docs" {
   parent_id   = data.aws_api_gateway_resource.internal_docs.id
-  path_part   = var.resource_name != null ? var.resource_name : var.path
+  path_part   = var.path
   rest_api_id = var.api_data.rest_api_id
 }
