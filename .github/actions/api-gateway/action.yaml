@@ -23,6 +23,7 @@ inputs:
     default: ''
   apply_response_script:
     description: 'Apply new scripts on integration'
+    default: true
     required: false
 
 runs:
