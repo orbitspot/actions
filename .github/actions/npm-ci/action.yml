@@ -33,7 +33,7 @@ runs:
 
   - name: Npm Install
     shell: bash
-    if: inputs.install
+    if: inputs.install == 'true'
     run: |
         npm install --loglevel verbose
 
