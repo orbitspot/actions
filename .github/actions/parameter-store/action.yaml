@@ -17,17 +17,8 @@ inputs:
     description: 'Bucket'
     required: true
     default: 'terraform-orbit'
-  variables:
-    description: 'Variables'
-    required: true
-  secrets:
-    description: 'Secrets'
-    required: true
 runs:
   using: composite
-  env:
-    TF_VAR_vars: ${{ inputs.variables }}
-    TF_VAR_secrets: ${{ inputs.secrets }}
   steps:
 
   - name: configure aws credentials
