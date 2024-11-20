@@ -46,4 +46,4 @@ runs:
         echo "Generated JSON: $result_json"
       
         # Define o output do step
-        echo "result=$result_json" >> $GITHUB_OUTPUT
+        echo "$result_json" >> content.json
