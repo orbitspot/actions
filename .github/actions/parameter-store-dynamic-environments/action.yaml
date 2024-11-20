@@ -12,7 +12,6 @@ runs:
   steps:
   - name: Generate JSON and set output
     shell: bash
-    if: ${{ inputs.kind == 'vars' }}
     run: |
         # Remove os colchetes da string
         keys=${{ inputs.keys }}
