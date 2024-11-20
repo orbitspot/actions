@@ -1,0 +1,85 @@
+name: 'Parameter Store'
+description: 'Parameter store'
+inputs:
+  keys:
+    description: 'Environment Keys'
+    required: true
+
+  kind:
+    description: 'vars or secrets'
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Generate JSON and set output
+    shell: bash
+    if: ${{ inputs.kind == 'vars' }}
+    run: |
+        # Remove os colchetes da string
+        keys=${{ inputs.keys }}
+        keys=$(echo $keys | sed 's/^\[\|]$//g')
+
+        # JSON contendo todas as variáveis de vars
+        vars_json='${{ toJson(vars) }}'
+
+        # Inicializa o JSON
+        result_json="{"
+
+        # Converte a string em um array
+        IFS=',' read -r -a array <<< "$keys"
+
+        # Itera sobre os elementos do array
+        for index in "${!array[@]}"; do
+            key=$(echo "${array[$index]}" | tr -d '"') # Remove aspas
+            value=$(echo "$vars_json" | jq -r ".\"$key\" // empty") # Obtém o valor da chave
+
+            # Só adiciona se o valor não estiver vazio
+            if [ -n "$value" ]; then
+                # Adiciona ao JSON
+                result_json="$result_json\"$key\":\"$value\","
+            fi
+        done
+
+        # Remove a última vírgula e fecha o JSON
+        result_json=$(echo "$result_json" | sed 's/,$//')
+        result_json="$result_json}"
+
+        # Define o output do step
+        echo "result=$result_json" >> $GITHUB_OUTPUT
+
+  - name: Generate JSON and set output
+    shell: bash
+    if: ${{ inputs.kind == 'secrets' }}
+    run: |
+        # Remove os colchetes da string
+        keys=${{ inputs.keys }}
+        keys=$(echo $keys | sed 's/^\[\|]$//g')
+
+        # JSON contendo todas as variáveis de vars
+        vars_json='${{ toJson(secrets) }}'
+
+        # Inicializa o JSON
+        result_json="{"
+
+        # Converte a string em um array
+        IFS=',' read -r -a array <<< "$keys"
+
+        # Itera sobre os elementos do array
+        for index in "${!array[@]}"; do
+            key=$(echo "${array[$index]}" | tr -d '"') # Remove aspas
+            value=$(echo "$vars_json" | jq -r ".\"$key\" // empty") # Obtém o valor da chave
+
+            # Só adiciona se o valor não estiver vazio
+            if [ -n "$value" ]; then
+                # Adiciona ao JSON
+                result_json="$result_json\"$key\":\"$value\","
+            fi
+        done
+
+        # Remove a última vírgula e fecha o JSON
+        result_json=$(echo "$result_json" | sed 's/,$//')
+        result_json="$result_json}"
+
+        # Define o output do step
+        echo "result=$result_json" >> $GITHUB_OUTPUT
