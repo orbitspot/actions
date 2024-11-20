@@ -41,6 +41,9 @@ runs:
         # Remove a última vírgula e fecha o JSON
         result_json=$(echo "$result_json" | sed 's/,$//')
         result_json="$result_json}"
-
+      
+        # Debug para verificar o JSON gerado
+        echo "Generated JSON: $result_json"
+      
         # Define o output do step
         echo "result=$result_json" >> $GITHUB_OUTPUT
