@@ -50,18 +50,17 @@ runs:
     shell: bash
     run: |
       cd code/terraform/parameter-store
-      ls -ltra
       terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=parameter-store/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
       
-#  - name: Terraform Plan
-#    shell: bash
-#    run: |
-#      cd code/terraform/parameter-store
-#      terraform plan -no-color
+  - name: Terraform Plan
+    shell: bash
+    run: |
+      cd code/terraform/parameter-store
+      terraform plan -no-color
 
-#  - name: Terraform Apply
-#    shell: bash
-#    run: |
-#      cd code/terraform/parameter-store
-#      terraform apply -auto-approve -no-color
+  - name: Terraform Apply
+    shell: bash
+    run: |
+      cd code/terraform/parameter-store
+      terraform apply -auto-approve -no-color
 
