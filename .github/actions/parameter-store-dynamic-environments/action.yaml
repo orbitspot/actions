@@ -10,6 +10,9 @@ inputs:
   file_name:
     description: 'file name'
     required: true
+  encrypt:
+    description: 'file name'
+    required: true
 runs:
   using: composite
   steps:
@@ -55,7 +58,7 @@ runs:
   - name: Encrypt the file
     shell: bash
     run: |
-      openssl enc -aes-256-cbc -salt -in content.json -out content.json.enc -k ${{ secrets.PARAMETERS_ENCRYPT_HASH }}
+      openssl enc -aes-256-cbc -salt -in content.json -out content.json.enc -k ${{ inputs.encrypt }}
 
   - name: Upload encrypted artifact
     uses: actions/upload-artifact@v4
