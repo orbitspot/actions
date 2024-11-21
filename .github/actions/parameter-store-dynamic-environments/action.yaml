@@ -58,7 +58,7 @@ runs:
       openssl enc -aes-256-cbc -salt -in content.json -out content.json.enc -k ${{ secrets.PARAMETERS_ENCRYPT_HASH }}
 
   - name: Upload encrypted artifact
-    uses: actions/upload-artifact@v3
+    uses: actions/upload-artifact@v4
     with:
       name: ${{ inputs.file_name }}
       path: content.json.enc
