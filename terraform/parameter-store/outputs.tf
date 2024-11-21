@@ -1,7 +1,7 @@
 output "secrets" {
-  value = var.secrets
+  value = local.secrets
 }
 
 output "vars" {
-  value = var.vars
+  value = local.variables
 }
