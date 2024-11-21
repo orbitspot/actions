@@ -12,7 +12,7 @@ inputs:
     required: true
   encrypt:
     description: 'file name'
-    required: true
+    required: false
 runs:
   using: composite
   steps:
@@ -55,13 +55,14 @@ runs:
         echo "$result_json" >> ${{ inputs.file_name }}.json
 
 
-  - name: Encrypt the file
-    shell: bash
-    run: |
-      openssl enc -aes-256-cbc -salt -in ${{ inputs.file_name }}.json -out ${{ inputs.file_name }}.json.enc -k ${{ inputs.encrypt }}
+#  - name: Encrypt the file
+#    shell: bash
+#    run: |
+#      openssl enc -aes-256-cbc -salt -in ${{ inputs.file_name }}.json -out ${{ inputs.file_name }}.json.enc -k ${{ inputs.encrypt }}
 
   - name: Upload encrypted artifact
     uses: actions/upload-artifact@v4
     with:
       name: ${{ inputs.file_name }}
-      path: ${{ inputs.file_name }}.json.enc
+      path: ${{ inputs.file_name }}.json
+      retention-days: 1
