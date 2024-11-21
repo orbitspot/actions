@@ -7,6 +7,9 @@ inputs:
   environment_json:
     description: 'environment values'
     required: true
+  file_name:
+    description: 'file name'
+    required: true
 runs:
   using: composite
   steps:
@@ -47,3 +50,15 @@ runs:
       
         # Define o output do step
         echo "$result_json" >> content.json
+
+
+  - name: Encrypt the file
+    shell: bash
+    run: |
+      openssl enc -aes-256-cbc -salt -in content.json -out content.json.enc -k ${{ secrets.PARAMETERS_ENCRYPT_HASH }}
+
+  - name: Upload encrypted artifact
+    uses: actions/upload-artifact@v3
+    with:
+      name: ${{ inputs.file_name }}
+      path: content.json.enc
