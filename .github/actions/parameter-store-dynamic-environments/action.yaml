@@ -55,11 +55,6 @@ runs:
         echo "$result_json" >> ${{ inputs.file_name }}.json
 
 
-#  - name: Encrypt the file
-#    shell: bash
-#    run: |
-#      openssl enc -aes-256-cbc -salt -in ${{ inputs.file_name }}.json -out ${{ inputs.file_name }}.json.enc -k ${{ inputs.encrypt }}
-
   - name: Upload encrypted artifact
     uses: actions/upload-artifact@v4
     with:
