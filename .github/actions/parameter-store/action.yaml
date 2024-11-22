@@ -17,6 +17,18 @@ inputs:
     description: 'Bucket'
     required: true
     default: 'terraform-orbit'
+  modulo:
+    description: 'Module'
+    required: true
+  versionament:
+    description: 'Versionament'
+    required: true
+  repository:
+    description: 'Repository'
+    required: true
+
+
+
 runs:
   using: composite
   steps:
