@@ -20,9 +20,6 @@ inputs:
   modulo:
     description: 'Module'
     required: true
-  versionament:
-    description: 'Versionament'
-    required: true
   repository:
     description: 'Repository'
     required: true
@@ -66,12 +63,19 @@ runs:
       
   - name: Terraform Plan
     shell: bash
+    env:
+      TF_VAR_modulo: ${{ inputs.modulo }}
+      TF_VAR_repository: ${{ inputs.repository }}
+
     run: |
       cd code/terraform/parameter-store
       terraform plan -no-color
 
   - name: Terraform Apply
     shell: bash
+    env:
+      TF_VAR_modulo: ${{ inputs.modulo }}
+      TF_VAR_repository: ${{ inputs.repository }}
     run: |
       cd code/terraform/parameter-store
       terraform apply -auto-approve -no-color
