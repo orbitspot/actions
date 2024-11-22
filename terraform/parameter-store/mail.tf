@@ -15,7 +15,7 @@
 
  resource "aws_ssm_parameter" "scrts" {
    for_each    = {
-     for index, value in local.variables : index => value
+     for index, value in local.secrets : index => value
    }
    name        = "/${var.repository}/secret/${each.key}"
    description = "Secret ${each.value} from module ${var.modulo}"
