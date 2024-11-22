@@ -2,7 +2,7 @@
    for_each    = {
      for index, value in local.variables : index => value
    }
-   name        = "/${var.repository}/environment/${var.versionament}/${each.key}"
+   name        = "/${var.repository}/environment/${each.key}"
    description = "Environment ${each.value} from module ${var.modulo}"
    type        = "String"
    value       = each.value
@@ -17,7 +17,7 @@
    for_each    = {
      for index, value in local.variables : index => value
    }
-   name        = "/${var.repository}/secret/${var.versionament}/${each.key}"
+   name        = "/${var.repository}/secret/${each.key}"
    description = "Secret ${each.value} from module ${var.modulo}"
    type        = "SecureString"
    value       = each.value
