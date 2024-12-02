@@ -54,6 +54,11 @@ runs:
     with:
         name: secrets
         path: code/terraform/parameter-store
+  
+  - uses: hashicorp/setup-terraform@v3
+    name: setup
+    with:
+        terraform_version: "1.5.0"
 
   - name: Terraform Init
     shell: bash
