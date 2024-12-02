@@ -7,6 +7,7 @@
    type        = "String"
    value       = each.value
    tier        = "Standard"
+   overwrite   = true # na proxima versão será removido, mas usar ele por enquanto
    tags = {
      Version = var.versionament
      "orbit:modulo": var.modulo
@@ -22,6 +23,7 @@
    type        = "SecureString"
    value       = each.value
    tier        = "Standard"
+   overwrite   = true # na proxima versão será removido, mas usar ele por enquanto
    tags = {
      Version = var.versionament
      "orbit:modulo": var.modulo
