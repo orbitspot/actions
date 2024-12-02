@@ -55,6 +55,11 @@ runs:
         name: secrets
         path: code/terraform/parameter-store
   
+  - name: Set up Node.js
+    uses: actions/setup-node@v4
+    with:
+        node-version: '20'
+
   - uses: hashicorp/setup-terraform@v3
     name: setup
     with:
@@ -63,7 +68,8 @@ runs:
   - name: Terraform Init
     shell: bash
     run: |
-      cd code/terraform/parameter-store
+      ls
+      cd code/terraform/parameter-store && ls
       terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=parameter-store/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
       
   - name: Terraform Plan
