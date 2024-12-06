@@ -1,5 +1,5 @@
 output "secrets" {
-  value = local.secrets
+  value = replace(local.secrets, "$$", "$")
 }
 
 output "vars" {
