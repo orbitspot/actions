@@ -36,12 +36,12 @@ runs:
         for index in "${!array[@]}"; do
             key=$(echo "${array[$index]}" | tr -d '"') # Remove aspas
             value=$(echo "$vars_json" | jq -r ".\"$key\" // empty") # Obtém o valor da chave
-            value=${$value//\$/\\\$} # escapa $
+            escaped_value="${value//\$/\\\$}" # escapa $
 
             # Só adiciona se o valor não estiver vazio
-            if [ -n "$value" ]; then
+            if [ -n "$escaped_value" ]; then
                 # Adiciona ao JSON
-                result_json="$result_json\"$key\":\"$value\","
+                result_json="$result_json\"$key\":\"$escaped_value\","
             fi
         done
 
