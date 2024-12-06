@@ -21,7 +21,7 @@
    name        = "/${var.repository}/secret/${each.key}"
    description = "Secret ${each.value} from module ${var.modulo}"
    type        = "SecureString"
-   value       = each.value
+   value       = replace(each.value, "$$", "$")
    tier        = "Standard"
    overwrite   = true # na proxima versão será removido, mas usar ele por enquanto
    tags = {
