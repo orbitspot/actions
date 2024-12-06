@@ -1,4 +1,4 @@
 locals {
   variables = jsondecode(file("variables.json"))
-  secrets = jsondecode(replace(file("secrets.json"), "/$", "$$"))
+  secrets = replace(jsondecode(file("secrets.json")), "/$", "$$")
 }
