@@ -1,0 +1,74 @@
+name: 'Validate env'
+description: 'validates env'
+inputs:
+  ENV:
+    description: 'Account Number'
+    required: true
+  AWS_REGION:
+    description: 'Aws role with polices to deploy'
+    required: true
+  ENVIRONMENT:
+    description: 'Aws region'
+    required: true
+  CLUSTER_NAME:
+    description: 'Artifact Name'
+    required: true
+    default: 'terraform'
+  CLUSTER_REGION:
+    description: 'State file Terraform'
+    required: true
+  CURRENT_ENVIROMENT:
+    description: 'Bucket Terraform'
+    required: true
+  _POLICY_JSON:
+    description: 'Directory containing Terraform files'
+    required: true
+  _PROPERTIES:
+    description: 'Directory containing Terraform files'
+    required: true
+  OIDC_PROVIDER:
+    description: 'Directory containing Terraform files'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: validate environments
+      shell: bash
+      run: |
+          if [ -z "${{ inputs.ENV }}" ]; then
+              echo "Error: Variable is empty"
+              exit 1
+          fi
+          if [ -z "${{ inputs.AWS_REGION }}" ]; then
+              echo "Error: Variable is empty"
+              exit 1
+          fi
+          if [ -z "${{ inputs.ENVIRONMENT }}" ]; then
+              echo "Error: Variable is empty"
+              exit 1
+          fi
+          if [ -z "${{ inputs.CLUSTER_NAME }}" ]; then
+              echo "Error: Variable is empty"
+              exit 1
+          fi
+          if [ -z "${{ inputs.CLUSTER_REGION }}" ]; then
+              echo "Error: Variable is empty"
+              exit 1
+          fi
+          if [ -z "${{ inputs.CURRENT_ENVIROMENT }}" ]; then
+              echo "Error: Variable is empty"
+              exit 1
+          fi
+          if [ -z "${{ inputs._POLICY_JSON }}" ]; then
+              echo "Error: Variable is empty"
+              exit 1
+          fi
+          if [ -z "${{ inputs._PROPERTIES }}" ]; then
+              echo "Error: Variable is empty"
+              exit 1
+          fi
+          if [ -z "${{ inputs.OIDC_PROVIDER }}" ]; then
+              echo "Error: Variable is empty"
+              exit 1
+          fi
