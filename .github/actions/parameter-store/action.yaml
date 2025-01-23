@@ -55,15 +55,17 @@ runs:
         name: secrets
         path: code/terraform/parameter-store
   
-  - name: Set up Node.js
-    uses: actions/setup-node@v4
-    with:
-        node-version: '20'
+  - name: Install Terraform
+    shell: bash
+    run: |
+      curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+      sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+      sudo apt-get update && sudo apt-get install terraform
+      terraform --version
 
-  - uses: hashicorp/setup-terraform@v3
-    name: setup
-    with:
-        terraform_version: "1.5.0"
+  - name: Verify Terraform Installation
+    shell: bash
+    run: terraform --version
 
   - name: Terraform Init
     shell: bash
