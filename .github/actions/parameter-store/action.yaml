@@ -79,10 +79,9 @@ runs:
     env:
       TF_VAR_modulo: ${{ inputs.modulo }}
       TF_VAR_repository: ${{ inputs.repository }}
-
     run: |
       cd code/terraform/parameter-store
-      terraform plan -no-color
+      TF_LOG=DEBUG terraform plan -no-color
 
   - name: Terraform Apply
     shell: bash
