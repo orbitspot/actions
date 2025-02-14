@@ -7,6 +7,7 @@
    type        = "String"
    value       = each.value
    tier        = "Standard"
+   overwrite   = true
    tags = {
      Version = var.versionament
      "orbit:modulo": var.modulo
@@ -22,6 +23,7 @@
    type        = "SecureString"
    value       = replace(each.value, "$$", "$")
    tier        = "Standard"
+   overwrite   = true
    tags = {
      Version = var.versionament
      "orbit:modulo": var.modulo
