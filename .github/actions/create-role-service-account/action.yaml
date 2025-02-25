@@ -104,7 +104,7 @@ runs:
         {
           "Effect": "Allow",
           "Principal": {
-            "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/$OIDC_PROVIDER"
+            "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/'"$OIDC_PROVIDER"'"
           },
           "Action": "sts:AssumeRoleWithWebIdentity",
           "Condition": {
