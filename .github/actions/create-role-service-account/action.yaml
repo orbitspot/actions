@@ -59,7 +59,7 @@ runs:
       AWS_REGION="us-east-1"
 
       OIDC_PROVIDER=$(aws secretsmanager get-secret-value \
-          --secret-id "$ENVIRONMENT" \
+          --secret-id "oidc_provider/$ENVIRONMENT" \
           --region "$AWS_REGION" \
           --query SecretString \
           --output text)
