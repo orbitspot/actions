@@ -56,7 +56,7 @@ runs:
 
   - name: Buscar OIDC provider
     shell: bash
-    run: /
+    run: |
       INPUT_STRING=${{ inputs.role }}
       echo "env - $INPUT_STRING"
       ENVIRONMENT="${INPUT_STRING##*-}"
