@@ -58,12 +58,11 @@ runs:
       ENVIRONMENT="${INPUT_STRING##*-}"
       AWS_REGION="us-east-1"
 
-      OIDC_PROVIDER=$(aws secretsmanager get-secret-value \
+      echo "OIDC_PROVIDER=$(aws secretsmanager get-secret-value \
           --secret-id "oidc_provider/$ENVIRONMENT" \
           --region "$AWS_REGION" \
           --query SecretString \
-          --output text)
-      export OIDC_PROVIDER
+          --output text)" >> $GITHUB_ENV
 
   - name: Criar role
     shell: bash
