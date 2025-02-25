@@ -81,23 +81,22 @@ runs:
     if: steps.check-role.outputs.role_exists == 'false'
     run: |
       aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
-        "Version": "2012-10-17",
-        "Statement": [
-          {
-            "Effect": "Allow",
-            "Principal": {
-              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/$OIDC_PROVIDER"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-              "StringEquals": {
-                "$OIDC_PROVIDER:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
-              }
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/$OIDC_PROVIDER"
+          },
+          "Action": "sts:AssumeRoleWithWebIdentity",
+          "Condition": {
+            "StringEquals": {
+              "'"$OIDC_PROVIDER"':sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
             }
           }
-        ]
-      }'
-
+        }
+      ]
+    }'
   - name: Atualizar Role
     shell: bash
     if: steps.check-role.outputs.role_exists == 'true'
