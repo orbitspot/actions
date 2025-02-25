@@ -51,11 +51,24 @@ runs:
           echo "role_exists=false" >> $GITHUB_OUTPUT
         fi
 
+  - name: Buscando OIDC Provider
+    shell: bash
+    run: |
+      INPUT_STRING=${{ inputs.role }}
+      ENVIRONMENT="${INPUT_STRING##*-}"
+      AWS_REGION="us-east-1"
+
+      OIDC_PROVIDER=$(aws secretsmanager get-secret-value \
+          --secret-id "$ENVIRONMENT" \
+          --region "$AWS_REGION" \
+          --query SecretString \
+          --output text)
+      export OIDC_PROVIDER
+
   - name: Criar role
     shell: bash
     if: steps.check-role.outputs.role_exists == 'false'
     run: |
-      OIDC_PROVIDER="$(aws eks describe-cluster --name ${{ inputs.cluster_name }} --query "cluster.identity.oidc.issuer" --output text | sed 's|https://||')"
       aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
       "Version": "2012-10-17",
       "Statement": [
@@ -78,7 +91,6 @@ runs:
     shell: bash
     if: steps.check-role.outputs.role_exists == 'true'
     run: |
-      OIDC_PROVIDER="$(aws eks describe-cluster --name ${{ inputs.cluster_name }} --query "cluster.identity.oidc.issuer" --output text | sed 's|https://||')"
       aws iam update-assume-role-policy --role-name "${{ inputs.role }}" --policy-document '{
       "Version": "2012-10-17",
       "Statement": [
