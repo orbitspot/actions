@@ -4,9 +4,6 @@ inputs:
   role:
     description: 'Aws role to be created'
     required: true
-  cluster_name:
-    description: 'Cluster Name'
-    required: true
   namespace:
     description: 'Application name'
     required: true
