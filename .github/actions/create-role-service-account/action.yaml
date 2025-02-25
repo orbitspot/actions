@@ -5,7 +5,7 @@ inputs:
     description: 'Aws role to be created'
     required: true
   cluster_name:
-    description: 'Cluster OIDC issuer URL without https'
+    description: 'Cluster Name'
     required: true
   namespace:
     description: 'Application name'
