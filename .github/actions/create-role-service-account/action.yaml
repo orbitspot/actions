@@ -62,7 +62,7 @@ runs:
       ENVIRONMENT="${INPUT_STRING##*-}"
       AWS_REGION="us-east-1"
 
-      SECRET_VALUE=$(aws secretsmanager get-secret-value \
+      OIDC_PROVIDER=$(aws secretsmanager get-secret-value \
           --secret-id "$ENVIRONMENT" \
           --region "$AWS_REGION" \
           --query SecretString \
@@ -73,7 +73,7 @@ runs:
           exit 1
       fi
 
-      export SECRET_VALUE
+      export OIDC_PROVIDER
       echo "Secret fetched successfully."
 
   - name: Criar role
@@ -86,12 +86,12 @@ runs:
           {
             "Effect": "Allow",
             "Principal": {
-              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer }}"
+              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/$OIDC_PROVIDER"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
               "StringEquals": {
-                "${{ inputs.cluster_oidc_issuer }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+                "$OIDC_PROVIDER:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
               }
             }
           }
@@ -108,12 +108,12 @@ runs:
           {
             "Effect": "Allow",
             "Principal": {
-              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/${{ inputs.cluster_oidc_issuer }}"
+              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/$OIDC_PROVIDER"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
               "StringEquals": {
-                "${{ inputs.cluster_oidc_issuer }}:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+                "$OIDC_PROVIDER:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
               }
             }
           }
