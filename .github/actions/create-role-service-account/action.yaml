@@ -54,6 +54,27 @@ runs:
           echo "role_exists=false" >> $GITHUB_OUTPUT
         fi
 
+  - name: Buscar OIDC provider
+    shell: bash
+    run: /
+      INPUT_STRING=${{ inputs.role }}
+      echo "env - $INPUT_STRING"
+      ENVIRONMENT="${INPUT_STRING##*-}"
+      AWS_REGION="us-east-1"
+
+      SECRET_VALUE=$(aws secretsmanager get-secret-value \
+          --secret-id "$ENVIRONMENT" \
+          --region "$AWS_REGION" \
+          --query SecretString \
+          --output text)
+
+      if [ $? -ne 0 ]; then
+          echo "Failed to retrieve secret"
+          exit 1
+      fi
+
+      export SECRET_VALUE
+      echo "Secret fetched successfully."
 
   - name: Criar role
     shell: bash
