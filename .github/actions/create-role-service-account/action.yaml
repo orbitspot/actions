@@ -4,7 +4,7 @@ inputs:
   role:
     description: 'Aws role to be created'
     required: true
-  cluster_oidc_issuer:
+  cluster_name:
     description: 'Cluster OIDC issuer URL without https'
     required: true
   namespace:
@@ -80,24 +80,7 @@ runs:
     shell: bash
     if: steps.check-role.outputs.role_exists == 'false'
     run: |
-      INPUT_STRING=${{ inputs.role }}
-      echo "env - $INPUT_STRING"
-      ENVIRONMENT="${INPUT_STRING##*-}"
-      AWS_REGION="us-east-1"
-
-      OIDC_PROVIDER=$(aws secretsmanager get-secret-value \
-          --secret-id "oidc_provider/$ENVIRONMENT" \
-          --region "$AWS_REGION" \
-          --query SecretString \
-          --output text)
-
-      if [ $? -ne 0 ]; then
-          echo "Failed to retrieve secret"
-          exit 1
-      fi
-
-      export OIDC_PROVIDER
-      echo "Secret fetched successfully."
+      OIDC_PROVIDER="$(aws eks describe-cluster --name ${{ inputs.cluster_name }} --query "cluster.identity.oidc.issuer" --output text | sed 's|https://||')"
       aws iam create-role --role-name "${{ inputs.role }}" --assume-role-policy-document '{
       "Version": "2012-10-17",
       "Statement": [
@@ -120,18 +103,19 @@ runs:
     shell: bash
     if: steps.check-role.outputs.role_exists == 'true'
     run: |
+      OIDC_PROVIDER="$(aws eks describe-cluster --name ${{ inputs.cluster_name }} --query "cluster.identity.oidc.issuer" --output text | sed 's|https://||')"
       aws iam update-assume-role-policy --role-name "${{ inputs.role }}" --policy-document '{
-        "Version": "2012-10-17",
-        "Statement": [
-          {
-            "Effect": "Allow",
-            "Principal": {
-              "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/$OIDC_PROVIDER"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-              "StringEquals": {
-                "$OIDC_PROVIDER:sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Federated": "arn:aws:iam::${{ inputs.aws_account_number }}:oidc-provider/'"$OIDC_PROVIDER"'"
+          },
+          "Action": "sts:AssumeRoleWithWebIdentity",
+          "Condition": {
+            "StringEquals": {
+              "'"$OIDC_PROVIDER"':sub": "system:serviceaccount:${{ inputs.namespace }}:${{ inputs.service_account_name }}"
               }
             }
           }
