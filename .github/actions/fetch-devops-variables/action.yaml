@@ -1,17 +1,30 @@
 name: 'Devops Variables'
 description: 'fetch devops variables'
+inputs:
+  devops_config_develop:
+    description: 'devops config'
+    required: true
+  devops_config_homolog:
+    description: 'devops config'
+    required: true
+  devops_config_master:
+    description: 'devops config'
+    required: true
+  branch:
+    description: 'branch'
+    required: true
 runs:
   using: composite
   steps:
   - name: Determine configuration variable
     shell: bash
     run: |
-      if [[ "${{ github.ref_name }}" == "develop" ]]; then 
-        echo 'CONFIG=${{ vars.DEVOPS_CONFIG_DEVELOP }}' >> $GITHUB_ENV
-      elif [[ "${{ github.ref_name }}" == "homolog" ]]; then
-        echo "CONFIG=${{ vars.DEVOPS_CONFIG_HOMOLOG }}" >> $GITHUB_ENV
-      elif [[ "${{ github.ref_name }}" == "master" ]]; then
-        echo "CONFIG=${{ vars.DEVOPS_CONFIG_MASTER }}" >> $GITHUB_ENV
+      if [[ "${{ inputs.branch }}" == "develop" ]]; then 
+        echo 'CONFIG=${{ inputs.devops_config_develop }}' >> $GITHUB_ENV
+      elif [[ "${{ inputs.branch }}" == "homolog" ]]; then
+        echo "CONFIG=${{ inputs.devops_config_homolog }}" >> $GITHUB_ENV
+      elif [[ "${{ inputs.branch }}" == "master" ]]; then
+        echo "CONFIG=${{ inputs.devops_config_master }}" >> $GITHUB_ENV
       fi
 
   - name: Set config as output
