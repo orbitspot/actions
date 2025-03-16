@@ -13,6 +13,16 @@ inputs:
   branch:
     description: 'branch'
     required: true
+outputs:
+  CLUSTER_REGION:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.CLUSTER_REGION }}
+  CLUSTER_NAME:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.CLUSTER_NAME }}
+  ENV:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.ENV }}
 runs:
   using: composite
   steps:
