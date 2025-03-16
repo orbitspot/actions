@@ -31,14 +31,15 @@ runs:
     shell: bash
     run: |
       echo 'CONFIG=${{ inputs.devops_config }}' >> $GITHUB_ENV
+      echo 'branch=${{ inputs.branch }}' >> $GITHUB_ENV
   
   - name: Set config as output
     shell: bash
     id: set-output
     run: |
-      keys=$(echo $CONFIG | jq -r '.develop | keys_unsorted[]')
+      keys=$(echo $CONFIG | jq -r --arg branch "$branch" '.[$branch] | keys_unsorted[]')
       for key in $keys; do
-        value=$(echo $CONFIG | jq -r ".develop.\"$key\"")
+        value=$(echo $CONFIG | jq -r --arg branch "$branch" '.[$branch]."$key"')
         echo "$key"
         echo "$key=$value" >> $GITHUB_OUTPUT
       done
