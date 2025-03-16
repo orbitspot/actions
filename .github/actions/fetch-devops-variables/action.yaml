@@ -1,0 +1,25 @@
+name: 'Devops Variables'
+description: 'fetch devops variables'
+runs:
+  using: composite
+  steps:
+  - name: Determine configuration variable
+    shell: bash
+    run: |
+      if [[ "${{ github.ref_name }}" == "develop" ]]; then 
+        echo 'CONFIG=${{ vars.DEVOPS_CONFIG_DEVELOP }}' >> $GITHUB_ENV
+      elif [[ "${{ github.ref_name }}" == "homolog" ]]; then
+        echo "CONFIG=${{ vars.DEVOPS_CONFIG_HOMOLOG }}" >> $GITHUB_ENV
+      elif [[ "${{ github.ref_name }}" == "master" ]]; then
+        echo "CONFIG=${{ vars.DEVOPS_CONFIG_MASTER }}" >> $GITHUB_ENV
+      fi
+
+  - name: Set config as output
+    shell: bash
+    id: set-output
+    run: |
+      keys=$(echo $CONFIG | jq -r 'keys_unsorted[]')
+      for key in $keys; do
+        value=$(echo $CONFIG | jq -r ".\"$key\"")
+        echo "$key=$value" >> $GITHUB_OUTPUT
+      done
