@@ -1,13 +1,6 @@
 name: 'Devops Variables'
 description: 'fetch devops variables'
 inputs:
-  # devops_config_develop:
-  #   description: 'devops config'
-  #   required: true
-  # devops_config_homolog:
-  #   description: 'devops config'
-  #   required: true
-  # devops_config_master:
   devops_config:
     description: 'devops config'
     required: true
