@@ -20,19 +20,15 @@ outputs:
 runs:
   using: composite
   steps:
-  - name: Determine configuration variable
-    shell: bash
-    run: |
-      echo 'CONFIG=${{ inputs.devops_config }}' >> $GITHUB_ENV
-      echo 'branch=${{ inputs.branch }}' >> $GITHUB_ENV
-  
   - name: Set config as output
     shell: bash
     id: set-output
     run: |
-      keys=$(echo "$CONFIG" | jq -r --arg branch "$branch" '.[$branch] | keys_unsorted[]')
+      echo 'config=${{ inputs.devops_config }}' >> $GITHUB_ENV
+      echo 'branch=${{ inputs.branch }}' >> $GITHUB_ENV
+      keys=$(echo "$config" | jq -r --arg branch "$branch" '.[$branch] | keys_unsorted[]')
       for key in $keys; do
-        value=$(echo "$CONFIG" | jq -r --arg branch "$branch" --arg key "$key" '.[$branch].[$key]')
+        value=$(echo "$config" | jq -r --arg branch "$branch" --arg key "$key" '.[$branch].[$key]')
         echo "$key" "$value"
         echo "$key=$value" >> $GITHUB_OUTPUT
       done
