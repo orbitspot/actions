@@ -63,7 +63,8 @@ runs:
       output_file = os.getenv('GITHUB_OUTPUT')
       with open(output_file, 'a') as f:
         for key, value in devops_config.items():
-          f.write(f"{key}={value}\n")
+          print(f"Value for {key}: {value}")
+          print(f'::set-output name={key}::{value}')
 
   # - name: Set config as output
   #   shell: bash
