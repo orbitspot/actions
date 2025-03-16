@@ -1,13 +1,14 @@
 name: 'Devops Variables'
 description: 'fetch devops variables'
 inputs:
-  devops_config_develop:
-    description: 'devops config'
-    required: true
-  devops_config_homolog:
-    description: 'devops config'
-    required: true
-  devops_config_master:
+  # devops_config_develop:
+  #   description: 'devops config'
+  #   required: true
+  # devops_config_homolog:
+  #   description: 'devops config'
+  #   required: true
+  # devops_config_master:
+  devops_config:
     description: 'devops config'
     required: true
   branch:
@@ -24,25 +25,52 @@ outputs:
     description: 'cluster region'
     value: ${{ steps.set-output.outputs.ENV }}
 runs:
+  # using: composite
+  # steps:
+  # - name: Determine configuration variable
+  #   shell: bash
+  #   run: |
+  #     if [[ "${{ inputs.branch }}" == "develop" ]]; then 
+  #       echo 'CONFIG=${{ inputs.devops_config_develop }}' >> $GITHUB_ENV
+  #     elif [[ "${{ inputs.branch }}" == "homolog" ]]; then
+  #       echo "CONFIG=${{ inputs.devops_config_homolog }}" >> $GITHUB_ENV
+  #     elif [[ "${{ inputs.branch }}" == "master" ]]; then
+  #       echo "CONFIG=${{ inputs.devops_config_master }}" >> $GITHUB_ENV
+  #     fi
   using: composite
   steps:
   - name: Determine configuration variable
-    shell: bash
-    run: |
-      if [[ "${{ inputs.branch }}" == "develop" ]]; then 
-        echo 'CONFIG=${{ inputs.devops_config_develop }}' >> $GITHUB_ENV
-      elif [[ "${{ inputs.branch }}" == "homolog" ]]; then
-        echo "CONFIG=${{ inputs.devops_config_homolog }}" >> $GITHUB_ENV
-      elif [[ "${{ inputs.branch }}" == "master" ]]; then
-        echo "CONFIG=${{ inputs.devops_config_master }}" >> $GITHUB_ENV
-      fi
-
-  - name: Set config as output
-    shell: bash
     id: set-output
+    shell: python
     run: |
-      keys=$(echo $CONFIG | jq -r 'keys_unsorted[]')
-      for key in $keys; do
-        value=$(echo $CONFIG | jq -r ".\"$key\"")
-        echo "$key=$value" >> $GITHUB_OUTPUT
-      done
+      import json
+      import os
+
+      # Get input from environment variable
+      github_vars_str = """${{ inputs.github_vars }}"""
+
+      # Convert JSON string to dictionary
+      try:
+          github_vars = json.loads(github_vars_str)
+          print("Parsed GitHub Vars:", json.dumps(github_vars, indent=2))
+      except json.JSONDecodeError as e:
+          print(f"Error decoding JSON: {e}")
+          github_vars = {}
+
+      # Example usage
+      if "CLUSTER_REGION" in github_vars:
+        print(f"Value for 'CLUSTER_REGION': {github_vars['CLUSTER_REGION']}")
+      output_file = os.getenv('GITHUB_OUTPUT')
+      with open(output_file, 'a') as f:
+        for key, value in github_vars.items():
+          f.write(f"{key}={value}\n")
+
+  # - name: Set config as output
+  #   shell: bash
+  #   id: set-output
+  #   run: |
+  #     keys=$(echo $CONFIG | jq -r 'keys_unsorted[]')
+  #     for key in $keys; do
+  #       value=$(echo $CONFIG | jq -r ".\"$key\"")
+  #       echo "$key=$value" >> $GITHUB_OUTPUT
+  #     done
