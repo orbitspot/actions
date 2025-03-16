@@ -47,22 +47,22 @@ runs:
       import os
 
       # Get input from environment variable
-      github_vars_str = """${{ inputs.github_vars }}"""
+      devops_config_str = """${{ inputs.devops_config }}"""
 
       # Convert JSON string to dictionary
       try:
-          github_vars = json.loads(github_vars_str)
-          print("Parsed GitHub Vars:", json.dumps(github_vars, indent=2))
+          devops_config = json.loads(devops_config_str)
+          print("Parsed GitHub Vars:", json.dumps(devops_config, indent=2))
       except json.JSONDecodeError as e:
           print(f"Error decoding JSON: {e}")
-          github_vars = {}
+          devops_config = {}
 
       # Example usage
-      if "CLUSTER_REGION" in github_vars:
-        print(f"Value for 'CLUSTER_REGION': {github_vars['CLUSTER_REGION']}")
+      if "CLUSTER_REGION" in devops_config:
+        print(f"Value for 'CLUSTER_REGION': {devops_config['CLUSTER_REGION']}")
       output_file = os.getenv('GITHUB_OUTPUT')
       with open(output_file, 'a') as f:
-        for key, value in github_vars.items():
+        for key, value in devops_config.items():
           f.write(f"{key}={value}\n")
 
   # - name: Set config as output
