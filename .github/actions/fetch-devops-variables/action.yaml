@@ -32,7 +32,7 @@ runs:
     run: |
       keys=$(echo "$CONFIG" | jq -r --arg branch "$branch" '.[$branch] | keys_unsorted[]')
       for key in $keys; do
-        value=$(echo "$CONFIG" | jq -r --arg branch "$branch" --arg key "$key" '.[$branch].[$key]')
+        value=$(echo "$CONFIG" | jq -r --arg branch "$branch" --arg key "$key" '.[$branch][$key]')
         echo "$key" "$value"
         echo "$key=$value" >> $GITHUB_OUTPUT
       done
