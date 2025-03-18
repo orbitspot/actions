@@ -19,14 +19,13 @@ runs:
   - name: Generate JSON and set output
     shell: python
     run: |
-        # Remove os colchetes da string
-        print(${{ inputs.keys }})
-        print(${{ inputs.environment_json }})
         keys = ${{ inputs.keys }}
         variables = ${{ inputs.environment_json }}
         result_json = {}
         for key in keys:
-          result_json.update({key: variables[key]}) 
+          value = variables[key]
+          value = value.replace("$", "$$")
+          result_json.update({key: value}) 
         print(result_json)
 
   - name: Upload encrypted artifact
