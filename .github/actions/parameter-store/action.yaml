@@ -86,6 +86,7 @@ runs:
   - name: Terraform Apply
     shell: bash
     env:
+      TF_VAR_region: ${{ inputs.aws_region }}
       TF_VAR_modulo: ${{ inputs.modulo }}
       TF_VAR_repository: ${{ inputs.repository }}
     run: |
