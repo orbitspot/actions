@@ -28,7 +28,7 @@ runs:
           result_json.update({key: value}) 
         print(result_json)
         f = open(f"${{ inputs.file_name }}.json", "a")
-        f.write(result_json)
+        f.write(str(result_json))
         f.close()
 
   - name: Upload encrypted artifact
