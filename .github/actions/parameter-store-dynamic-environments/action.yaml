@@ -19,6 +19,7 @@ runs:
   - name: Generate JSON and set output
     shell: python
     run: |
+        import json
         keys = ${{ inputs.keys }}
         variables = ${{ inputs.environment_json }}
         result_json = {}
