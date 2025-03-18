@@ -20,13 +20,16 @@ runs:
     shell: python
     run: |
         import json
+
         keys = ${{ inputs.keys }}
         variables = ${{ inputs.environment_json }}
         result_json = {}
+
         for key in keys:
           value = variables[key]
           value = value.replace("$", "$$")
           result_json.update({key: value}) 
+
         with open(f"${{ inputs.file_name }}.json", "w") as outfile:
           json.dump(result_json, outfile)
 
