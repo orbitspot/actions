@@ -27,7 +27,7 @@ runs:
 
         for key in keys:
           value = variables[key].replace("$", "$$") # no terraform $ delimita as variaveis 
-          if value.length > 0: # nao adiciona variaveis sem valor
+          if len(value) > 0: # nao adiciona variaveis sem valor
             result_json.update({key: value}) 
 
         with open(f"${{ inputs.file_name }}.json", "w") as outfile:
