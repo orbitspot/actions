@@ -29,7 +29,7 @@ runs:
         result_json = str(result_json)
         result_json = result_json.replace("'", '\"')
         result_json = result_json.replace("{", '"{')
-        result_json = result_json.replace("}", '"}')
+        result_json = result_json.replace("}", '}"')
         print(result_json)
         f = open(f"${{ inputs.file_name }}.json", "a")
         f.write(str(result_json))
