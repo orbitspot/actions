@@ -26,8 +26,7 @@ runs:
         result_json = {}
 
         for key in keys:
-          value = variables[key]
-          value = value.replace("$", "$$")
+          value = variables[key].replace("$", "$$")
           result_json.update({key: value}) 
 
         with open(f"${{ inputs.file_name }}.json", "w") as outfile:
