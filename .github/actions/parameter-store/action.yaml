@@ -24,12 +24,9 @@ inputs:
     description: 'Repository'
     required: true
 
-
-
 runs:
   using: composite
   steps:
-
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
