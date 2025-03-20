@@ -22,7 +22,7 @@ jobs:
         uses: orbitspot/actions/.github/actions/fetch-devops-variables@nova-action
         with:
           devops_config: ${{ vars.DEVOPS_CONFIG }}
-          branch: ${{ github.ref_name }}
+          branch: develop
 
   loading-environments:
     name: loading-environments
@@ -84,7 +84,7 @@ jobs:
   create-parameters-vars:
       name: Create parameters
       runs-on: ubuntu-latest
-      environment: ${{ github.ref_name }}
+      environment: develop
       needs: loading-environments
       permissions:
         id-token: write
@@ -101,7 +101,7 @@ jobs:
   create-parameters-secrets:
       name: Create parameters secrets
       runs-on: ubuntu-latest
-      environment: ${{ github.ref_name }}
+      environment: develop
       needs: loading-environments
       permissions:
         id-token: write
@@ -118,7 +118,7 @@ jobs:
   apply-parameters:
       name: Apply parameters
       runs-on: ubuntu-latest
-      environment: ${{ github.ref_name }}
+      environment: develop
       needs: [setup-config, create-parameters-vars, create-parameters-secrets]
       env:
         CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
