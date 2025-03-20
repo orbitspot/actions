@@ -16,10 +16,14 @@ on:
                 required: true
                 type: string
 
+concurrency:
+    group: '${{ github.workflow }}-${{ github.ref }}'
+    cancel-in-progress: true
+
 jobs:
     create-api-gateway:
         name: Create
-        runs-on: [ develop, '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         permissions:
             id-token: write
             contents: read
@@ -37,7 +41,7 @@ jobs:
             - name: Start
               uses: orbitspot/actions/.github/actions/api-gateway@nova-action
               env:
-                  TF_VAR_branch: develop
+                  TF_VAR_branch: ${{ github.ref_name }}
                   TF_VAR_api_gateway: ${{ vars.API_GATEWAY }}
                   TF_VAR_repository_name: ${{ github.event.repository.name }}
                   TF_VAR_hosts: '${{ inputs.hosts }}'

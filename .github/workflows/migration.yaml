@@ -7,9 +7,13 @@ on:
                 required: true
                 type: string
 
+concurrency:
+    group: '${{ github.workflow }}-${{ github.ref }}'
+    cancel-in-progress: true
+
 jobs:
     setup-config:
-        runs-on: ubuntu-latest
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         outputs:
           CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
           CLUSTER_NAME: ${{ steps.set-output.outputs.CLUSTER_NAME }}
@@ -20,11 +24,11 @@ jobs:
             uses: orbitspot/actions/.github/actions/fetch-devops-variables@nova-action
             with:
               devops_config: ${{ vars.DEVOPS_CONFIG }}
-              branch: develop
+              branch: ${{ github.ref_name }}
               
     building:
         name: Building
-        runs-on: ubuntu-latest
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         needs: [setup-config]
         permissions:
           id-token: write
@@ -55,9 +59,9 @@ jobs:
   
     generate-docker:
         name: Docker Build Migration
-        runs-on: ubuntu-latest
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         needs: [setup-config, building]
-        environment: develop
+        environment: ${{ github.ref_name }}
         permissions:
           id-token: write
           contents: read
@@ -96,8 +100,8 @@ jobs:
 
     prepare-helm-replacements:
         name: Building Helm Values
-        runs-on: ["develop", timeflow, linux, self-hosted, x64]
-        environment: develop
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [generate-docker]
         permissions:
             id-token: write
@@ -148,8 +152,8 @@ jobs:
 
     helm-CD-migration:
         name: K8s Deploy Migration
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, prepare-helm-replacements]
         permissions:
           id-token: write

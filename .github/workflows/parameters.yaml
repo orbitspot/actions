@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
     setup-config:
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         outputs:
           CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
         steps:
@@ -22,11 +22,11 @@ jobs:
             uses: orbitspot/actions/.github/actions/fetch-devops-variables@nova-action
             with:
               devops_config: ${{ vars.DEVOPS_CONFIG }}
-              branch: develop
+              branch: ${{ github.ref_name }}
 
     loading-environments:
         name: loading-environments
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         needs: [setup-config]
         outputs:
             environments: ${{ steps.environments.outputs.result }}
@@ -83,8 +83,8 @@ jobs:
 
     create-parameters-vars:
         name: Create parameters
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: develop
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: loading-environments
         permissions:
             id-token: write
@@ -100,8 +100,8 @@ jobs:
 
     create-parameters-secrets:
         name: Create parameters secrets
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: develop
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: loading-environments
         permissions:
             id-token: write
@@ -117,8 +117,8 @@ jobs:
 
     apply-parameters:
         name: Apply parameters
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: develop
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, create-parameters-vars, create-parameters-secrets]
         env:
           CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
