@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@18
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@nova-action
         with:
           devops_config: ${{ vars.DEVOPS_CONFIG }}
           branch: ${{ github.ref_name }}
