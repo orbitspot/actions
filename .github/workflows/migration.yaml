@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@nova-action
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18
         with:
           devops_config: '${{ vars.DEVOPS_CONFIG }}'
           branch: '${{ github.ref_name }}'
@@ -36,7 +36,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v17.3
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -52,7 +52,7 @@ jobs:
           bash co_login_commands.txt
 
       - name: Npm Building
-        uses: orbitspot/actions/.github/actions/npm-ci@v17.3
+        uses: orbitspot/actions/.github/actions/npm-ci@v18
         with:
           node_version: '20'
 
@@ -74,7 +74,7 @@ jobs:
           fetch-depth: 0
 
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v17.3
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -85,7 +85,7 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-images/Dockerfile Dockerfile
 
       - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@v17.3
+        uses: orbitspot/actions/.github/actions/docker@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -170,7 +170,7 @@ jobs:
           fetch-depth: 0
 
       - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v17.3
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -178,7 +178,7 @@ jobs:
           cluster_name: '${{ vars.CLUSTER_NAME }}'
 
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v17.3
+        uses: orbitspot/actions/.github/actions/helm-deploy@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_region: '${{ env.CLUSTER_REGION }}'
