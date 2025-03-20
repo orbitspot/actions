@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   setup-config:
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     outputs:
       CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -20,14 +20,14 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@nova-action
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18
         with:
           devops_config: '${{ vars.DEVOPS_CONFIG }}'
           branch: 'develop'
 
   building:
     name: Building
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     needs: [setup-config]
     permissions:
       id-token: write
@@ -36,7 +36,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v17.3
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -52,15 +52,15 @@ jobs:
           bash co_login_commands.txt
 
       - name: Npm Building
-        uses: orbitspot/actions/.github/actions/npm-ci@v17.3
+        uses: orbitspot/actions/.github/actions/npm-ci@v18
         with:
           node_version: '20'
 
   generate-docker:
     name: Docker Build Migration
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     needs: [setup-config, building]
-    environment: 'develop'
+    environment: '${{ github.ref_name }}'
     permissions:
       id-token: write
       contents: read
@@ -74,7 +74,7 @@ jobs:
           fetch-depth: 0
 
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v17.3
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -85,7 +85,7 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-images/Dockerfile Dockerfile
 
       - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@v17.3
+        uses: orbitspot/actions/.github/actions/docker@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -99,8 +99,8 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: ubuntu-latest
-    environment: 'develop'
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    environment: '${{ github.ref_name }}'
     needs: [generate-docker]
     permissions:
       id-token: write
@@ -152,8 +152,8 @@ jobs:
 
   helm-CD-migration:
     name: K8s Deploy Migration
-    runs-on: ubuntu-latest
-    environment: 'develop'
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    environment: '${{ github.ref_name }}'
     needs: [setup-config, prepare-helm-replacements]
     permissions:
       id-token: write
@@ -170,7 +170,7 @@ jobs:
           fetch-depth: 0
 
       - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v17.3
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -178,7 +178,7 @@ jobs:
           cluster_name: '${{ vars.CLUSTER_NAME }}'
 
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v17.3
+        uses: orbitspot/actions/.github/actions/helm-deploy@v18
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_region: '${{ env.CLUSTER_REGION }}'
