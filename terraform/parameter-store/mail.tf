@@ -19,7 +19,7 @@ resource "aws_ssm_parameter" "scrts" {
    for index, value in local.secrets : index => value
  }
  name        = "/${var.repository}/secret/${each.key}"
- description = "Secret ${each.value} from module ${var.modulo}"
+ description = "Secret ${each.key} from module ${var.modulo}"
  type        = "SecureString"
  value       = trimspace(replace(each.value, "$$", "$"))
  tier        = "Standard"

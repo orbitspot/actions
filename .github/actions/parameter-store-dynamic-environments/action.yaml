@@ -16,48 +16,26 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Generate JSON and set output
-    shell: bash
-    run: |
-        # Remove os colchetes da string
-        keys=${{ inputs.keys }}
-        keys=$(echo $keys | sed 's/^\[\|]$//g')
+    - name: Generate JSON and set output
+      shell: python
+      run: |
+          import json
 
-        # JSON contendo todas as variáveis de vars
-        vars_json='${{ inputs.environment_json }}'
+          keys = ${{ inputs.keys }}
+          variables = ${{ inputs.environment_json }}
+          result_json = {}
 
-        # Inicializa o JSON
-        result_json="{"
+          for key in keys:
+            value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
+            if len(value) > 0: # nao adiciona variaveis sem valor
+              result_json.update({key: value}) 
 
-        # Converte a string em um array
-        IFS=',' read -r -a array <<< "$keys"
+          with open(f"${{ inputs.file_name }}.json", "w") as outfile:
+            json.dump(result_json, outfile)
 
-        # Itera sobre os elementos do array
-        for index in "${!array[@]}"; do
-            key=$(echo "${array[$index]}" | tr -d '"') # Remove aspas
-            value=$(echo "$vars_json" | jq -r ".\"$key\" // empty") # Obtém o valor da chave
-
-            # Só adiciona se o valor não estiver vazio
-            if [ -n "$value" ]; then
-                # Adiciona ao JSON
-                result_json="$result_json\"$key\":\"$value\","
-            fi
-        done
-
-        # Remove a última vírgula e fecha o JSON
-        result_json=$(echo "$result_json" | sed 's/,$//')
-        result_json="$result_json}"
-      
-        # Debug para verificar o JSON gerado
-        echo "Generated JSON: $result_json"
-      
-        # Define o output do step
-        echo "$result_json" >> ${{ inputs.file_name }}.json
-
-
-  - name: Upload encrypted artifact
-    uses: actions/upload-artifact@v4
-    with:
-      name: ${{ inputs.file_name }}
-      path: ${{ inputs.file_name }}.json
-      retention-days: 1
+    - name: Upload encrypted artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.file_name }}
+        path: ${{ inputs.file_name }}.json
+        retention-days: 1

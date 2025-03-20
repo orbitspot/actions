@@ -24,12 +24,9 @@ inputs:
     description: 'Repository'
     required: true
 
-
-
 runs:
   using: composite
   steps:
-
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
@@ -77,6 +74,7 @@ runs:
   - name: Terraform Plan
     shell: bash
     env:
+      TF_VAR_region: ${{ inputs.aws_region }}
       TF_VAR_modulo: ${{ inputs.modulo }}
       TF_VAR_repository: ${{ inputs.repository }}
     run: |
@@ -86,6 +84,7 @@ runs:
   - name: Terraform Apply
     shell: bash
     env:
+      TF_VAR_region: ${{ inputs.aws_region }}
       TF_VAR_modulo: ${{ inputs.modulo }}
       TF_VAR_repository: ${{ inputs.repository }}
     run: |
