@@ -1,0 +1,38 @@
+name: 'Devops Variables'
+description: 'fetch devops variables'
+inputs:
+  devops_config:
+    description: 'devops config'
+    required: true
+  branch:
+    description: 'branch'
+    required: true
+outputs:
+  CLUSTER_REGION:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.CLUSTER_REGION }}
+  CLUSTER_NAME:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.CLUSTER_NAME }}
+  ENV:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.ENV }}
+runs:
+  using: composite
+  steps:
+  - name: Determine configuration variable
+    shell: bash
+    run: |
+      echo 'config=${{ inputs.devops_config }}' >> $GITHUB_ENV
+      echo 'branch=${{ inputs.branch }}' >> $GITHUB_ENV
+  
+  - name: Set config as output
+    shell: bash
+    id: set-output
+    run: |
+      keys=$(echo "$config" | jq -r --arg branch "$branch" '.[$branch] | keys_unsorted[]')
+      for key in $keys; do
+        value=$(echo "$config" | jq -r --arg branch "$branch" --arg key "$key" '.[$branch][$key]')
+        echo "$key" "$value"
+        echo "$key=$value" >> $GITHUB_OUTPUT
+      done
