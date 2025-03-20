@@ -1,0 +1,45 @@
+name: Api Gateway
+
+on:
+    workflow_call:
+        inputs:
+            module:
+                required: true
+                type: string
+            docs:
+                required: true
+                type: string
+            istio_enabled:
+                required: true
+                type: string
+            hosts:
+                required: true
+                type: string
+
+jobs:
+    create-api-gateway:
+        name: Create
+        runs-on: [ develop, '${{ inputs.module }}', linux, self-hosted, x64]
+        permissions:
+            id-token: write
+            contents: read
+        steps:
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+
+            - uses: hashicorp/setup-terraform@v3
+              name: setup
+              with:
+                  terraform_version: '1.5.0'
+
+            - name: Start
+              uses: orbitspot/actions/.github/actions/api-gateway@nova-action
+              env:
+                  TF_VAR_branch: develop
+                  TF_VAR_api_gateway: ${{ vars.API_GATEWAY }}
+                  TF_VAR_repository_name: ${{ github.event.repository.name }}
+                  TF_VAR_hosts: '${{ inputs.hosts }}'
+                  TF_VAR_docs: '${{ inputs.docs }}'
+                  TF_VAR_istio_enabled: '${{ inputs.istio_enabled }}'
