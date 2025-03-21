@@ -15,7 +15,7 @@ on:
       dockerfile_path:
         required: false
         type: string
-        default: false
+        default: ''
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
