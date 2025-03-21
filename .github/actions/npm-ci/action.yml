@@ -4,26 +4,21 @@ inputs:
   node_version:
     description: 'Node Version'
     required: true
-
   install:
     description: 'Npm install'
     default: false
+  customized_dockerfile:
+    description: "Not empty if using the repo's Dockerfile for build"
+    default: ''
+
 runs:
   using: composite
   steps:
-
   - uses: actions/checkout@v4
     name: Checkout
     with:
         ref: ${{ inputs.git_ref }}
         fetch-depth: 0
-
-  # - name: Cache dependences
-  #   uses: actions/cache@v4
-  #   with:
-  #       path: ~/.npm
-  #       key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
-
 
   - name: Set up Node.js
     uses: actions/setup-node@v4
@@ -51,15 +46,19 @@ runs:
         mkdir -p deps
         mv dist building/dist
         mv package.json building/package.json
-        mv .github/docker building/docker
         mv .github/scripts building/scripts
         mv node_modules deps/node_modules
+
+  - name: Copy Dockerfile
+    if: ${{ inputs.customized_dockerfile != '' }}
+    shell: bash
+    run: |
+        mv ${{ inputs.customized_dockerfile }} building/docker
 
   - uses: vimtor/action-zip@v1.2
     with:
       files: deps
       dest: building/node_modules.zip
-
 
   - name: Upload Artifacts
     uses: actions/upload-artifact@v4
