@@ -5,6 +5,9 @@ on:
       module:
         required: true
         type: string
+      run_command:
+        required: true
+        type: string
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -83,6 +86,7 @@ jobs:
       - name: Download File from S3
         run: |
           aws s3 cp s3://devops.orbitspot.com/build-images/migration/Dockerfile Dockerfile
+          aws s3 cp s3://devops.orbitspot.com/build-images/migration/migration.sh migration.sh
 
       - name: docker-build
         uses: orbitspot/actions/.github/actions/docker@v18
@@ -95,7 +99,8 @@ jobs:
           tag: '${{ github.sha }}'
           build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
           before_building: |
-            mv .github/scripts/migration.sh migration.sh
+            echo "${{ inputs.run_command }}" >> migration.sh
+            cat migration.sh
 
   prepare-helm-replacements:
     name: Building Helm Values
