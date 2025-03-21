@@ -46,7 +46,7 @@ jobs:
                   bash co_login_commands.txt
 
             - name: Npm Building
-              uses: orbitspot/actions/.github/actions/npm-ci@v18
+              uses: orbitspot/actions/.github/actions/npm-ci@fix-npm-ci
               with:
                   node_version: '${{ inputs.version }}'
                   customized_dockerfile: '${{ inputs.dockerfile_path  }}'
