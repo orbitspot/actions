@@ -39,6 +39,7 @@ jobs:
     building:
         name: Building
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        needs: [setup-config]
         permissions:
             id-token: write
             contents: read
@@ -69,7 +70,7 @@ jobs:
         name: Docker Build Api
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [building]
+        needs: [setup-config, building]
         strategy:
             matrix:
                 artifacts: ['api', 'consumer']
@@ -113,7 +114,7 @@ jobs:
         name: Creating Aws Resources
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [generate-docker]
+        needs: [setup-config, generate-docker]
         permissions:
             id-token: write
             contents: read
@@ -201,7 +202,7 @@ jobs:
         name: K8s Deploy Api
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [prepare-helm-replacements]
+        needs: [setup-config, prepare-helm-replacements]
         permissions:
             id-token: write
             contents: read
@@ -241,7 +242,7 @@ jobs:
         if: ${{ inputs.consumer == 'true' }}
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [prepare-helm-replacements]
+        needs: [setup-config, prepare-helm-replacements]
         permissions:
             id-token: write
             contents: read
