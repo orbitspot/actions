@@ -12,6 +12,10 @@ on:
       version:
         required: true
         type: string
+      dockerfile_path:
+        required: false
+        type: string
+        default: false
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -45,6 +49,7 @@ jobs:
               uses: orbitspot/actions/.github/actions/npm-ci@v18
               with:
                   node_version: '${{ inputs.version }}'
+                  customized_dockerfile: '${{ inputs.dockerfile_path  }}'
 
     generate-docker:
         name: Docker Build Api
@@ -65,10 +70,16 @@ jobs:
               aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
               aws_region: us-east-1
     
-          - name: Download File from S3
+          - name: Download Dockerfile from S3
+            if: ${{ inputs.dockerfile_path == ''}}
             run: |
               aws s3 cp s3://devops.orbitspot.com/build-github-actions/node/${{ inputs.version }}/Dockerfile Dockerfile
               aws s3 cp s3://devops.orbitspot.com/build-github-actions/scripts/base_script.sh base_script.sh
+
+          - name: Copy Dockerfile from original repository
+            if: ${{ inputs.dockerfile_path != '' }}
+            run: |
+              mv ${{ inputs.dockerfile_path }} Dockerfile
     
           - name: docker-build
             uses: orbitspot/actions/.github/actions/docker@v18
