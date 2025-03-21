@@ -37,6 +37,7 @@ jobs:
           with:
             ref: ${{ inputs.git_ref }}
             fetch-depth: 0
+
         - name: Configurar Python
           uses: actions/setup-python@v5
           with:
