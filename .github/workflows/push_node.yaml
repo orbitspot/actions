@@ -67,8 +67,8 @@ jobs:
     
           - name: Download File from S3
             run: |
-              aws s3 cp s3://devops.orbitspot.com/build-images/node/${{ inputs.version }}/Dockerfile Dockerfile
-              aws s3 cp s3://devops.orbitspot.com/build-images/scripts/base_script.sh base_script.sh
+              aws s3 cp s3://devops.orbitspot.com/build-github-actions/node/${{ inputs.version }}/Dockerfile Dockerfile
+              aws s3 cp s3://devops.orbitspot.com/build-github-actions/scripts/base_script.sh base_script.sh
     
           - name: docker-build
             uses: orbitspot/actions/.github/actions/docker@v18
