@@ -22,6 +22,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+    setup-config:
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      outputs:
+        CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
+        CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
+        ENV: '${{ steps.set-output.outputs.ENV }}'
+      steps:
+        - name: Fetch devops variables
+          id: set-output
+          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18
+          with:
+            devops_config: '${{ vars.DEVOPS_CONFIG }}'
+            branch: '${{ github.ref_name }}'
+    
     building:
         name: Building
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
