@@ -215,7 +215,7 @@ jobs:
         if: ${{ inputs.consumer == 'true' }}
         runs-on: ubuntu-latest
         environment: develop
-        needs: [prepare-helm-replacements]
+        # needs: [prepare-helm-replacements]
         permissions:
             id-token: write
             contents: read
