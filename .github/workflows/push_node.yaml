@@ -209,8 +209,7 @@ jobs:
                       --set environment=${{ vars.ENV}} \
                       --set region=${{ vars.CLUSTER_REGION }} \
                       --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
-                      --set 'containers[0].repository.tag=${{ github.sha }}' \
-                      --set nodeSelector.nodegroup-type=${{ vars.NODE_SELECTOR }}
+                      --set 'containers[0].repository.tag=${{ github.sha }}'
 
     helm-CD-consumer:
         name: K8s Deploy Consumer
