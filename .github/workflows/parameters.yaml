@@ -93,7 +93,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-vars
-          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18.1.1
+          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18.1
           with:
             keys: ${{ needs.loading-environments.outputs.environments }}
             environment_json: ${{ toJson(vars) }}
@@ -110,7 +110,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-secrets
-          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18.1.1
+          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18.1
           with:
             keys: ${{ needs.loading-environments.outputs.secrets }}
             environment_json: ${{ toJson(secrets) }}
