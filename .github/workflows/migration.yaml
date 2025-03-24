@@ -89,11 +89,7 @@ jobs:
       - name: Download Files from S3
         run: |
           aws s3 sync s3://devops.orbitspot.com/build-github-actions/migration/ .
-          ls
-          sed -i 's/<NOME-DO-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
-          mkdir .github/helm/migration
-          mv values.yaml .github/helm/migration/values.yaml
-          cat .github/helm/migration/values.yaml
+
     # sed -i 's/<TAG-GRAFANA>/${{ inputs.grafana_tag }}/g' values.yaml
 
       # - name: docker-build
@@ -135,6 +131,15 @@ jobs:
         with:
           repository: orbitspot/actions
           path: code
+      
+      - name: Download Helm from S3
+        run: |
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/values.yaml values.yaml
+          ls
+          sed -i 's/<NOME-DO-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
+          mkdir .github/helm/migration
+          mv values.yaml .github/helm/migration/values.yaml
+          cat .github/helm/migration/values.yaml
 
       - name: append-data-in-properties
         run: |
