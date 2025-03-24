@@ -89,7 +89,7 @@ jobs:
       - name: Download Files from S3
         run: |
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/Dockerfile Dockerfile
-          aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/base_script.sh migration.sh
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/migration.sh migration.sh
 
     # sed -i 's/<TAG-GRAFANA>/${{ inputs.grafana_tag }}/g' values.yaml
 
