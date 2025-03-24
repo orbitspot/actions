@@ -143,8 +143,6 @@ jobs:
         run: |
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/values.yaml values.yaml
           ls
-          sed -i 's/<NOME-DO-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
-          sed -i 's/<TAG-GRAFANA>/${{ github.event.repository.name }}/g' values.yaml
           mkdir .github/helm/migration
           mv values.yaml .github/helm/migration/values.yaml
           cat .github/helm/migration/values.yaml
@@ -152,13 +150,14 @@ jobs:
       - name: append-data-in-properties
         run: |
           echo "${{ vars._PROPERTIES }}" > values.properties
+          echo "grafana_tag=${{ inputs.grafana_tag }}" >> values.properties
+          echo "repository_name=${{ github.event.repository.name }}" >> values.properties
           echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
           echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
           cat .github/helm/migration/values.yaml
 
       - name: replace-data
         env:
-          PREFIX: '.${{ github.event.repository.name }}'
           PROPERTIES_PATH: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
           YAML_PATH: .github/helm/migration/values.yaml
         run: python code/.github/scripts/replace-properties.py

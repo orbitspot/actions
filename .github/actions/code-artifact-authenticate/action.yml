@@ -19,7 +19,6 @@ inputs:
 runs:
   using: composite
   steps:
-
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
@@ -35,7 +34,6 @@ runs:
     shell: bash
     if: inputs.co_login_file_name != ''
     run: aws codeartifact login --tool npm --repository packages --domain seidor --namespace @seidor --dry-run > ${{ inputs.co_login_file_name }}
-
 
   - name: Log in to CodeArtifact without file
     shell: bash
