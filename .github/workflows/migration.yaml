@@ -38,8 +38,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    env:
-      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
     steps:
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.1
@@ -200,7 +198,7 @@ jobs:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: '${{ env.CLUSTER_REGION }}'
-          cluster_name: '${{ vars.CLUSTER_NAME }}'
+          cluster_name: '${{ env.CLUSTER_NAME }}'
 
       - name: helm-apply
         uses: orbitspot/actions/.github/actions/helm-deploy@v18.1
