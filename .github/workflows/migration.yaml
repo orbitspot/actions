@@ -90,9 +90,10 @@ jobs:
         run: |
           aws s3 sync s3://devops.orbitspot.com/build-github-actions/migration/ .
           ls
+          sed -i 's/<NOME-DO-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
+          mkdir .github/helm/migration
           mv values.yaml .github/helm/migration/values.yaml
           cat .github/helm/migration/values.yaml
-    # sed -i 's/<NOME-DO-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
     # sed -i 's/<TAG-GRAFANA>/${{ inputs.grafana_tag }}/g' values.yaml
 
       # - name: docker-build
@@ -140,8 +141,7 @@ jobs:
           echo "${{ vars._PROPERTIES }}" > values.properties
           echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
           echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
-          echo "<NOME-DO-REPOSITORIO>=${{ github.event.repository.name }}" >> values.properties
-          echo "<TAG-GRAFANA>=${{ inputs.grafana_tag }}" >> values.properties
+          echo "tag_grafana=${{ inputs.grafana_tag }}" >> values.properties
           cat .github/helm/migration/values.yaml
 
       - name: replace-data
