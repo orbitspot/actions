@@ -144,6 +144,7 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/values.yaml values.yaml
           ls
           sed -i 's/<NOME-DO-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
+          sed -i 's/<TAG-GRAFANA>/${{ github.event.repository.name }}/g' values.yaml
           mkdir .github/helm/migration
           mv values.yaml .github/helm/migration/values.yaml
           cat .github/helm/migration/values.yaml
@@ -153,7 +154,6 @@ jobs:
           echo "${{ vars._PROPERTIES }}" > values.properties
           echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
           echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
-          echo "tag_grafana=${{ inputs.grafana_tag }}" >> values.properties
           cat .github/helm/migration/values.yaml
 
       - name: replace-data
