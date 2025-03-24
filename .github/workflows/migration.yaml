@@ -89,11 +89,11 @@ jobs:
       - name: Download Files from S3
         run: |
           aws s3 sync s3://devops.orbitspot.com/build-github-actions/migration/ .
-          sed -i 's/<NOME-DO-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
-          sed -i 's/<TAG-GRAFANA>/${{ inputs.grafana_tag }}/g' values.yaml
           ls
           mv values.yaml .github/helm/migration/values.yaml
           cat .github/helm/migration/values.yaml
+    # sed -i 's/<NOME-DO-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
+    # sed -i 's/<TAG-GRAFANA>/${{ inputs.grafana_tag }}/g' values.yaml
 
       # - name: docker-build
       #   uses: orbitspot/actions/.github/actions/docker@fix-npm-ci
@@ -140,6 +140,8 @@ jobs:
           echo "${{ vars._PROPERTIES }}" > values.properties
           echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
           echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
+          echo "<NOME-DO-REPOSITORIO>=${{ github.event.repository.name }}" >> values.properties
+          echo "<TAG-GRAFANA>=${{ inputs.grafana_tag }}" >> values.properties
           cat .github/helm/migration/values.yaml
 
       - name: replace-data
@@ -154,6 +156,7 @@ jobs:
           parameters=$(cat .github/helm/parameter-store.yaml)
           echo "" >> .github/helm/migration/values.yaml
           echo "$parameters" >> .github/helm/migration/values.yaml
+          cat .github/helm/migration/values.yaml
 
       - name: upload
         uses: actions/upload-artifact@v4
