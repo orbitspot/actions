@@ -8,6 +8,9 @@ on:
       run_command:
         required: true
         type: string
+      grafana_tag:
+        required: true
+        type: string
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -23,7 +26,7 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.1
         with:
           devops_config: '${{ vars.DEVOPS_CONFIG }}'
           branch: '${{ github.ref_name }}'
@@ -35,11 +38,9 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    env:
-      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -55,7 +56,7 @@ jobs:
           bash co_login_commands.txt
 
       - name: Npm Building
-        uses: orbitspot/actions/.github/actions/npm-ci@v18
+        uses: orbitspot/actions/.github/actions/npm-ci@v18.1
         with:
           node_version: '20'
 
@@ -77,19 +78,19 @@ jobs:
           fetch-depth: 0
 
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: us-east-1
 
-      - name: Download File from S3
+      - name: Download Files from S3
         run: |
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/Dockerfile Dockerfile
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/migration.sh migration.sh
 
       - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@v18
+        uses: orbitspot/actions/.github/actions/docker@v18.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -127,12 +128,29 @@ jobs:
         with:
           repository: orbitspot/actions
           path: code
+      
+      - name: Authenticate
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.1
+        with:
+          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
+          aws_region: us-east-1
+
+      - name: Download Helm from S3
+        run: |
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/values.yaml values.yaml
+          sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
+          sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
+          mkdir .github/helm/migration
+          mv values.yaml .github/helm/migration/values.yaml
+          cat .github/helm/migration/values.yaml
 
       - name: append-data-in-properties
         run: |
           echo "${{ vars._PROPERTIES }}" > values.properties
           echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
           echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
+          cat .github/helm/migration/values.yaml
 
       - name: replace-data
         env:
@@ -175,15 +193,15 @@ jobs:
           fetch-depth: 0
 
       - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v18
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: '${{ env.CLUSTER_REGION }}'
-          cluster_name: '${{ vars.CLUSTER_NAME }}'
+          cluster_name: '${{ env.CLUSTER_NAME }}'
 
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v18
+        uses: orbitspot/actions/.github/actions/helm-deploy@v18.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_region: '${{ env.CLUSTER_REGION }}'

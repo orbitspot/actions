@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.1
         with:
           devops_config: ${{ vars.DEVOPS_CONFIG }}
           branch: develop
@@ -37,6 +37,7 @@ jobs:
           with:
             ref: ${{ inputs.git_ref }}
             fetch-depth: 0
+
         - name: Configurar Python
           uses: actions/setup-python@v5
           with:
@@ -92,7 +93,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-vars
-          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18
+          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18.1
           with:
             keys: ${{ needs.loading-environments.outputs.environments }}
             environment_json: ${{ toJson(vars) }}
@@ -109,7 +110,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-secrets
-          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18
+          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18.1
           with:
             keys: ${{ needs.loading-environments.outputs.secrets }}
             environment_json: ${{ toJson(secrets) }}
@@ -137,7 +138,7 @@ jobs:
           terraform_version: "1.5.0"
               
       - name: Start terraform
-        uses: orbitspot/actions/.github/actions/parameter-store@v18
+        uses: orbitspot/actions/.github/actions/parameter-store@v18.1
         with:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
