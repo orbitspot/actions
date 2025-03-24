@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   setup-config:
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     outputs:
       CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -26,47 +26,47 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@fix-npm-ci
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.1
         with:
           devops_config: '${{ vars.DEVOPS_CONFIG }}'
-          branch: 'develop'
+          branch: '${{ github.ref_name }}'
 
-  # building:
-  #   name: Building
-  #   runs-on: ubuntu-latest
-  #   needs: [setup-config]
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #   env:
-  #     CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-  #   steps:
-  #     - name: Authenticate
-  #       uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix-npm-ci
-  #       with:
-  #         aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-  #         aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-  #         aws_region: us-east-1
+  building:
+    name: Building
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    needs: [setup-config]
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+    steps:
+      - name: Authenticate
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.1
+        with:
+          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
+          aws_region: us-east-1
 
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-  #     - name: Bash Co Login
-  #       run: |
-  #         bash co_login_commands.txt
+      - name: Bash Co Login
+        run: |
+          bash co_login_commands.txt
 
-  #     - name: Npm Building
-  #       uses: orbitspot/actions/.github/actions/npm-ci@fix-npm-ci
-  #       with:
-  #         node_version: '20'
+      - name: Npm Building
+        uses: orbitspot/actions/.github/actions/npm-ci@v18.1
+        with:
+          node_version: '20'
 
   generate-docker:
     name: Docker Build Migration
-    runs-on: ubuntu-latest
-    needs: [setup-config]
-    environment: 'develop'
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    needs: [setup-config, building]
+    environment: '${{ github.ref_name }}'
     permissions:
       id-token: write
       contents: read
@@ -80,7 +80,7 @@ jobs:
           fetch-depth: 0
 
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix-npm-ci
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -91,26 +91,24 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/Dockerfile Dockerfile
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/migration.sh migration.sh
 
-    # sed -i 's/<TAG-GRAFANA>/${{ inputs.grafana_tag }}/g' values.yaml
-
-      # - name: docker-build
-      #   uses: orbitspot/actions/.github/actions/docker@fix-npm-ci
-      #   with:
-      #     aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-      #     aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-      #     aws_region: '${{ env.CLUSTER_REGION }}'
-      #     image: 'migration-${{ github.event.repository.name }}'
-      #     content: 'building'
-      #     tag: '${{ github.sha }}'
-      #     build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
-      #     before_building: |
-      #       echo "${{ inputs.run_command }}" >> migration.sh
-      #       cat migration.sh
+      - name: docker-build
+        uses: orbitspot/actions/.github/actions/docker@v18.1
+        with:
+          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
+          aws_region: '${{ env.CLUSTER_REGION }}'
+          image: 'migration-${{ github.event.repository.name }}'
+          content: 'building'
+          tag: '${{ github.sha }}'
+          build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
+          before_building: |
+            echo "${{ inputs.run_command }}" >> migration.sh
+            cat migration.sh
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: ubuntu-latest
-    environment: 'develop'
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    environment: '${{ github.ref_name }}'
     needs: [generate-docker]
     permissions:
       id-token: write
@@ -134,7 +132,7 @@ jobs:
           path: code
       
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix-npm-ci
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -159,7 +157,7 @@ jobs:
       - name: replace-data
         env:
           PREFIX: '.${{ github.event.repository.name }}'
-          PROPERTIES_PATH: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+          PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
           YAML_PATH: .github/helm/migration/values.yaml
         run: python code/.github/scripts/replace-properties.py
 
@@ -168,7 +166,6 @@ jobs:
           parameters=$(cat .github/helm/parameter-store.yaml)
           echo "" >> .github/helm/migration/values.yaml
           echo "$parameters" >> .github/helm/migration/values.yaml
-          cat .github/helm/migration/values.yaml
 
       - name: upload
         uses: actions/upload-artifact@v4
@@ -178,45 +175,45 @@ jobs:
           retention-days: 1
 
 
-  # helm-CD-migration:
-  #   name: K8s Deploy Migration
-  #   runs-on: ubuntu-latest
-  #   environment: 'develop'
-  #   needs: [setup-config, prepare-helm-replacements]
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #   env:
-  #     CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-  #     CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
-  #     ENV: '${{ needs.setup-config.outputs.ENV }}'
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       name: Checkout
-  #       with:
-  #         ref: '${{ inputs.git_ref }}'
-  #         fetch-depth: 0
+  helm-CD-migration:
+    name: K8s Deploy Migration
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    environment: '${{ github.ref_name }}'
+    needs: [setup-config, prepare-helm-replacements]
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+      CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
+      ENV: '${{ needs.setup-config.outputs.ENV }}'
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+        with:
+          ref: '${{ inputs.git_ref }}'
+          fetch-depth: 0
 
-  #     - name: configure
-  #       uses: orbitspot/actions/.github/actions/kubernetes-auth@fix-npm-ci
-  #       with:
-  #         aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-  #         aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-  #         aws_region: '${{ env.CLUSTER_REGION }}'
-  #         cluster_name: '${{ vars.CLUSTER_NAME }}'
+      - name: configure
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.1
+        with:
+          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
+          aws_region: '${{ env.CLUSTER_REGION }}'
+          cluster_name: '${{ vars.CLUSTER_NAME }}'
 
-  #     - name: helm-apply
-  #       uses: orbitspot/actions/.github/actions/helm-deploy@fix-npm-ci
-  #       with:
-  #         aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-  #         aws_region: '${{ env.CLUSTER_REGION }}'
-  #         namespace: '${{ github.event.repository.name }}'
-  #         helm_values: helm-values-migration
-  #         release: migration
-  #         chart_name: orbitspot/orbitspot-terraform
-  #         chart_version: 0.3.5
-  #         sets: |
-  #           --set environment=${{ env.ENV}} \
-  #           --set region=${{ env.CLUSTER_REGION }} \
-  #           --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER}}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/migration-${{github.event.repository.name }}' \
-  #           --set 'containers[0].repository.tag=${{ github.sha }}'
+      - name: helm-apply
+        uses: orbitspot/actions/.github/actions/helm-deploy@v18.1
+        with:
+          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+          aws_region: '${{ env.CLUSTER_REGION }}'
+          namespace: '${{ github.event.repository.name }}'
+          helm_values: helm-values-migration
+          release: migration
+          chart_name: orbitspot/orbitspot-terraform
+          chart_version: 0.3.5
+          sets: |
+            --set environment=${{ env.ENV}} \
+            --set region=${{ env.CLUSTER_REGION }} \
+            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER}}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/migration-${{github.event.repository.name }}' \
+            --set 'containers[0].repository.tag=${{ github.sha }}'
