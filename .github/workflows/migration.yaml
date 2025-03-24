@@ -92,7 +92,7 @@ jobs:
           sed -i 's/<NOME-DO-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
           sed -i 's/<TAG-GRAFANA>/${{ inputs.grafana_tag }}/g' values.yaml
           ls
-          mv values.yaml .gitub/helm/migration/values.yaml
+          mv values.yaml .github/helm/migration/values.yaml
           cat .github/helm/migration/values.yaml
 
       - name: docker-build
