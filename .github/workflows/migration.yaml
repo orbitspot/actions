@@ -31,41 +31,41 @@ jobs:
           devops_config: '${{ vars.DEVOPS_CONFIG }}'
           branch: 'develop'
 
-  building:
-    name: Building
-    runs-on: ubuntu-latest
-    needs: [setup-config]
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-    steps:
-      - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix-npm-ci
-        with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-          aws_region: us-east-1
+  # building:
+  #   name: Building
+  #   runs-on: ubuntu-latest
+  #   needs: [setup-config]
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   env:
+  #     CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+  #   steps:
+  #     - name: Authenticate
+  #       uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix-npm-ci
+  #       with:
+  #         aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+  #         aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
+  #         aws_region: us-east-1
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
 
-      - name: Bash Co Login
-        run: |
-          bash co_login_commands.txt
+  #     - name: Bash Co Login
+  #       run: |
+  #         bash co_login_commands.txt
 
-      - name: Npm Building
-        uses: orbitspot/actions/.github/actions/npm-ci@fix-npm-ci
-        with:
-          node_version: '20'
+  #     - name: Npm Building
+  #       uses: orbitspot/actions/.github/actions/npm-ci@fix-npm-ci
+  #       with:
+  #         node_version: '20'
 
   generate-docker:
     name: Docker Build Migration
     runs-on: ubuntu-latest
-    needs: [setup-config, building]
+    needs: [setup-config]
     environment: 'develop'
     permissions:
       id-token: write
@@ -95,19 +95,19 @@ jobs:
           mv values.yaml .github/helm/migration/values.yaml
           cat .github/helm/migration/values.yaml
 
-      - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@fix-npm-ci
-        with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-          aws_region: '${{ env.CLUSTER_REGION }}'
-          image: 'migration-${{ github.event.repository.name }}'
-          content: 'building'
-          tag: '${{ github.sha }}'
-          build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
-          before_building: |
-            echo "${{ inputs.run_command }}" >> migration.sh
-            cat migration.sh
+      # - name: docker-build
+      #   uses: orbitspot/actions/.github/actions/docker@fix-npm-ci
+      #   with:
+      #     aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+      #     aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
+      #     aws_region: '${{ env.CLUSTER_REGION }}'
+      #     image: 'migration-${{ github.event.repository.name }}'
+      #     content: 'building'
+      #     tag: '${{ github.sha }}'
+      #     build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
+      #     before_building: |
+      #       echo "${{ inputs.run_command }}" >> migration.sh
+      #       cat migration.sh
 
   prepare-helm-replacements:
     name: Building Helm Values
