@@ -83,10 +83,14 @@ jobs:
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: us-east-1
 
-      - name: Download File from S3
+      - name: Download Files from S3
         run: |
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/Dockerfile Dockerfile
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/migration.sh migration.sh
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/helm-values.yaml values.yaml
+          echo "module: ${{ inputs.grafana_tag }}" | cat - values.yaml > temp.yaml && mv temp.yaml .github/helm/migration/values.yaml
+          ls
+          cat .github/helm/migration/values.yaml
 
       - name: docker-build
         uses: orbitspot/actions/.github/actions/docker@v18.1
@@ -133,6 +137,7 @@ jobs:
           echo "${{ vars._PROPERTIES }}" > values.properties
           echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
           echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
+          cat .github/helm/migration/values.yaml
 
       - name: replace-data
         env:
