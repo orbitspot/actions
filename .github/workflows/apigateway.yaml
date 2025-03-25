@@ -10,11 +10,13 @@ on:
         required: true
         type: string
       istio_enabled:
-        required: true
+        required: false
         type: string
+        default: "true"
       hosts:
-        required: true
+        required: false
         type: string
+        default: "${{ vars.ISTIO_HOST }}"
         
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
