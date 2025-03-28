@@ -62,13 +62,7 @@ runs:
     shell: bash
     run: |
       cd code/terraform/api-gateway
-      terraform state list > state.txt
-      if [ -s state.txt ]; then
-        echo "Resource already exists"
-        terraform destroy -auto-approve
-      else
-        echo "Resource doesn't exist"
-      fi
+      terraform destroy -auto-approve
       
   - name: Terraform Plan
     shell: bash
