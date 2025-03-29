@@ -142,3 +142,5 @@ jobs:
         with:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
+          aws_region: "${{ env.CLUSTER_REGION }}"
+
