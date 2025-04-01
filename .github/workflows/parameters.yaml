@@ -85,7 +85,7 @@ jobs:
   create-parameters-vars:
       name: Create parameters
       runs-on: ubuntu-latest
-      environment: ${{ github.ref_name }}
+      environment: develop
       needs: loading-environments
       permissions:
         id-token: write
