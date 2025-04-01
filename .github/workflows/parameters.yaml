@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   setup-config:
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     outputs:
       CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
     steps:

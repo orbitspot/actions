@@ -22,8 +22,8 @@ runs:
 
           variables = ${{ inputs.environment_json }}
           print(variables)
-          not_container_variables = ['ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT', 
-                                    'API_GATEWAY', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET']
+          not_container_variables = ['CLUSTER_REGION', 'ENV', 'CLUSTER_NAME', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT', 
+                                    'API_GATEWAY', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', '_PROPERTIES', '_POLICY_JSON']
           result_json = {}
           for key in variables:
             value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
