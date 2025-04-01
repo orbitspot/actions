@@ -23,8 +23,8 @@ inputs:
     default: ''
   apply_response_script:
     description: 'Apply new scripts on integration'
-    default: true
     required: false
+    default: true
 
 runs:
   using: composite
@@ -52,12 +52,17 @@ runs:
         repository: 'orbitspot/actions'
         path: code
 
-
   - name: Terraform Init
     shell: bash
     run: |
       cd code/terraform/api-gateway
       terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
+
+  - name: Delete resource if it exists
+    shell: bash
+    run: |
+      cd code/terraform/api-gateway
+      terraform destroy -auto-approve
       
   - name: Terraform Plan
     shell: bash
