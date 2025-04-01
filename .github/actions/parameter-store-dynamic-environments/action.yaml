@@ -1,18 +1,12 @@
 name: 'Parameter Store'
 description: 'Parameter store'
 inputs:
-  keys:
-    description: 'Environment Keys'
-    required: true
   environment_json:
     description: 'environment values'
     required: true
   file_name:
     description: 'file name'
     required: true
-  encrypt:
-    description: 'file name'
-    required: false
 runs:
   using: composite
   steps:
@@ -26,13 +20,13 @@ runs:
       run: |
           import json
 
-          keys = ${{ inputs.keys }}
           variables = ${{ inputs.environment_json }}
+          devops_variables = ['CLUSTER_REGION', 'ENV', 'CLUSTER_NAME', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT', 
+                              'API_GATEWAY', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', '_PROPERTIES', '_POLICY_JSON']
           result_json = {}
-
-          for key in keys:
+          for key in variables:
             value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
-            if len(value) > 0: # nao adiciona variaveis sem valor
+            if len(value) > 0 and key not in devops_variables: # nao adiciona variaveis sem valor
               result_json.update({key: value}) 
 
           with open(f"${{ inputs.file_name }}.json", "w") as outfile:
