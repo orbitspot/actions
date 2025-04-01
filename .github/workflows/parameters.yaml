@@ -26,7 +26,7 @@ jobs:
 
   loading-environments:
     name: loading-environments
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     # needs: [setup-config]
     outputs:
       environments: ${{ steps.environments.outputs.result }}
@@ -84,7 +84,7 @@ jobs:
 
   create-parameters-vars:
       name: Create parameters
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ubuntu-latest
       environment: ${{ github.ref_name }}
       needs: loading-environments
       permissions:
