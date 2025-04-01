@@ -42,7 +42,7 @@ jobs:
 
   create-parameters-secrets:
       name: Create parameters secrets
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ubuntu-latest
       environment: ${{ github.ref_name }}
       # needs: [setup-config]
       permissions:
