@@ -28,11 +28,11 @@ runs:
 
           keys = ${{ inputs.keys }}
           variables = ${{ inputs.environment_json }}
+          print(variables)
           result_json = {}
-
           for key in keys:
             value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
-            if len(value) > 0: # nao adiciona variaveis sem valor
+            if len(value) >: # nao adiciona variaveis sem valor
               result_json.update({key: value}) 
 
           with open(f"${{ inputs.file_name }}.json", "w") as outfile:
@@ -44,3 +44,5 @@ runs:
         name: ${{ inputs.file_name }}
         path: ${{ inputs.file_name }}.json
         retention-days: 1
+
+# not_container_variables = ['API_GATEWAY', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', '_DEVOPS_CONFIG', 'ISTIO_HOST', 'TERRAFORM_BUCKET', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT']
