@@ -34,7 +34,7 @@ jobs:
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.3
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: 'develop'
+            branch: '${{ github.ref_name }}'
     
     building:
         name: Building
@@ -188,7 +188,7 @@ jobs:
                 aws s3 cp s3://devops.orbitspot.com/build-github-actions/deploy/${{ matrix.artifacts }}/values.yaml values.yaml
                 sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
-                mkdir .github/helm/${{ matrix.artifacts }}
+                mkdir -p .github/helm/${{ matrix.artifacts }}
                 mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
                 cat .github/helm/${{ matrix.artifacts }}/values.yaml
 

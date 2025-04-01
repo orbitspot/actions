@@ -141,7 +141,7 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/values.yaml values.yaml
           sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
           sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
-          mkdir .github/helm/migration
+          mkdir -p .github/helm/migration
           mv values.yaml .github/helm/migration/values.yaml
           cat .github/helm/migration/values.yaml
 
