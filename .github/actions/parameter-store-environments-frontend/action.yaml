@@ -35,7 +35,12 @@ runs:
             result_string = result_string.rstrip()
           env.close()
 
-    # - name: Upload encrypted artifact
+    - name: cat env
+      shell: python
+      run: |
+          pwd
+          ls
+          cat .env
     #   uses: actions/upload-artifact@v4
     #   with:
     #     name: build_args
