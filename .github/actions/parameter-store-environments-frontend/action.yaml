@@ -26,7 +26,8 @@ runs:
                               'API_GATEWAY', 'DEVOPS_CONFIG', '_DEVOPS_CONFIG', 'github_token', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', '_PROPERTIES', '_POLICY_JSON']
           
           result_string = ''
-          with open('.env', 'w+') as env:
+          os.mkdir('env')
+          with open('env/.env', 'w+') as env:
             for key in variables:
               value = variables[key]
               if len(value) > 0 and key not in devops_variables: 
@@ -40,7 +41,7 @@ runs:
       run: |
           ls -a
           pwd
-          cat .env
+          cat env/.env
     #   uses: actions/upload-artifact@v4
     #   with:
     #     name: build_args
@@ -51,7 +52,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: env
-        path: .env
+        path: env
         retention-days: 1
 
 

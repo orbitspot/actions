@@ -83,11 +83,17 @@ jobs:
               uses: orbitspot/actions/.github/actions/parameter-store-environments-frontend@criação-workflow-reutilizavel-frontend
               with:
                 environment_json: ${{ toJson(vars) }}
+            
+            - name: Download Building files
+              uses: actions/download-artifact@v4
+              with:
+                  name: env
 
             - name: Yarn Building
               shell: bash
               run: |
-                ls cat .env
+                ls -a
+                cat .env
                 yarn
                 yarn build
         
