@@ -26,7 +26,7 @@ runs:
                               'API_GATEWAY', 'DEVOPS_CONFIG', '_DEVOPS_CONFIG', 'github_token', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', '_PROPERTIES', '_POLICY_JSON']
           
           result_string = ''
-          with open('.env', 'x') as env:
+          with open('.env', 'w+') as env:
             for key in variables:
               value = variables[key]
               if len(value) > 0 and key not in devops_variables: 
