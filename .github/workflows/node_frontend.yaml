@@ -42,6 +42,7 @@ jobs:
         name: Building
         runs-on: ubuntu-latest
         environment: develop
+        needs: [setup-config]
         permissions:
             id-token: write
             contents: read
@@ -79,7 +80,7 @@ jobs:
 
             - name: Generate Build Args
               id: generate-environments-vars
-              uses: orbitspot/actions/.github/actions/parameter-store-environment-frontend@criacao-workflow-reutilizavel-frontend
+              uses: orbitspot/actions/.github/actions/parameter-store-environment-frontend@criação-workflow-reutilizavel-frontend
               with:
                 environment_json: ${{ toJson(vars) }}
 
@@ -110,7 +111,7 @@ jobs:
         name: Docker Build
         runs-on: ubuntu-latest
         environment: develop
-        needs: [building]
+        needs: [setup-config, building]
         permissions:
             id-token: write
             contents: read
@@ -150,7 +151,7 @@ jobs:
         name: Creating Aws Resources
         runs-on: ubuntu-latest
         environment: develop
-        needs: [building]
+        needs: [setup-config, building]
         permissions:
             id-token: write
             contents: read
@@ -181,7 +182,7 @@ jobs:
         name: K8s Deploy
         runs-on: ubuntu-latest
         environment: develop
-        needs: [ create-service-account-role, generate-docker ]
+        needs: [ setup-config, create-service-account-role, generate-docker ]
         permissions:
             id-token: write
             contents: read
