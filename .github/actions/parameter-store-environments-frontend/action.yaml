@@ -38,8 +38,7 @@ runs:
     - name: cat env
       shell: python
       run: |
-          pwd
-          ls
+          ls -a
           cat .env
     #   uses: actions/upload-artifact@v4
     #   with:
