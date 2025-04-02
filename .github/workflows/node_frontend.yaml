@@ -80,7 +80,7 @@ jobs:
 
             - name: Generate Build Args
               id: generate-environments-vars
-              uses: orbitspot/actions/.github/actions/parameter-store-environment-frontend@criação-workflow-reutilizavel-frontend
+              uses: orbitspot/actions/.github/actions/parameter-store-environments-frontend@criação-workflow-reutilizavel-frontend
               with:
                 environment_json: ${{ toJson(vars) }}
 
