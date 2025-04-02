@@ -35,7 +35,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-vars
-          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18.3
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v18.3
           with:
             environment_json: ${{ toJson(vars) }}
             file_name: variables
@@ -51,7 +51,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-secrets
-          uses: orbitspot/actions/.github/actions/parameter-store-dynamic-environments@v18.3
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v18.3
           with:
             environment_json: ${{ toJson(secrets) }}
             file_name: secrets
