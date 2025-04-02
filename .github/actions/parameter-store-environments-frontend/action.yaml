@@ -53,6 +53,7 @@ runs:
       with:
         name: env
         path: env/.env
+        include-hidden-files: true
         retention-days: 1
 
 
