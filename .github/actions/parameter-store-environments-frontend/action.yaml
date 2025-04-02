@@ -36,9 +36,10 @@ runs:
           env.close()
 
     - name: cat env
-      shell: python
+      shell: bash
       run: |
           ls -a
+          pwd
           cat .env
     #   uses: actions/upload-artifact@v4
     #   with:
