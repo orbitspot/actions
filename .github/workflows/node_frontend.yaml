@@ -150,10 +150,8 @@ jobs:
                 content: "building"
                 image: ${{ github.event.repository.name }}
                 tag: ${{ github.sha }}
-                build_args: "${{ steps.tests.generate-environments-vars.BUILD_ARGS }}"
                 before_building: |
                       ls
-                      mv .env .env
 
     create-service-account-role:
         name: Creating Aws Resources
