@@ -28,7 +28,7 @@ jobs:
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
-        ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
+        ACM_ARN_FRONTEND: '${{ steps.set-output.outputs.ACM_ARN_FRONTEND }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
         - name: Fetch devops variables
@@ -150,8 +150,6 @@ jobs:
                 content: "building"
                 image: ${{ github.event.repository.name }}
                 tag: ${{ github.sha }}
-                before_building: |
-                      ls
 
     create-service-account-role:
         name: Creating Aws Resources
@@ -199,7 +197,7 @@ jobs:
         env:
           CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
           CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
-          ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
+          ACM_ARN_FRONTEND: '${{ needs.setup-config.outputs.ACM_ARN_FRONTEND }}'
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - uses: actions/checkout@v4
@@ -246,5 +244,5 @@ jobs:
                       --set region=${{ env.CLUSTER_REGION }} \
                       --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
                       --set 'containers[0].repository.tag=${{ github.sha }}' \
-                      --set ingress.annotations.acm=${{ env.ACM_ARN }} \
+                      --set ingress.annotations.acm=${{ env.ACM_ARN_FRONTEND }} \
                       --set ingress.rules[0].host=${{ vars.HOST_MF }}
