@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
     setup-config:
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ubuntu-latest
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -34,11 +34,11 @@ jobs:
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@fix-parameters-dinamicos
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: '${{ github.ref_name }}'
+            branch: 'develop'
     
     building:
         name: Building
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ubuntu-latest
         needs: [setup-config]
         permissions:
             id-token: write
@@ -68,8 +68,8 @@ jobs:
 
     generate-docker:
         name: Docker Build Api
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [setup-config, building]
         strategy:
             matrix:
@@ -114,8 +114,8 @@ jobs:
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [setup-config, generate-docker]
         permissions:
             id-token: write
@@ -149,8 +149,8 @@ jobs:
 
     prepare-helm-replacements:
         name: Building Helm Values
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [generate-docker]
         strategy:
             matrix:
@@ -234,8 +234,8 @@ jobs:
 
     helm-cd-api:
         name: K8s Deploy Api
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [setup-config, prepare-helm-replacements]
         permissions:
             id-token: write
@@ -277,8 +277,8 @@ jobs:
 
     helm-cd-consumer:
         name: K8s Deploy Consumer
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [setup-config, prepare-helm-replacements]
         permissions:
             id-token: write
