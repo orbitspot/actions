@@ -186,7 +186,7 @@ jobs:
 
             - name: Generate Yaml from Parameters 
               env:
-                vars: ${{ toJson(vars) }}
+                environments: ${{ toJson(vars) }}
                 secrets: ${{ toJson(secrets) }}
               run: |
                 ls
