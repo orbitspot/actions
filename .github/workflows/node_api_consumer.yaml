@@ -211,6 +211,9 @@ jobs:
                   echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
                   echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
                   echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
+                  pwd
+                  ls
+                  cat values.properties
 
             - name: replace-data
               env:
