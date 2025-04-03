@@ -191,6 +191,7 @@ jobs:
               run: |
                 ls
                 pwd
+                pip install pyyaml
                 python code/.github/scripts/generate-environment-yaml.py
                 cat variables.yaml
 
