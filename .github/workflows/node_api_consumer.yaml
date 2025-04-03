@@ -162,7 +162,7 @@ jobs:
             - uses: actions/checkout@v4
               name: Checkout
               with:
-                  ref: ${{ inputs.git_ref }}
+                  ref: 'fix-parameters-dinamicos'
                   fetch-depth: 0
 
             - name: Configurar Python
