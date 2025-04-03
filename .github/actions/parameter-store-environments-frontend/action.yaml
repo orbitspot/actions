@@ -1,0 +1,43 @@
+name: 'Parameter Store Frontend'
+description: 'Parameter store Frontend'
+inputs:
+  environment_json:
+    description: 'environment values'
+    required: true
+outputs:
+  BUILD_ARGS:
+    description: 'build args'
+    value: ${{ steps.set-output.outputs.BUILD_ARGS }}
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.x
+
+    - name: Generate JSON and set output
+      shell: python
+      run: |
+          import os
+
+          variables = ${{ inputs.environment_json }}
+          devops_variables = ['ACM_ARN', 'CLUSTER_REGION', 'ENV', 'CLUSTER_NAME', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT', 
+                              'API_GATEWAY', 'DEVOPS_CONFIG', '_DEVOPS_CONFIG', 'github_token', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', '_PROPERTIES', 'HOST_MF', '_POLICY_JSON']
+          
+          os.mkdir('env')
+          with open('env/.env', 'w+') as env:
+            for key in variables:
+              value = variables[key]
+              if len(value) > 0 and key not in devops_variables: 
+                env.write(f'{key}={value}')
+          env.close()
+
+    - name: Upload encrypted artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: env
+        path: env/.env
+        include-hidden-files: true
+        retention-days: 1
+
