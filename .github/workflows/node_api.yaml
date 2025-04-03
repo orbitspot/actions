@@ -71,9 +71,6 @@ jobs:
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, building]
-        strategy:
-            matrix:
-                artifacts: ['api', 'consumer']
         permissions:
             id-token: write
             contents: read
@@ -105,12 +102,12 @@ jobs:
                 aws_role_name: ${{ vars.AWS_ROLE_NAME }}
                 aws_region: ${{ env.CLUSTER_REGION }}
                 content: 'building'
-                image: '${{ matrix.artifacts }}-${{ github.event.repository.name }}'
+                image: 'api-${{ github.event.repository.name }}'
                 tag: ${{ github.sha }}
-                build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=${{ matrix.artifacts }}'
+                build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=api'
                 before_building: |
-                    cat base_script.sh scripts/${{ matrix.artifacts }}.sh > ${{ matrix.artifacts }}.sh
-                    cat ${{ matrix.artifacts }}.sh
+                    cat base_script.sh scripts/api.sh > api.sh
+                    cat api.sh
 
     create-service-account-role:
         name: Creating Aws Resources
@@ -152,9 +149,6 @@ jobs:
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [generate-docker]
-        strategy:
-            matrix:
-                artifacts: ['api', 'consumer']
         permissions:
             id-token: write
             contents: read
@@ -195,11 +189,11 @@ jobs:
 
             - name: Download Helm from S3
               run: |
-                aws s3 cp s3://devops.orbitspot.com/build-github-actions/deploy/${{ matrix.artifacts }}/values.yaml values.yaml
+                aws s3 cp s3://devops.orbitspot.com/build-github-actions/deploy/api/values.yaml values.yaml
                 sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
-                mkdir -p .github/helm/${{ matrix.artifacts }}
-                mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
+                mkdir -p .github/helm/api
+                mv values.yaml .github/helm/api/values.yaml
 
             - name: append-data-in-properties
               run: |
@@ -213,21 +207,21 @@ jobs:
               env:
                   PREFIX: .${{ github.event.repository.name }}
                   PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
-                  YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
+                  YAML_PATH: .github/helm/api/values.yaml
               run: python code/.github/scripts/replace-properties.py
 
             - name: append-parameters
               run: |
                   parameters=$(cat variables.yaml)
-                  echo "" >> .github/helm/${{ matrix.artifacts }}/values.yaml
-                  echo "$parameters" >> .github/helm/${{ matrix.artifacts }}/values.yaml
-                  cat .github/helm/${{ matrix.artifacts }}/values.yaml
+                  echo "" >> .github/helm/api/values.yaml
+                  echo "$parameters" >> .github/helm/api/values.yaml
+                  cat .github/helm/api/values.yaml
 
             - name: upload
               uses: actions/upload-artifact@v4
               with:
-                  name: helm-values-${{ matrix.artifacts }}
-                  path: .github/helm/${{ matrix.artifacts }}/values.yaml
+                  name: helm-values-api
+                  path: .github/helm/api/values.yaml
                   retention-days: 1
 
     helm-cd-api:
@@ -273,45 +267,3 @@ jobs:
                       --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
                       --set 'containers[0].repository.tag=${{ github.sha }}'
 
-    helm-cd-consumer:
-        name: K8s Deploy Consumer
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
-        needs: [setup-config, prepare-helm-replacements]
-        permissions:
-            id-token: write
-            contents: read
-        env:
-          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-          CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
-          ENV: '${{ needs.setup-config.outputs.ENV }}'
-        steps:
-            - uses: actions/checkout@v4
-              name: Checkout
-              with:
-                  ref: ${{ inputs.git_ref }}
-                  fetch-depth: 0
-
-            - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.4
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-                  aws_region: ${{ env.CLUSTER_REGION }}
-                  cluster_name: ${{ env.CLUSTER_NAME }}
-
-            - name: helm-apply
-              uses: orbitspot/actions/.github/actions/helm-deploy@v18.4
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_region: ${{ env.CLUSTER_REGION }}
-                  namespace: ${{ github.event.repository.name }}
-                  helm_values: helm-values-consumer
-                  release: consumer
-                  chart_name: orbitspot/orbitspot-terraform
-                  chart_version: 0.3.5
-                  sets: |
-                      --set environment=${{ env.ENV}} \
-                      --set region=${{ env.CLUSTER_REGION }} \
-                      --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/consumer-${{ github.event.repository.name }}' \
-                      --set 'containers[0].repository.tag=${{ github.sha }}'
