@@ -188,7 +188,9 @@ jobs:
                 vars: ${{ toJson(vars) }}
                 secrets: ${{ toJson(secrets) }}
               run: |
-                python code .github/scripts/generate-environment-yaml.py
+                ls
+                pwd
+                python code/.github/scripts/generate-environment-yaml.py
                 cat variables.yaml
 
             - name: Download Helm from S3
