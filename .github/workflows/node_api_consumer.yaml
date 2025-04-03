@@ -191,7 +191,6 @@ jobs:
               run: |
                 ls
                 pwd
-                cd code && ls
                 python code/.github/scripts/generate-environment-yaml.py
                 cat variables.yaml
 
