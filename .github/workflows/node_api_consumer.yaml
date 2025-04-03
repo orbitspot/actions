@@ -183,14 +183,25 @@ jobs:
                 aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
                 aws_region: us-east-1
 
+            - name: Generate Yaml from Parameters
+              uses: orbitspot/actions/.github/actions/parameter-store-generate-yaml@v18.4
+              with:
+                vars: ${{ toJson(vars) }}
+                secrets: ${{ toJson(secrets) }}
+            
+            - name: Download Building files
+              uses: actions/download-artifact@v4
+              with:
+                  name: variables
+
             - name: Download Helm from S3
               run: |
+                cat variables.yaml
                 aws s3 cp s3://devops.orbitspot.com/build-github-actions/deploy/${{ matrix.artifacts }}/values.yaml values.yaml
                 sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
                 mkdir -p .github/helm/${{ matrix.artifacts }}
                 mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
-                cat .github/helm/${{ matrix.artifacts }}/values.yaml
 
             - name: append-data-in-properties
               run: |
@@ -209,9 +220,10 @@ jobs:
 
             - name: append-parameters
               run: |
-                  parameters=$(cat .github/helm/parameter-store.yaml)
+                  parameters=$(cat variables.yaml)
                   echo "" >> .github/helm/${{ matrix.artifacts }}/values.yaml
                   echo "$parameters" >> .github/helm/${{ matrix.artifacts }}/values.yaml
+                  cat .github/helm/${{ matrix.artifacts }}/values.yaml
 
             - name: upload
               uses: actions/upload-artifact@v4
