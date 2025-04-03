@@ -31,7 +31,7 @@ jobs:
       steps:
         - name: Fetch devops variables
           id: set-output
-          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.4
+          uses: orbitspot/actions/.github/actions/fetch-devops-variables@fix-parameters-dinamicos
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
             branch: '${{ github.ref_name }}'
@@ -45,7 +45,7 @@ jobs:
             contents: read
         steps:
             - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.4
+              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix-parameters-dinamicos
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -61,7 +61,7 @@ jobs:
                   bash co_login_commands.txt
 
             - name: Npm Building
-              uses: orbitspot/actions/.github/actions/npm-ci@v18.4
+              uses: orbitspot/actions/.github/actions/npm-ci@fix-parameters-dinamicos
               with:
                   node_version: '${{ inputs.version }}'
                   customized_dockerfile: '${{ inputs.dockerfile_path  }}'
@@ -78,7 +78,7 @@ jobs:
           CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
         steps:
           - name: Authenticate
-            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.4
+            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix-parameters-dinamicos
             with:
               aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
               aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -96,7 +96,7 @@ jobs:
               mv ${{ inputs.dockerfile_path }} Dockerfile
     
           - name: docker-build
-            uses: orbitspot/actions/.github/actions/docker@v18.4
+            uses: orbitspot/actions/.github/actions/docker@fix-parameters-dinamicos
             with:
                 aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                 aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -123,7 +123,7 @@ jobs:
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - name: create-role
-              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.4
+              uses: orbitspot/actions/.github/actions/create-role-service-account@fix-parameters-dinamicos
               with:
                   role: '${{ github.event.repository.name }}-${{ env.ENV }}'
                   namespace: ${{ github.event.repository.name }}
@@ -134,7 +134,7 @@ jobs:
                   policy: ${{ vars._POLICY_JSON }}
 
             - name: create-namespace
-              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.4
+              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@fix-parameters-dinamicos
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -171,19 +171,35 @@ jobs:
                   path: code
             
             - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.4
+              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix-parameters-dinamicos
               with:
                 aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
                 aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
                 aws_region: us-east-1
+            
+            - name: Generate Yaml from Parameters
+              uses: orbitspot/actions/.github/actions/parameter-store-generate-yaml@fix-parameters-dinamicos
+              with:
+                vars: ${{ toJson(vars) }}
+                secrets: ${{ toJson(secrets) }}
+            
+            - name: Download Building files
+              uses: actions/download-artifact@v4
+              with:
+                  name: variables
 
-            - name: Download Helm from S3
+            - name: Download Helm from S3 and Append Parameters
               run: |
                 aws s3 cp s3://devops.orbitspot.com/build-github-actions/deploy/api/values.yaml values.yaml
                 sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
                 mkdir -p .github/helm/api
                 mv values.yaml .github/helm/api/values.yaml
+
+                parameters=$(cat variables.yaml)
+                echo "" >> .github/helm/api/values.yaml
+                echo "$parameters" >> .github/helm/api/values.yaml
+
                 cat .github/helm/api/values.yaml
 
             - name: append-data-in-properties
@@ -200,12 +216,6 @@ jobs:
                   PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
                   YAML_PATH: .github/helm/api/values.yaml
               run: python code/.github/scripts/replace-properties.py
-
-            - name: append-parameters
-              run: |
-                  parameters=$(cat .github/helm/parameter-store.yaml)
-                  echo "" >> .github/helm/api/values.yaml
-                  echo "$parameters" >> .github/helm/api/values.yaml
 
             - name: upload
               uses: actions/upload-artifact@v4
@@ -234,7 +244,7 @@ jobs:
                   fetch-depth: 0
 
             - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.4
+              uses: orbitspot/actions/.github/actions/kubernetes-auth@fix-parameters-dinamicos
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -242,7 +252,7 @@ jobs:
                   cluster_name: ${{ env.CLUSTER_NAME }}
 
             - name: helm-apply
-              uses: orbitspot/actions/.github/actions/helm-deploy@v18.4
+              uses: orbitspot/actions/.github/actions/helm-deploy@fix-parameters-dinamicos
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_region: ${{ env.CLUSTER_REGION }}
