@@ -136,6 +136,16 @@ jobs:
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: us-east-1
 
+      - name: Generate Yaml from Parameters 
+        env:
+          environments: ${{ toJson(vars) }}
+          secrets: ${{ toJson(secrets) }}
+          repository_name: ${{ github.event.repository.name }}
+        run: |
+          pip install pyyaml
+          python code/.github/scripts/generate-environment-yaml.py
+          cat variables.yaml
+
       - name: Download Helm from S3
         run: |
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/values.yaml values.yaml
@@ -161,9 +171,10 @@ jobs:
 
       - name: append-parameters
         run: |
-          parameters=$(cat .github/helm/parameter-store.yaml)
-          echo "" >> .github/helm/migration/values.yaml
-          echo "$parameters" >> .github/helm/migration/values.yaml
+            parameters=$(cat variables.yaml)
+            echo "" >> .github/helm/${{ matrix.artifacts }}/values.yaml
+            echo "$parameters" >> .github/helm/${{ matrix.artifacts }}/values.yaml
+            cat .github/helm/${{ matrix.artifacts }}/values.yaml
 
       - name: upload
         uses: actions/upload-artifact@v4

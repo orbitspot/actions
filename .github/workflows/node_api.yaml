@@ -266,4 +266,3 @@ jobs:
                       --set region=${{ env.CLUSTER_REGION }} \
                       --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
                       --set 'containers[0].repository.tag=${{ github.sha }}'
-
