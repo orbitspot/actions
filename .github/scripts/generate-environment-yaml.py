@@ -1,8 +1,9 @@
 import yaml
+import json
 import os
 
 def generate_yaml():
-  import json
+
   environments = json.loads(os.getenv('environments'))
   secrets = json.loads(os.getenv('secrets'))
   repository_name = os.getenv('repository_name')
@@ -25,6 +26,5 @@ def generate_yaml():
 
   with open(f"variables.yaml", "a") as outfile:
     yaml.dump(result_secrets, outfile, default_flow_style=False)
-
 
 generate_yaml()
