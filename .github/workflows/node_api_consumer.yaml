@@ -162,7 +162,7 @@ jobs:
             - uses: actions/checkout@v4
               name: Checkout
               with:
-                  ref: 'fix-parameters-dinamicos'
+                  ref: '${{ inputs.git_ref }}'
                   fetch-depth: 0
 
             - name: Configurar Python
@@ -175,6 +175,7 @@ jobs:
               with:
                   repository: 'orbitspot/actions'
                   path: code
+                  ref: 'fix-parameters-dinamicos'
 
             - name: Authenticate
               uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix-parameters-dinamicos
