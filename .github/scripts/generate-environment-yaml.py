@@ -1,4 +1,5 @@
 import yaml
+import os
 
 def generate_yaml():
   environments = os.getenv('environments')
