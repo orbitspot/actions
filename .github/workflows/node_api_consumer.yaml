@@ -188,6 +188,7 @@ jobs:
               env:
                 environments: ${{ toJson(vars) }}
                 secrets: ${{ toJson(secrets) }}
+                repository_name: 'office-service'
               run: |
                 ls
                 pwd
@@ -320,4 +321,4 @@ jobs:
                       --set environment=${{ env.ENV}} \
                       --set region=${{ env.CLUSTER_REGION }} \
                       --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/consumer-${{ github.event.repository.name }}' \
-                      --set 'containers[0].repository.tag=${{ github.sha }}'
+                      --set 'containers[0].repository.tag=4643fb54b8164ac8bdedc5dbbed19dcc70d833fa'
