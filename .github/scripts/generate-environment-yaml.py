@@ -4,7 +4,7 @@ import os
 def generate_yaml():
   import json
   environments = json.loads(os.getenv('environments'))
-  secrets = os.getenv('secrets')
+  secrets = json.loads(os.getenv('secrets'))
 
   devops_variables = ['CLUSTER_REGION', 'ENV', 'CLUSTER_NAME', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT', 
                       'API_GATEWAY', 'DEVOPS_CONFIG', '_DEVOPS_CONFIG', 'github_token', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', '_PROPERTIES', '_POLICY_JSON']
@@ -15,7 +15,7 @@ def generate_yaml():
       result_environments.append({"context": "ssmparameter", "name": f'${{ github.event.repository.name }}/environment/{key}'}) 
 
   result_secrets = []
-  for key in secrets:
+  for key in secrets.keys():
     if len(secrets[key]) > 0 and key not in devops_variables:
       result_secrets.append({"context": "ssmparameter", "name": f'${{ github.event.repository.name }}/secret/{key}'}) 
 
