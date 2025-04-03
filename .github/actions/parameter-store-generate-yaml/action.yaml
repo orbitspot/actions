@@ -18,6 +18,7 @@ runs:
     - name: Generate JSON and set output
       shell: python
       run: |
+          import yaml
           vars = ${{ inputs.vars }}
           secrets = ${{ inputs.secrets }}
           devops_variables = ['CLUSTER_REGION', 'ENV', 'CLUSTER_NAME', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT', 
