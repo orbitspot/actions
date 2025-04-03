@@ -23,30 +23,15 @@ runs:
 
           variables = ${{ inputs.environment_json }}
           devops_variables = ['ACM_ARN', 'CLUSTER_REGION', 'ENV', 'CLUSTER_NAME', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT', 
-                              'API_GATEWAY', 'DEVOPS_CONFIG', '_DEVOPS_CONFIG', 'github_token', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', '_PROPERTIES', '_POLICY_JSON']
+                              'API_GATEWAY', 'DEVOPS_CONFIG', '_DEVOPS_CONFIG', 'github_token', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', '_PROPERTIES', 'HOST_MF', '_POLICY_JSON']
           
-          result_string = ''
           os.mkdir('env')
           with open('env/.env', 'w+') as env:
             for key in variables:
               value = variables[key]
               if len(value) > 0 and key not in devops_variables: 
                 env.write(f'{key}={value}')
-                result_string += f'--build-arg {key}={value} '
-            result_string = result_string.rstrip()
           env.close()
-
-    - name: cat env
-      shell: bash
-      run: |
-          ls -a
-          pwd
-          cat env/.env
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: build_args
-    #     path: build_args.txt
-    #     retention-days: 1
 
     - name: Upload encrypted artifact
       uses: actions/upload-artifact@v4
@@ -56,6 +41,3 @@ runs:
         include-hidden-files: true
         retention-days: 1
 
-
-          # with open(f"${{ inputs.file_name }}.txt", "w") as outfile:
-          #   outfile.write(result_string)
