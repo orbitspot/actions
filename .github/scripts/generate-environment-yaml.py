@@ -13,12 +13,12 @@ def generate_yaml():
   print(type(environments))
   for key in environments.keys():
     if len(environments[key]) > 0 and key not in devops_variables:
-      result_environments["parameters"].append({"context": "ssmparameter", "name": f'{repository_name}/environment/{key}'}) 
+      result_environments["parameters"].append({"context": "ssmparameter", "name": f'/{repository_name}/environment/{key}'}) 
 
   result_secrets = []
   for key in secrets.keys():
     if len(secrets[key]) > 0 and key not in devops_variables:
-      result_secrets.append({"context": "ssmparameter", "name": f'{repository_name}/secret/{key}'}) 
+      result_secrets.append({"context": "ssmparameter", "name": f'/{repository_name}/secret/{key}'}) 
 
   with open(f"variables.yaml", "w") as outfile:
     yaml.dump(result_environments, outfile, default_flow_style=False)
