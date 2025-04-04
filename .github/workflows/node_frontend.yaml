@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
     setup-config:
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ubuntu-latest
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -35,12 +35,12 @@ jobs:
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.4
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: '${{ github.ref_name }}'
+            branch: 'develop'
   
     building:
         name: Building
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [setup-config]
         permissions:
             id-token: write
@@ -65,7 +65,7 @@ jobs:
             - uses: actions/checkout@v4
               name: Checkout
               with:
-                  ref: ${{ github.ref_name }}
+                  ref: develop
                   fetch-depth: 0
         
             - name: Cache dependences
@@ -77,22 +77,9 @@ jobs:
             - name: Install Yarn
               run: npm install -g yarn
 
-            - name: Generate Build Args
-              id: generate-environments-vars
-              uses: orbitspot/actions/.github/actions/parameter-store-environments-frontend@v18.4
-              with:
-                environment_json: ${{ toJson(vars) }}
-            
-            - name: Download Building files
-              uses: actions/download-artifact@v4
-              with:
-                  name: env
-
             - name: Yarn Building
               shell: bash
               run: |
-                ls -a
-                cat .env
                 yarn
                 yarn build
         
@@ -114,8 +101,8 @@ jobs:
 
     generate-docker:
         name: Docker Build
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [setup-config, building]
         permissions:
             id-token: write
@@ -140,6 +127,20 @@ jobs:
             run: |
               mv ${{ inputs.dockerfile_path }} Dockerfile
 
+          - name: Checkout script repository
+            uses: actions/checkout@v4
+            with:
+                repository: 'orbitspot/actions'
+                path: code
+                ref: 'fix-frontend-env'
+                
+          - name: Generate Yaml from Parameters 
+            env:
+              environments: ${{ toJson(vars) }}
+            run: |
+              python code/.github/scripts/generate-environment-frontend.py
+              cat .env
+
           - name: docker-build
             uses: orbitspot/actions/.github/actions/docker@v1
             with:
@@ -149,11 +150,13 @@ jobs:
                 content: "building"
                 image: ${{ github.event.repository.name }}
                 tag: ${{ github.sha }}
+                before_building: |
+                  mv .env .env
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [setup-config, building]
         permissions:
             id-token: write
@@ -187,8 +190,8 @@ jobs:
 
     helm-deploy:
         name: K8s Deploy
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [ setup-config, create-service-account-role, generate-docker ]
         permissions:
             id-token: write
@@ -202,7 +205,7 @@ jobs:
             - uses: actions/checkout@v4
               name: Checkout
               with:
-                  ref: ${{ github.ref_name }}
+                  ref: develop
                   fetch-depth: 0
 
             - name: configure
