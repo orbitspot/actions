@@ -17,6 +17,9 @@ on:
         required: false
         type: string
         default: "${{ vars.ISTIO_HOST }}"
+      resource_name:
+        required: false
+        type: string
         
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -49,3 +52,4 @@ jobs:
           TF_VAR_hosts: '${{ inputs.hosts }}'
           TF_VAR_docs: '${{ inputs.docs }}'
           TF_VAR_istio_enabled: '${{ inputs.istio_enabled }}'
+          TF_VAR_resource_name: '${{ inputs.resource_name }}'
