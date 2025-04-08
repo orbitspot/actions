@@ -139,7 +139,7 @@ jobs:
               environments: ${{ toJson(vars) }}
             run: |
               python code/.github/scripts/generate-environment-frontend.py
-              cat .env.prodution
+              cat .env.production
 
           - name: docker-build
             uses: orbitspot/actions/.github/actions/docker@v1
