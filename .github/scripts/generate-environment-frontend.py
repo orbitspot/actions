@@ -1,4 +1,5 @@
 import os
+import json
 
 def generate_env():
   environments = json.loads(os.getenv('environments'))
