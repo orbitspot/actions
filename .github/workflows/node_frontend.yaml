@@ -150,8 +150,8 @@ jobs:
                 content: "building"
                 image: ${{ github.event.repository.name }}
                 tag: ${{ github.sha }}
-                before_building: |
-                  mv .env .env
+                # before_building: |
+                #   cp .env .env
 
     create-service-account-role:
         name: Creating Aws Resources
