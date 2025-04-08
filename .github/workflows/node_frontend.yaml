@@ -32,11 +32,11 @@ jobs:
       steps:
         - name: Fetch devops variables
           id: set-output
-          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.4
+          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.5
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
             branch: '${{ github.ref_name }}'
-  
+
     building:
         name: Building
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
@@ -47,7 +47,7 @@ jobs:
             contents: read
         steps:
             - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.4
+              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.5
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -76,22 +76,17 @@ jobs:
         
             - name: Install Yarn
               run: npm install -g yarn
-
-            - name: Generate Build Args
-              id: generate-environments-vars
-              uses: orbitspot/actions/.github/actions/parameter-store-environments-frontend@v18.4
-              with:
-                environment_json: ${{ toJson(vars) }}
             
-            - name: Download Building files
-              uses: actions/download-artifact@v4
+            - name: Fetch fronted variables
+              uses: orbitspot/actions/.github/actions/fetch-frontend-variables@v18.5
               with:
-                  name: env
-
+                frontend_config: '${{ vars._FRONTEND_CONFIG }}'
+                branch: '${{ github.ref_name }}'
+                
             - name: Yarn Building
               shell: bash
               run: |
-                ls -a
+                echo 'PUBLIC_PATH="https://${{ vars.HOST_MF }}/"' >> .env
                 cat .env
                 yarn
                 yarn build
@@ -124,7 +119,7 @@ jobs:
           CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
         steps:
           - name: Authenticate
-            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.4
+            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.5
             with:
               aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
               aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -164,7 +159,7 @@ jobs:
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - name: create-role
-              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.4
+              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.5
               with:
                   role: "${{ github.event.repository.name }}-${{ env.ENV }}"
                   namespace: ${{ github.event.repository.name }}
@@ -175,7 +170,7 @@ jobs:
                   policy: ${{ vars._POLICY_JSON }}
 
             - name: create-namespace
-              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.4
+              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.5
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -206,7 +201,7 @@ jobs:
                   fetch-depth: 0
 
             - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.4
+              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.5
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -229,7 +224,7 @@ jobs:
                   retention-days: 1
 
             - name: helm-apply
-              uses: orbitspot/actions/.github/actions/helm-deploy@v18.4
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.5
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_region: ${{ env.CLUSTER_REGION }}
