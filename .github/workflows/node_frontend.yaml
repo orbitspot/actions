@@ -150,6 +150,7 @@ jobs:
                 content: "building"
                 image: ${{ github.event.repository.name }}
                 tag: ${{ github.sha }}
+                build_args:  "--build-arg REACT_APP_COMMON_PATH=${{ vars.REACT_COMMON_PATH }} --build-arg REACT_APP_URL_API_4TAX=${{ vars.REACT_APP_URL_API_4TAX }} --build-arg REACT_APP_URL_ORBIT=${{ vars.REACT_APP_URL_ORBIT }} --build-arg REACT_APP_URL_ADM_PORTAL=${{ vars.REACT_APP_URL_ADM_PORTAL }} --build-arg REACT_APP_ENVIRONMENT=${{ vars.REACT_APP_ENVIRONMENT }} --build-arg REACT_APP_PASS_HASH=${{ vars.REACT_APP_PASS_HASH }} --build-arg PUBLIC_PATH=https://${{ vars.HOST_MF }}/"
                 # before_building: |
                 #   cp .env .env
 
