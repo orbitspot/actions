@@ -44,14 +44,14 @@ jobs:
           id: set-output
           uses: orbitspot/actions/.github/actions/fetch-frontend-variables@fix-frontend-env
           with:
-            devops_config: '${{ vars._FRONTEND_CONFIG }}'
+            frontend_config: '${{ vars._FRONTEND_CONFIG }}'
             branch: 'develop'
   
     building:
         name: Building
         runs-on: ubuntu-latest
         environment: develop
-        needs: [setup-config]
+        needs: [setup-config, frontend-env]
         permissions:
             id-token: write
             contents: read

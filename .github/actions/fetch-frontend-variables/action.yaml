@@ -27,3 +27,4 @@ runs:
         echo "$key" "$value"
         echo '$key="$value"' >> .env
       done
+      cat .env
