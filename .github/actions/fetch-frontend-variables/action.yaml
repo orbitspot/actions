@@ -25,6 +25,6 @@ runs:
       for key in $keys; do
         value=$(echo "$config" | jq -r --arg branch "$branch" --arg key "$key" '.[$branch][$key]')
         echo "$key" "$value"
-        echo '$key="$value"' >> .env
+        printf '%s="%s"\n' $key $value > .env
       done
       cat .env
