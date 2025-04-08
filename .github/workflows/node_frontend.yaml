@@ -76,15 +76,9 @@ jobs:
         
             - name: Install Yarn
               run: npm install -g yarn
-            
-            - name: Checkout script repository
-              uses: actions/checkout@v4
-              with:
-                  repository: 'orbitspot/actions'
-                  path: code
+
             
             - name: Fetch fronted variables
-              id: set-output
               uses: orbitspot/actions/.github/actions/fetch-frontend-variables@v18.5
               with:
                 frontend_config: '${{ vars._FRONTEND_CONFIG }}'
