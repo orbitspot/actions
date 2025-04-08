@@ -10,7 +10,7 @@ def generate_env():
     for key in environments:
       value = environments[key]
       if len(value) > 0 and key not in devops_variables: 
-        env.write(f'{key}={value}\n')
+        env.write(f'{key}="{value}"\n')
   env.close()
 
 generate_env()
