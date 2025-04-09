@@ -14,9 +14,9 @@ outputs:
   CLUSTER_NAME:
     description: 'cluster region'
     value: ${{ steps.set-output.outputs.CLUSTER_NAME }}
-  ACM_ARN_FRONTEND:
+  ACM_ARN:
     description: 'cluster region'
-    value: ${{ steps.set-output.outputs.ACM_ARN_FRONTEND }}
+    value: ${{ steps.set-output.outputs.ACM_ARN }}
   ENV:
     description: 'cluster region'
     value: ${{ steps.set-output.outputs.ENV }}

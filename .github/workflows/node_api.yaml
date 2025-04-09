@@ -16,6 +16,10 @@ on:
         required: false
         type: string
         default: ''
+      enabled_old_host:
+        required: false
+        type: string
+        default: ''
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -23,6 +27,7 @@ concurrency:
 
 jobs:
     setup-config:
+      name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
@@ -195,7 +200,7 @@ jobs:
                 mkdir -p .github/helm/api
                 mv values.yaml .github/helm/api/values.yaml
 
-            - name: append-data-in-properties
+            - name: Append Properties
               run: |
                   RABBITMQ_BASE64=$(echo -n "${{ secrets.BROKER_AMQP }}" | base64)
                   echo "${{ vars._PROPERTIES }}" > values.properties
@@ -252,6 +257,7 @@ jobs:
                   cluster_name: ${{ env.CLUSTER_NAME }}
 
             - name: helm-apply
+              if: inputs.enabled_old_host == ''
               uses: orbitspot/actions/.github/actions/helm-deploy@v18.5
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
@@ -266,3 +272,21 @@ jobs:
                       --set region=${{ env.CLUSTER_REGION }} \
                       --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
                       --set 'containers[0].repository.tag=${{ github.sha }}'
+
+            - name: helm-apply
+              if: inputs.enabled_old_host != ''
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.5
+              with:
+                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                  aws_region: ${{ env.CLUSTER_REGION }}
+                  namespace: ${{ github.event.repository.name }}
+                  helm_values: helm-values-api
+                  release: api
+                  chart_name: orbitspot/orbitspot-microservices
+                  chart_version: 3.0.1
+                  sets: |
+                      --set environment=${{ env.ENV}} \
+                      --set region=${{ env.CLUSTER_REGION }} \
+                      --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+                      --set 'containers[0].repository.tag=${{ github.sha }}' \
+                      --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}

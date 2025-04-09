@@ -16,6 +16,10 @@ on:
         required: false
         type: string
         default: ''
+      enabled_old_host:
+        required: false
+        type: string
+        default: ''
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -23,10 +27,12 @@ concurrency:
 
 jobs:
     setup-config:
+      name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
+        ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
         - name: Fetch devops variables
@@ -201,10 +207,21 @@ jobs:
                 mkdir -p .github/helm/${{ matrix.artifacts }}
                 mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
 
-            - name: append-data-in-properties
+            - name: Download Old Ingress Config from S3
+              if: ${{ (inputs.enabled_old_host != '') && (matrix.artifacts == 'api') }}
+              run: |
+                aws s3 cp s3://devops.orbitspot.com/build-github-actions/deploy/${{ matrix.artifacts }}/old_ingress_values.yaml old_ingress_values.yaml
+                sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' old_ingress_values.yaml
+                sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' old_ingress_values.yaml
+                old_ingress_values.yaml >> .github/helm/${{ matrix.artifacts }}/values.yaml
+                echo "build.acm_arn=${{ env.ACM_ARN }}" >> values.properties
+                echo "build.environment=${{ env.ENV }}" >> values.properties
+                cat .github/helm/${{ matrix.artifacts }}/values.yaml
+
+            - name: Append Properties
               run: |
                   RABBITMQ_BASE64=$(echo -n "${{ secrets.BROKER_AMQP }}" | base64)
-                  echo "${{ vars._PROPERTIES }}" > values.properties
+                  echo "${{ vars._PROPERTIES }}" >> values.properties
                   echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
                   echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
                   echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
@@ -258,6 +275,7 @@ jobs:
                   cluster_name: ${{ env.CLUSTER_NAME }}
 
             - name: helm-apply
+              if: inputs.enabled_old_host == ''
               uses: orbitspot/actions/.github/actions/helm-deploy@v18.5
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
@@ -271,8 +289,25 @@ jobs:
                       --set environment=${{ env.ENV}} \
                       --set region=${{ env.CLUSTER_REGION }} \
                       --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
-                      --set 'containers[0].repository.tag=${{ github.sha }}'
-
+                      --set 'containers[0].repository.tag=${{ github.sha }}' 
+            
+            - name: helm-apply
+              if: inputs.enabled_old_host != ''
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.5
+              with:
+                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                  aws_region: ${{ env.CLUSTER_REGION }}
+                  namespace: ${{ github.event.repository.name }}
+                  helm_values: helm-values-api
+                  release: api
+                  chart_name: orbitspot/orbitspot-microservices
+                  chart_version: 3.0.1
+                  sets: |
+                      --set environment=${{ env.ENV}} \
+                      --set region=${{ env.CLUSTER_REGION }} \
+                      --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+                      --set 'containers[0].repository.tag=${{ github.sha }}' \
+                      --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
     helm-cd-consumer:
         name: K8s Deploy Consumer
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]

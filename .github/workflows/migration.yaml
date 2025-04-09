@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   setup-config:
+    name: Set Up Config
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     outputs:
       CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
@@ -155,7 +156,7 @@ jobs:
           mv values.yaml .github/helm/migration/values.yaml
           cat .github/helm/migration/values.yaml
 
-      - name: append-data-in-properties
+      - name: Append Properties
         run: |
           echo "${{ vars._PROPERTIES }}" > values.properties
           echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
