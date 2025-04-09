@@ -218,6 +218,7 @@ jobs:
                 cat old_ingress_values.yaml >> .github/helm/${{ matrix.artifacts }}/values.yaml
                 echo "build.acm_arn=${{ env.ACM_ARN }}" >> values.properties
                 echo "build.environment=${{ env.ENV }}" >> values.properties
+                sed -i 's/ClusterIP/NodePort/g' .github/helm/api/values.yaml
                 cat .github/helm/${{ matrix.artifacts }}/values.yaml
 
             - name: Append Properties
