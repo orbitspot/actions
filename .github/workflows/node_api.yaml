@@ -32,6 +32,7 @@ jobs:
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
+        ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
         - name: Fetch devops variables
@@ -157,6 +158,9 @@ jobs:
         permissions:
             id-token: write
             contents: read
+        env:
+          ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
+          ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - uses: actions/checkout@v4
               name: Checkout
