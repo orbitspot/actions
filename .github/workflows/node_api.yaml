@@ -154,7 +154,7 @@ jobs:
         name: Building Helm Values
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [generate-docker]
+        needs: [setup-config, generate-docker]
         permissions:
             id-token: write
             contents: read
