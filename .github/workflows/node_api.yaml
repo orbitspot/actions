@@ -213,10 +213,11 @@ jobs:
             - name: Append Properties
               run: |
                   RABBITMQ_BASE64=$(echo -n "${{ secrets.BROKER_AMQP }}" | base64)
-                  echo "${{ vars._PROPERTIES }}" > values.properties
+                  echo "${{ vars._PROPERTIES }}" >> values.properties
                   echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
                   echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
                   echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
+                  cat values.properties
 
             - name: replace-data
               env:
