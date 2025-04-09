@@ -205,7 +205,7 @@ jobs:
               run: |
                 aws s3 cp s3://devops.orbitspot.com/build-github-actions/deploy/api/old_ingress_values.yaml old_ingress_values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' old_ingress_values.yaml
-                old_ingress_values.yaml >> .github/helm/api/values.yaml
+                cat old_ingress_values.yaml >> .github/helm/api/values.yaml
                 echo "build.acm_arn=${{ env.ACM_ARN }}" >> values.properties
                 echo "build.environment=${{ env.ENV }}" >> values.properties
                 cat .github/helm/api/values.yaml
