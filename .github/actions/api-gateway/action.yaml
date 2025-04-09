@@ -51,6 +51,7 @@ runs:
     with:
         repository: 'orbitspot/actions'
         path: code
+        ref: 'fix-api-gateway'
 
   - name: Terraform Init
     shell: bash
