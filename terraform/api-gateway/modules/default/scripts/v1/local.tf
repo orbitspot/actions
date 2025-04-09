@@ -15,6 +15,7 @@ locals {
             type = "HTTP"
             request_parameters = {
                 "integration.request.header.userid" = "context.authorizer.userId"
+                "integration.request.header.clienttenantid" = "context.authorizer.clienttenantid"
                 "integration.request.header.token" = "''"
                 "integration.request.header.Accept-Encoding" = "'identity'"
                 "integration.request.header.target" = "'${var.path}'"
@@ -55,6 +56,7 @@ locals {
             type = "HTTP"
             request_parameters = {
                 "integration.request.header.userid" = "context.authorizer.userId"
+                "integration.request.header.clienttenantid" = "context.authorizer.clienttenantid"
                 "integration.request.header.token" = "''"
                 "integration.request.header.Accept-Encoding" = "'identity'"
                 "integration.request.header.x-http-method-override" = "'GET'"
