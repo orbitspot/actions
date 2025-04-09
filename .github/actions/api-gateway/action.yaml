@@ -51,13 +51,11 @@ runs:
     with:
         repository: 'orbitspot/actions'
         path: code
-        ref: 'fix-api-gateway'
 
   - name: Terraform Init
     shell: bash
     run: |
       cd code/terraform/api-gateway
-      cat locals.tf
       terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
 
   - name: Delete resource if it exists
