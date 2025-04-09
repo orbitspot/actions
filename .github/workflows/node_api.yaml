@@ -227,7 +227,7 @@ jobs:
             - name: replace-data
               env:
                   PREFIX: .${{ github.event.repository.name }}
-                  PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+                  PROPERTIES_PATH: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
                   YAML_PATH: .github/helm/api/values.yaml
               run: python code/.github/scripts/replace-properties.py
 
