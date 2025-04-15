@@ -18,9 +18,8 @@ inputs:
     required: true
     default: 'terraform-orbit'
   tag:
-    description: 'Bucket'
+    description: 'tag'
     required: true
-    default: ''
   apply_response_script:
     description: 'Apply new scripts on integration'
     required: false
@@ -39,18 +38,10 @@ runs:
 
   - name: Checkout code
     uses: actions/checkout@v4
-    if: inputs.tag != ''
     with:
         repository: 'orbitspot/actions'
         path: code
         ref: '${{ inputs.tag }}'
-
-  - name: Checkout code
-    uses: actions/checkout@v4
-    if: inputs.tag == ''
-    with:
-        repository: 'orbitspot/actions'
-        path: code
 
   - name: Terraform Init
     shell: bash

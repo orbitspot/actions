@@ -23,6 +23,9 @@ inputs:
   repository:
     description: 'Repository'
     required: true
+  tag:
+    description: 'tag'
+    required: true
 
 runs:
   using: composite
@@ -39,6 +42,7 @@ runs:
     with:
         repository: 'orbitspot/actions'
         path: code
+        ref: '${{ inputs.tag }}'
 
   - name: Download Artifact Variables
     uses: actions/download-artifact@v4
