@@ -96,6 +96,13 @@ jobs:
               aws s3 cp s3://devops.orbitspot.com/build-github-actions/node/${{ inputs.version }}/Dockerfile Dockerfile
               aws s3 cp s3://devops.orbitspot.com/build-github-actions/scripts/base_script.sh base_script.sh
 
+          - name: Checkout
+            if: ${{ inputs.dockerfile_path != '' }}
+            uses: actions/checkout@v4
+            with:
+                ref: '${{ inputs.git_ref }}'
+                fetch-depth: 0
+
           - name: Copy Dockerfile from original repository
             if: ${{ inputs.dockerfile_path != '' }}
             run: |
