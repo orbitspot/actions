@@ -185,7 +185,7 @@ jobs:
               with:
                   repository: 'orbitspot/actions'
                   path: code
-                  ref: 'v18.6'
+                  ref: 'fix-ref-checkout'
 
             - name: Authenticate
               uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.6
