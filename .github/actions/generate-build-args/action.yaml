@@ -1,0 +1,34 @@
+name: 'Frontend Variables'
+description: 'fetch frontend variables'
+inputs:
+  frontend_config:
+    description: 'frontend config'
+    required: true
+  branch:
+    description: 'branch'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.x
+  
+    - name: Set config as output
+      shell: python
+      id: set-output
+      run: |
+        import os
+        config=${{ inputs.frontend_config }}
+        branch="${{ inputs.branch }}"
+        string = ""
+
+        for key in config[branch].keys():
+          string += f"--build-arg {key}={config[branch][key]} "
+
+        string = string.rstrip()
+        print(string)
+        with open(os.environ['GITHUB_ENV'], 'a') as env_file:
+          env_file.write(f"BUILD_ARGS={string}\n")
