@@ -28,7 +28,7 @@ concurrency:
 jobs:
     setup-config:
       name: Set Up Config
-      runs-on: ubuntu-latest
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -44,7 +44,7 @@ jobs:
     
     building:
         name: Building
-        runs-on: ubuntu-latest
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         needs: [setup-config]
         permissions:
             id-token: write
@@ -74,7 +74,7 @@ jobs:
 
     generate-docker:
         name: Docker Build Api
-        runs-on: ubuntu-latest
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
@@ -124,7 +124,7 @@ jobs:
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: ubuntu-latest
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, generate-docker]
         permissions:
@@ -159,7 +159,7 @@ jobs:
 
     prepare-helm-replacements:
         name: Building Helm Values
-        runs-on: ubuntu-latest
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, generate-docker]
         permissions:
@@ -255,7 +255,7 @@ jobs:
 
     helm-cd-api:
         name: K8s Deploy Api
-        runs-on: ubuntu-latest
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, prepare-helm-replacements]
         permissions:
