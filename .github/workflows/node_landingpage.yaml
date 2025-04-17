@@ -24,7 +24,7 @@ concurrency:
 jobs:
     setup-config:
       name: Set Up Config
-      runs-on: ubuntu-latest
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -33,15 +33,15 @@ jobs:
       steps:
         - name: Fetch devops variables
           id: set-output
-          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.6
+          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.7
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: 'develop'
+            branch: '${{ github.ref_name }}'
 
     building:
         name: Building
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config]
         permissions:
           id-token: write
@@ -63,16 +63,16 @@ jobs:
                 fetch-depth: 0
 
             - name: Fetch fronted variables
-              uses: orbitspot/actions/.github/actions/fetch-frontend-variables@v18.6
+              uses: orbitspot/actions/.github/actions/fetch-frontend-variables@v18.7
               with:
                 frontend_config: '${{ vars._LANDINGPAGE_CONFIG }}'
-                branch: 'develop'
+                branch: '${{ github.ref_name }}'
 
             - name: Generate Build Args
-              uses: orbitspot/actions/.github/actions/generate-build-args@add-template-landingpage
+              uses: orbitspot/actions/.github/actions/generate-build-args@v18.7
               with:
                 frontend_config: '${{ vars._LANDINGPAGE_CONFIG }}'
-                branch: 'develop'
+                branch: '${{ github.ref_name }}'
                 
             - name: Download Dockerfile from S3
               if: ${{ inputs.dockerfile_path == ''}}
@@ -87,7 +87,7 @@ jobs:
                 mv ${{ inputs.dockerfile_path }} Dockerfile
 
             - name: docker-build
-              uses: orbitspot/actions/.github/actions/docker@v1
+              uses: orbitspot/actions/.github/actions/docker@v18.7
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -95,13 +95,11 @@ jobs:
                   image: ${{ github.event.repository.name }}
                   tag: ${{ github.sha }}
                   build_args: '${{ env.BUILD_ARGS }} --build-arg AWS_ACCESS_KEY=${{ secrets.ACCESS_KEY_CODE_ARTIFACT }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY_CODE_ARTIFACT }}'
-                  # before_building: |
-                  #   cp .env .env
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
             id-token: write
@@ -112,7 +110,7 @@ jobs:
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - name: create-role
-              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.6
+              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.7
               with:
                   role: "${{ github.event.repository.name }}-${{ env.ENV }}"
                   namespace: ${{ github.event.repository.name }}
@@ -123,7 +121,7 @@ jobs:
                   policy: ${{ vars._POLICY_JSON }}
 
             - name: create-namespace
-              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.6
+              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.7
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -135,8 +133,8 @@ jobs:
 
     prepare-helm-replacements:
       name: Building Helm Values
-      runs-on: ubuntu-latest
-      environment: develop
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: ${{ github.ref_name }}
       needs: [setup-config, building]
       permissions:
           id-token: write
@@ -148,7 +146,7 @@ jobs:
           - uses: actions/checkout@v4
             name: Checkout
             with:
-                ref: 'develop'
+                ref: '${{ github.ref_name }}'
                 fetch-depth: 0
 
           - name: Configurar Python
@@ -161,10 +159,10 @@ jobs:
             with:
                 repository: 'orbitspot/actions'
                 path: code
-                ref: 'add-template-landingpage'
+                ref: 'v18.7'
 
           - name: Authenticate
-            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.6
+            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.7
             with:
               aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
               aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -200,8 +198,8 @@ jobs:
 
     helm-deploy:
         name: K8s Deploy
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [ setup-config, prepare-helm-replacements ]
         permissions:
             id-token: write
@@ -212,7 +210,7 @@ jobs:
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.6
+              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.7
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -220,7 +218,7 @@ jobs:
                   cluster_name: ${{ env.CLUSTER_NAME }}
 
             - name: helm-apply
-              uses: orbitspot/actions/.github/actions/helm-deploy@v18.6
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.7
               with:
                 aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                 aws_region: ${{ env.CLUSTER_REGION }}
