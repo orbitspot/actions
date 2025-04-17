@@ -79,10 +79,10 @@ jobs:
           terraform_version: "1.5.0"
               
       - name: Start terraform
-        uses: orbitspot/actions/.github/actions/parameter-store@v18.6
+        uses: orbitspot/actions/.github/actions/parameter-store@fix-ref-checkout
         with:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
           aws_region: "${{ env.CLUSTER_REGION }}"
-          tag: 'v18.6'
+          tag: 'fix-ref-checkout'
 
