@@ -136,7 +136,7 @@ jobs:
     prepare-helm-replacements:
       name: Building Helm Values
       runs-on: ubuntu-latest
-      environment: ${{ github.ref_name }}
+      environment: develop
       needs: [setup-config, building]
       permissions:
           id-token: write
