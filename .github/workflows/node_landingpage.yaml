@@ -1,0 +1,220 @@
+name: Push node
+
+on:
+  workflow_call:
+    inputs:
+      module:
+        required: true
+        type: string
+      grafana_tag:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      dockerfile_path:
+        required: false
+        type: string
+        default: ''
+
+concurrency:
+    group: '${{ github.workflow }}-${{ github.ref }}'
+    cancel-in-progress: true
+
+jobs:
+    setup-config:
+      name: Set Up Config
+      runs-on: ubuntu-latest
+      outputs:
+        CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
+        CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
+        ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
+        ENV: '${{ steps.set-output.outputs.ENV }}'
+      steps:
+        - name: Fetch devops variables
+          id: set-output
+          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.6
+          with:
+            devops_config: '${{ vars._DEVOPS_CONFIG }}'
+            branch: 'develop'
+
+    building:
+        name: Building
+        runs-on: ubuntu-latest
+        environment: develop
+        needs: [setup-config]
+        permissions:
+          id-token: write
+          contents: read
+        env:
+          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+        steps:
+            - name: Configure aws credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
+                role-session-name: "${{ vars.AWS_ROLE_NAME }}"
+                aws-region: "us-east-1"
+            
+            - name: Fetch fronted variables
+              uses: orbitspot/actions/.github/actions/fetch-frontend-variables@v18.6
+              with:
+                frontend_config: '${{ vars._LANDINGPAGE_CONFIG }}'
+                branch: 'develop'
+
+            - name: Generate Build Args
+              uses: orbitspot/actions/.github/actions/generate-build-args@add-template-landingpage
+              with:
+                frontend_config: '${{ vars._LANDINGPAGE_CONFIG }}'
+                branch: 'develop'
+                
+            - name: Yarn Building
+              shell: bash
+              run: |
+                cat .env
+            
+            - name: Get CodeArtifact token and registry
+              id: codeartifact
+              run: |
+                DOMAIN="seidor"
+                OWNER="${{ vars.AWS_ACCOUNT_NUMBER }}"
+                REPO="packages"
+      
+                TOKEN=$(aws codeartifact get-authorization-token \
+                  --domain $DOMAIN \
+                  --domain-owner $OWNER \
+                  --query authorizationToken \
+                  --output text)
+      
+                URL=$(aws codeartifact get-repository-endpoint \
+                  --domain $DOMAIN \
+                  --domain-owner $OWNER \
+                  --repository $REPO \
+                  --format npm \
+                  --query repositoryEndpoint \
+                  --output text)
+      
+                echo "::add-mask::$TOKEN"
+                echo "NPM_TOKEN=$TOKEN" >> $GITHUB_ENV
+                echo "NPM_REGISTRY_URL=$URL" >> $GITHUB_ENV
+
+            - name: Download Dockerfile from S3
+              if: ${{ inputs.dockerfile_path == ''}}
+              run: |
+                aws s3 sync s3://devops.orbitspot.com/build-github-actions/deploy/landingpage .
+                echo $NPM_REGISTRY_URL
+                echo $NPM_TOKEN
+                echo $BUILD_ARGS
+
+            - name: Copy Dockerfile from original repository
+              if: ${{ inputs.dockerfile_path != '' }}
+              run: |
+                mv ${{ inputs.dockerfile_path }} Dockerfile
+
+            - name: docker-build
+              uses: orbitspot/actions/.github/actions/docker@v1
+              with:
+                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+                  aws_region: ${{ env.CLUSTER_REGION }}
+                  image: ${{ github.event.repository.name }}
+                  tag: ${{ github.sha }}
+                  build_args: '$BUILD_ARGS --env NPM_TOKEN=$NPM_TOKEN --env NPM_REGISTRY_URL=$NPM_REGISTRY_URL'
+                  # before_building: |
+                  #   cp .env .env
+
+    create-service-account-role:
+        name: Creating Aws Resources
+        runs-on: ubuntu-latest
+        environment: develop
+        needs: [setup-config, building]
+        permissions:
+            id-token: write
+            contents: read
+        env:
+          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+          CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
+          ENV: '${{ needs.setup-config.outputs.ENV }}'
+        steps:
+            - name: create-role
+              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.6
+              with:
+                  role: "${{ github.event.repository.name }}-${{ env.ENV }}"
+                  namespace: ${{ github.event.repository.name }}
+                  service_account_name: "application-permission"
+                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+                  aws_region: ${{ vars.AWS_REGION }}
+                  policy: ${{ vars._POLICY_JSON }}
+
+            - name: create-namespace
+              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.6
+              with:
+                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+                  aws_region: ${{ env.CLUSTER_REGION }}
+                  cluster_name: ${{ env.CLUSTER_NAME }}
+                  namespace: ${{ github.event.repository.name }}
+                  role_arn: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ github.event.repository.name }}-${{ env.ENV }}"
+                  service_account_name: "application-permission"
+
+    helm-deploy:
+        name: K8s Deploy
+        runs-on: ubuntu-latest
+        environment: develop
+        needs: [ setup-config, create-service-account-role ]
+        permissions:
+            id-token: write
+            contents: read
+        env:
+          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+          CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
+          ENV: '${{ needs.setup-config.outputs.ENV }}'
+        steps:
+            - uses: actions/checkout@v4
+              name: Checkout
+              with:
+                  ref: develop
+                  fetch-depth: 0
+
+            - name: configure
+              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.6
+              with:
+                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+                  aws_region: ${{ env.CLUSTER_REGION }}
+                  cluster_name: ${{ env.CLUSTER_NAME }}
+
+            - name: Download Helm from S3
+              run: |
+                aws s3 cp s3://devops.orbitspot.com/build-github-actions/deploy/landingpage/values.yaml values.yaml
+                sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
+                mkdir -p .github/helm/next
+                mv values.yaml .github/helm/next/values.yaml
+                cat .github/helm/next/values.yaml
+            
+            - name: upload
+              uses: actions/upload-artifact@v4
+              with:
+                  name: helm-values
+                  path: .github/helm/next/values.yaml
+                  retention-days: 1
+
+            - name: helm-apply
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.6
+              with:
+                aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                aws_region: ${{ vars.CLUSTER_REGION }}
+                namespace: ${{ github.event.repository.name }}
+                helm_values: helm-values
+                release: landingpage
+                chart_name: orbitspot/orbitspot-front-nginx
+                chart_version: 1.0.3
+                sets: |
+                  --set environment=${{ vars.ENV}} \
+                  --set region=${{ vars.AWS_REGION }} \
+                  --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
+                  --set 'containers[0].repository.tag=${{ github.sha }}' \
+                  --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
+                  --set ingress.rules[0].host=${{ vars.HOST_MF }} \
+                  --set ingress.rules[1].host=${{ vars.HOST_MF_2 }}
