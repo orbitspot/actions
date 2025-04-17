@@ -20,11 +20,11 @@ inputs:
     description: 'Aws region'
     required: true
   policy:
-    description: 'Policy Role'
-    required: true
+    description: 'Policy'
+    required: false
   policy_name:
     description: 'Policy Role'
-    required: true
+    required: false
     default: 'default'
 
 runs:
@@ -106,6 +106,7 @@ runs:
       }'
 
   - name: Adicionar Policy à Role
+    if: inputs.policy != ''
     shell: bash
     run: |
       aws iam put-role-policy --role-name "${{ inputs.role }}" --policy-name "${{ inputs.policy_name }}" --policy-document '${{ inputs.policy }}'
