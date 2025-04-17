@@ -21,12 +21,12 @@ runs:
           import json
 
           variables = ${{ inputs.environment_json }}
-          devops_variables = ['CLUSTER_REGION', 'ENV', 'CLUSTER_NAME', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT', '_FRONTEND_CONFIG', 'AWS_REGION',
-                              'API_GATEWAY', 'DEVOPS_CONFIG', '_DEVOPS_CONFIG', 'github_token', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', '_PROPERTIES', '_POLICY_JSON', 'API_HOST']
+          devops_variables = ['CLUSTER_REGION', 'ENV', 'CLUSTER_NAME', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT', 'AWS_REGION',
+                              'API_GATEWAY', 'DEVOPS_CONFIG', 'github_token', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', 'API_HOST']
           result_json = {}
           for key in variables:
             value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
-            if len(value) > 0 and key not in devops_variables: # nao adiciona variaveis sem valor
+            if len(value) > 0 and key not in devops_variables and not key.startswith("_"): # nao adiciona variaveis sem valor e reservadas para DEVOPS
               result_json.update({key: value}) 
 
           with open(f"${{ inputs.file_name }}.json", "w") as outfile:
