@@ -175,6 +175,11 @@ jobs:
                   path: code
                   ref: 'add-template-landingpage'
 
+            - name: Append Properties
+              run: |
+                  echo "${{ vars._PROPERTIES }}" > values.properties
+                  cat values.properties
+
             - name: replace-data
               env:
                   PREFIX: .${{ github.event.repository.name }}
