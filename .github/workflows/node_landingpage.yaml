@@ -95,7 +95,7 @@ jobs:
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - name: create-role
-              uses: orbitspot/actions/.github/actions/create-role-service-account@hot-clean-up
+              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.7
               with:
                   role: "${{ github.event.repository.name }}-${{ env.ENV }}"
                   namespace: ${{ github.event.repository.name }}
