@@ -9,9 +9,6 @@ on:
       grafana_tag:
         required: true
         type: string
-      version:
-        required: true
-        type: string
 
 concurrency:
     group: '${{ github.workflow }}-${{ github.ref }}'
@@ -106,7 +103,6 @@ jobs:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
                   aws_region: ${{ vars.AWS_REGION }}
-                  policy: ${{ vars._POLICY_JSON }}
 
             - name: create-namespace
               uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.7
@@ -173,7 +169,7 @@ jobs:
           - name: replace-data
             env:
                 PREFIX: .${{ github.event.repository.name }}
-                PROPERTIES_PATH: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+                PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
                 YAML_PATH: .github/helm/next/values.yaml
             run: python code/.github/scripts/replace-properties.py && cat .github/helm/next/values.yaml
 
