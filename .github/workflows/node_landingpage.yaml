@@ -120,7 +120,7 @@ jobs:
                   aws_region: ${{ env.CLUSTER_REGION }}
                   image: ${{ github.event.repository.name }}
                   tag: ${{ github.sha }}
-                  build_args: '${{ env.BUILD_ARGS }} --env NPM_TOKEN=$NPM_TOKEN --env NPM_REGISTRY_URL=$NPM_REGISTRY_URL'
+                  build_args: '${{ env.BUILD_ARGS }} --build-arg NPM_TOKEN=$NPM_TOKEN --build-arg NPM_REGISTRY_URL=$NPM_REGISTRY_URL'
                   # before_building: |
                   #   cp .env .env
 
