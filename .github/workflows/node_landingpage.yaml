@@ -55,7 +55,7 @@ jobs:
                 role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
                 role-session-name: "${{ vars.AWS_ROLE_NAME }}"
                 aws-region: "us-east-1"
-                
+
             - uses: actions/checkout@v4
               name: Checkout
               with:
@@ -126,7 +126,7 @@ jobs:
                   aws_region: ${{ env.CLUSTER_REGION }}
                   image: ${{ github.event.repository.name }}
                   tag: ${{ github.sha }}
-                  build_args: '${{ env.BUILD_ARGS }} --build-arg NPM_TOKEN=${{ env.NPM_TOKEN }} --build-arg NPM_REGISTRY_URL=${{ env.NPM_REGISTRY_URL }}'
+                  build_args: '${{ env.BUILD_ARGS }} --build-arg AWS_ACCESS_KEY=${{ secrets.ACCESS_KEY_CODE_ARTIFACT }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY_CODE_ARTIFACT }} --build-arg NPM_TOKEN=${{ env.NPM_TOKEN }} --build-arg NPM_REGISTRY_URL=${{ env.NPM_REGISTRY_URL }}'
                   # before_building: |
                   #   cp .env .env
 
