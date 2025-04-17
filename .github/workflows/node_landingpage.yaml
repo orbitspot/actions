@@ -12,10 +12,6 @@ on:
       version:
         required: true
         type: string
-      dockerfile_path:
-        required: false
-        type: string
-        default: ''
 
 concurrency:
     group: '${{ github.workflow }}-${{ github.ref }}'
@@ -71,20 +67,12 @@ jobs:
             - name: Generate Build Args
               uses: orbitspot/actions/.github/actions/generate-build-args@v18.7
               with:
-                frontend_config: '${{ vars._LANDINGPAGE_CONFIG }}'
+                landingpage_config: '${{ vars._LANDINGPAGE_CONFIG }}'
                 branch: '${{ github.ref_name }}'
                 
             - name: Download Dockerfile from S3
-              if: ${{ inputs.dockerfile_path == ''}}
               run: |
                 aws s3 sync s3://devops.orbitspot.com/build-github-actions/deploy/landingpage .
-                echo $BUILD_ARGS
-                echo ${{ env.BUILD_ARGS }}
-
-            - name: Copy Dockerfile from original repository
-              if: ${{ inputs.dockerfile_path != '' }}
-              run: |
-                mv ${{ inputs.dockerfile_path }} Dockerfile
 
             - name: docker-build
               uses: orbitspot/actions/.github/actions/docker@v18.7

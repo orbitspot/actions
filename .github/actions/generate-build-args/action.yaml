@@ -1,7 +1,7 @@
-name: 'Frontend Variables'
-description: 'fetch frontend variables'
+name: 'Landing Page Args'
+description: 'build landing pages args'
 inputs:
-  frontend_config:
+  landingpage_config:
     description: 'frontend config'
     required: true
   branch:
@@ -21,7 +21,7 @@ runs:
       id: set-output
       run: |
         import os
-        config=${{ inputs.frontend_config }}
+        config=${{ inputs.landingpage_config }}
         branch="${{ inputs.branch }}"
         string = ""
 
