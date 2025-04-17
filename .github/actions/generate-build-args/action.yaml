@@ -2,7 +2,7 @@ name: 'Landing Page Args'
 description: 'build landing pages args'
 inputs:
   landingpage_config:
-    description: 'frontend config'
+    description: 'landingpage config'
     required: true
   branch:
     description: 'branch'
