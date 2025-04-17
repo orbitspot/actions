@@ -146,12 +146,6 @@ jobs:
           CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
-            - uses: actions/checkout@v4
-              name: Checkout
-              with:
-                  ref: develop
-                  fetch-depth: 0
-
             - name: configure
               uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.6
               with:
@@ -168,19 +162,31 @@ jobs:
                 mkdir -p .github/helm/next
                 mv values.yaml .github/helm/next/values.yaml
                 cat .github/helm/next/values.yaml
-            
-            - name: upload
-              uses: actions/upload-artifact@v4
+
+            - name: Configurar Python
+              uses: actions/setup-python@v5
               with:
-                  name: helm-values
-                  path: .github/helm/next/values.yaml
-                  retention-days: 1
+                  python-version: '3.x'
+  
+            - name: Checkout script repository
+              uses: actions/checkout@v4
+              with:
+                  repository: 'orbitspot/actions'
+                  path: code
+                  ref: 'add-template-landingpage'
+
+            - name: replace-data
+              env:
+                  PREFIX: .${{ github.event.repository.name }}
+                  PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+                  YAML_PATH: .github/helm/next/values.yaml
+              run: python code/.github/scripts/replace-properties.py
 
             - name: helm-apply
               uses: orbitspot/actions/.github/actions/helm-deploy@v18.6
               with:
                 aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                aws_region: ${{ vars.CLUSTER_REGION }}
+                aws_region: ${{ env.CLUSTER_REGION }}
                 namespace: ${{ github.event.repository.name }}
                 helm_values: helm-values
                 release: landingpage
