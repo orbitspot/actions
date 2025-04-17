@@ -55,7 +55,13 @@ jobs:
                 role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
                 role-session-name: "${{ vars.AWS_ROLE_NAME }}"
                 aws-region: "us-east-1"
-            
+                
+            - uses: actions/checkout@v4
+              name: Checkout
+              with:
+                ref: ${{ inputs.git_ref }}
+                fetch-depth: 0
+
             - name: Fetch fronted variables
               uses: orbitspot/actions/.github/actions/fetch-frontend-variables@v18.6
               with:
@@ -111,12 +117,6 @@ jobs:
               if: ${{ inputs.dockerfile_path != '' }}
               run: |
                 mv ${{ inputs.dockerfile_path }} Dockerfile
-
-            - uses: actions/checkout@v4
-              name: Checkout
-              with:
-                  ref: ${{ inputs.git_ref }}
-                  fetch-depth: 0
 
             - name: docker-build
               uses: orbitspot/actions/.github/actions/docker@v1
