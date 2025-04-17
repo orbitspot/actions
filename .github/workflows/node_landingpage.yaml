@@ -74,42 +74,10 @@ jobs:
                 frontend_config: '${{ vars._LANDINGPAGE_CONFIG }}'
                 branch: 'develop'
                 
-            - name: Yarn Building
-              shell: bash
-              run: |
-                cat .env
-            
-            - name: Get CodeArtifact token and registry
-              id: codeartifact
-              run: |
-                DOMAIN="seidor"
-                OWNER="${{ vars.AWS_ACCOUNT_NUMBER }}"
-                REPO="packages"
-      
-                TOKEN=$(aws codeartifact get-authorization-token \
-                  --domain $DOMAIN \
-                  --domain-owner $OWNER \
-                  --query authorizationToken \
-                  --output text)
-      
-                URL=$(aws codeartifact get-repository-endpoint \
-                  --domain $DOMAIN \
-                  --domain-owner $OWNER \
-                  --repository $REPO \
-                  --format npm \
-                  --query repositoryEndpoint \
-                  --output text)
-      
-                echo "::add-mask::$TOKEN"
-                echo "NPM_TOKEN=$TOKEN" >> $GITHUB_ENV
-                echo "NPM_REGISTRY_URL=$URL" >> $GITHUB_ENV
-
             - name: Download Dockerfile from S3
               if: ${{ inputs.dockerfile_path == ''}}
               run: |
                 aws s3 sync s3://devops.orbitspot.com/build-github-actions/deploy/landingpage .
-                echo $NPM_REGISTRY_URL
-                echo $NPM_TOKEN
                 echo $BUILD_ARGS
                 echo ${{ env.BUILD_ARGS }}
 
@@ -126,7 +94,7 @@ jobs:
                   aws_region: ${{ env.CLUSTER_REGION }}
                   image: ${{ github.event.repository.name }}
                   tag: ${{ github.sha }}
-                  build_args: '${{ env.BUILD_ARGS }} --build-arg AWS_ACCESS_KEY=${{ secrets.ACCESS_KEY_CODE_ARTIFACT }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY_CODE_ARTIFACT }} --build-arg NPM_TOKEN=${{ env.NPM_TOKEN }} --build-arg NPM_REGISTRY_URL=${{ env.NPM_REGISTRY_URL }}'
+                  build_args: '${{ env.BUILD_ARGS }} --build-arg AWS_ACCESS_KEY=${{ secrets.ACCESS_KEY_CODE_ARTIFACT }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY_CODE_ARTIFACT }}'
                   # before_building: |
                   #   cp .env .env
 
