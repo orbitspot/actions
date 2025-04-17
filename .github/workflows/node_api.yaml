@@ -28,7 +28,7 @@ concurrency:
 jobs:
     setup-config:
       name: Set Up Config
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -44,7 +44,7 @@ jobs:
     
     building:
         name: Building
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         needs: [setup-config]
         permissions:
             id-token: write
@@ -74,7 +74,7 @@ jobs:
 
     generate-docker:
         name: Docker Build Api
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
@@ -93,8 +93,14 @@ jobs:
           - name: Download Dockerfile from S3
             if: ${{ inputs.dockerfile_path == ''}}
             run: |
-              aws s3 cp s3://devops.orbitspot.com/build-github-actions/node/${{ inputs.version }}/Dockerfile Dockerfile
-              aws s3 cp s3://devops.orbitspot.com/build-github-actions/scripts/base_script.sh base_script.sh
+              aws s3 cp s3://devops.orbitspot.com/build-github-actions/node/${{ inputs.version }}/Dockerfile Dockerfile          
+
+          - name: Checkout
+            if: ${{ inputs.dockerfile_path != '' }}
+            uses: actions/checkout@v4
+            with:
+                ref: '${{ inputs.git_ref }}'
+                fetch-depth: 0
 
           - name: Copy Dockerfile from original repository
             if: ${{ inputs.dockerfile_path != '' }}
@@ -112,12 +118,13 @@ jobs:
                 tag: ${{ github.sha }}
                 build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=api'
                 before_building: |
+                    aws s3 cp s3://devops.orbitspot.com/build-github-actions/scripts/base_script.sh base_script.sh
                     cat base_script.sh scripts/api.sh > api.sh
                     cat api.sh
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, generate-docker]
         permissions:
@@ -152,7 +159,7 @@ jobs:
 
     prepare-helm-replacements:
         name: Building Helm Values
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, generate-docker]
         permissions:
@@ -178,6 +185,7 @@ jobs:
               with:
                   repository: 'orbitspot/actions'
                   path: code
+                  ref: 'v18.6'
 
             - name: Authenticate
               uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.6
@@ -247,7 +255,7 @@ jobs:
 
     helm-cd-api:
         name: K8s Deploy Api
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, prepare-helm-replacements]
         permissions:

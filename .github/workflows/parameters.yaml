@@ -84,4 +84,5 @@ jobs:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
           aws_region: "${{ env.CLUSTER_REGION }}"
+          tag: 'v18.6'
 
