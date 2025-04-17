@@ -112,6 +112,12 @@ jobs:
               run: |
                 mv ${{ inputs.dockerfile_path }} Dockerfile
 
+            - uses: actions/checkout@v4
+              name: Checkout
+              with:
+                  ref: ${{ inputs.git_ref }}
+                  fetch-depth: 0
+
             - name: docker-build
               uses: orbitspot/actions/.github/actions/docker@v1
               with:
@@ -120,7 +126,7 @@ jobs:
                   aws_region: ${{ env.CLUSTER_REGION }}
                   image: ${{ github.event.repository.name }}
                   tag: ${{ github.sha }}
-                  build_args: '${{ env.BUILD_ARGS }} --build-arg NPM_TOKEN=$NPM_TOKEN --build-arg NPM_REGISTRY_URL=$NPM_REGISTRY_URL'
+                  build_args: '${{ env.BUILD_ARGS }} --build-arg NPM_TOKEN=${{ env.NPM_TOKEN }} --build-arg NPM_REGISTRY_URL=${{ env.NPM_REGISTRY_URL }}'
                   # before_building: |
                   #   cp .env .env
 
