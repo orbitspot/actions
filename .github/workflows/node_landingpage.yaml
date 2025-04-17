@@ -211,7 +211,7 @@ jobs:
                 chart_name: orbitspot/orbitspot-front-nginx
                 chart_version: 1.0.3
                 sets: |
-                  --set environment=${{ vars.ENV}} \
+                  --set environment=${{ env.ENV}} \
                   --set region=${{ vars.AWS_REGION }} \
                   --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
                   --set 'containers[0].repository.tag=${{ github.sha }}' \
