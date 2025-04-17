@@ -26,7 +26,7 @@ runs:
         string = ""
 
         for key in config[branch].keys():
-          string += f"--build-arg={key}={config[branch][key]} "
+          string += f"--build-arg {key}={config[branch][key]} "
 
         string = string.rstrip()
         print(string)
