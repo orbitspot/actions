@@ -21,7 +21,7 @@ runs:
       id: set-output
       run: |
         config=${{ inputs.frontend_config }}
-        branch=${{ inputs.branch }}
+        branch="${{ inputs.branch }}"
         string = ""
 
         for key in config[branch].keys():
