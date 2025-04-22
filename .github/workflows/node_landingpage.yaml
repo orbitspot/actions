@@ -85,13 +85,7 @@ jobs:
                     echo "---------------"
                     df -h
                     echo "---------------"
-                    sudo du -sh /var/lib/docker
-                    echo "---------------"
-                    sudo apt-get autoremove
-                    echo "---------------"
-                    sudo apt-get clean
-                    echo "---------------"
-                    sudo apt-get autoclean
+                    docker image ls
                     echo "---------------"
                     df -h
 
