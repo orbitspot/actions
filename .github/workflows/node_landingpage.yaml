@@ -85,8 +85,6 @@ jobs:
                     echo "---------------"
                     df -h
                     echo "---------------"
-                    du -sh /var/lib/docker
-                    echo "---------------"
                     sudo du -sh /var/lib/docker
 
 
