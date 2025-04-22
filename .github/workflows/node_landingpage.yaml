@@ -87,12 +87,6 @@ jobs:
                     echo "---------------"
                     sudo du -sh /var/lib/docker
                     echo "---------------"
-                    sudo du -a -h /var | sort -h -r | head -n 10
-                    echo "---------------"
-                    sudo du -a -h /home | sort -h -r | head -n 10
-                    echo "---------------"
-                    sudo du -a -h /root | sort -h -r | head -n 10
-                    echo "---------------"
                     sudo apt-get autoremove
                     echo "---------------"
                     sudo apt-get clean
@@ -101,7 +95,12 @@ jobs:
                     echo "---------------"
                     df -h
 
-
+# sudo du -a -h /var | sort -h -r | head -n 10
+# echo "---------------"
+# sudo du -a -h /home | sort -h -r | head -n 10
+# echo "---------------"
+# sudo du -a -h /root | sort -h -r | head -n 10
+# echo "---------------"
     create-service-account-role:
         name: Creating Aws Resources
         runs-on: ubuntu-latest
