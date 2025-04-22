@@ -17,11 +17,10 @@ concurrency:
 jobs:
     setup-config:
       name: Set Up Config
-      runs-on: ubuntu-latest
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
-        ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
         - name: Fetch devops variables
@@ -29,12 +28,12 @@ jobs:
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.7
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: 'develop'
+            branch: '${{ github.ref_name }}'
 
     building:
         name: Building
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config]
         permissions:
           id-token: write
@@ -59,13 +58,13 @@ jobs:
               uses: orbitspot/actions/.github/actions/fetch-frontend-variables@v18.7
               with:
                 frontend_config: '${{ vars._LANDINGPAGE_CONFIG }}'
-                branch: 'develop'
+                branch: '${{ github.ref_name }}'
 
             - name: Generate Build Args
               uses: orbitspot/actions/.github/actions/generate-build-args@v18.7
               with:
                 landingpage_config: '${{ vars._LANDINGPAGE_CONFIG }}'
-                branch: 'develop'
+                branch: '${{ github.ref_name }}'
                 
             - name: Download Dockerfile from S3
               run: |
@@ -80,16 +79,11 @@ jobs:
                   image: ${{ github.event.repository.name }}
                   tag: ${{ github.sha }}
                   build_args: '${{ env.BUILD_ARGS }} --build-arg AWS_ACCESS_KEY=${{ secrets.ACCESS_KEY_CODE_ARTIFACT }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY_CODE_ARTIFACT }}'
-                  before_building: |
-                    df -i
-                    echo "---------------"
-                    df -h
-                    echo "---------------"
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
             id-token: write
@@ -122,20 +116,19 @@ jobs:
 
     prepare-helm-replacements:
       name: Building Helm Values
-      runs-on: ubuntu-latest
-      environment: develop
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: ${{ github.ref_name }}
       needs: [setup-config, building]
       permissions:
           id-token: write
           contents: read
       env:
-        ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
         ENV: '${{ needs.setup-config.outputs.ENV }}'
       steps:
           - uses: actions/checkout@v4
             name: Checkout
             with:
-                ref: 'develop'
+                ref: '${{ github.ref_name }}'
                 fetch-depth: 0
 
           - name: Configurar Python
@@ -187,8 +180,8 @@ jobs:
 
     helm-deploy:
         name: K8s Deploy
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [ setup-config, prepare-helm-replacements ]
         permissions:
             id-token: write
