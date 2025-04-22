@@ -33,7 +33,7 @@ jobs:
 
     building:
         name: Building
-        runs-on: ubuntu-latest
+        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: develop
         needs: [setup-config]
         permissions:
@@ -80,6 +80,15 @@ jobs:
                   image: ${{ github.event.repository.name }}
                   tag: ${{ github.sha }}
                   build_args: '${{ env.BUILD_ARGS }} --build-arg AWS_ACCESS_KEY=${{ secrets.ACCESS_KEY_CODE_ARTIFACT }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY_CODE_ARTIFACT }}'
+                  before_building: |
+                    df -i
+                    echo "---------------"
+                    df -h
+                    echo "---------------"
+                    du -sh /var/lib/docker
+                    echo "---------------"
+                    sudo du -sh /var/lib/docker
+
 
     create-service-account-role:
         name: Creating Aws Resources
