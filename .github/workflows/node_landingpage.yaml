@@ -199,7 +199,7 @@ jobs:
                   aws_region: ${{ env.CLUSTER_REGION }}
                   cluster_name: ${{ env.CLUSTER_NAME }}
 
-            - name: helm-apply 1 host
+            - name: Helm Apply 1 host
               if: ${{ vars.HOST_MF_2 == ''}}
               uses: orbitspot/actions/.github/actions/helm-deploy@v18.7
               with:
@@ -218,7 +218,7 @@ jobs:
                  --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
                  --set ingress.rules[0].host=${{ vars.HOST_MF }} 
                   
-            - name: helm-apply 2 hosts
+            - name: Helm Apply 2 hosts
               if: ${{ vars.HOST_MF_2 != ''}}
               uses: orbitspot/actions/.github/actions/helm-deploy@v18.7
               with:
