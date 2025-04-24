@@ -17,7 +17,7 @@ concurrency:
 jobs:
     setup-config:
       name: Set Up Config
-      runs-on: ubuntu-latest
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -32,7 +32,7 @@ jobs:
 
     building:
         name: Building
-        runs-on: ubuntu-latest
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config]
         permissions:
@@ -82,7 +82,7 @@ jobs:
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: ubuntu-latest
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
@@ -116,7 +116,7 @@ jobs:
 
     prepare-helm-replacements:
       name: Building Helm Values
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       needs: [setup-config, building]
       permissions:
@@ -180,7 +180,7 @@ jobs:
 
     helm-deploy:
         name: K8s Deploy
-        runs-on: ubuntu-latest
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [ setup-config, prepare-helm-replacements ]
         permissions:
@@ -209,7 +209,7 @@ jobs:
                 helm_values: helm-values
                 release: landingpage
                 chart_name: orbitspot/orbitspot-front-nginx
-                chart_version: 1.0.3
+                chart_version: 1.1.0
                 sets: |
                  --set environment=${{ env.ENV}} \
                  --set region=${{ vars.AWS_REGION }} \
@@ -228,7 +228,7 @@ jobs:
                 helm_values: helm-values
                 release: landingpage
                 chart_name: orbitspot/orbitspot-front-nginx
-                chart_version: 1.0.3
+                chart_version: 1.1.0
                 sets: |
                   --set environment=${{ env.ENV}} \
                   --set region=${{ vars.AWS_REGION }} \
