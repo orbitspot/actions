@@ -11,8 +11,8 @@ on:
         type: string
 
 concurrency:
-    group: '${{ github.workflow }}-${{ github.ref }}'
-    cancel-in-progress: true
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
 
 jobs:
     setup-config:
@@ -199,7 +199,8 @@ jobs:
                   aws_region: ${{ env.CLUSTER_REGION }}
                   cluster_name: ${{ env.CLUSTER_NAME }}
 
-            - name: helm-apply
+            - name: Helm Apply 1 host
+              if: ${{ vars.HOST_MF_2 == ''}}
               uses: orbitspot/actions/.github/actions/helm-deploy@v18.7
               with:
                 aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
@@ -208,7 +209,26 @@ jobs:
                 helm_values: helm-values
                 release: landingpage
                 chart_name: orbitspot/orbitspot-front-nginx
-                chart_version: 1.0.3
+                chart_version: 1.1.0
+                sets: |
+                 --set environment=${{ env.ENV}} \
+                 --set region=${{ vars.AWS_REGION }} \
+                 --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
+                 --set 'containers[0].repository.tag=${{ github.sha }}' \
+                 --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
+                 --set ingress.rules[0].host=${{ vars.HOST_MF }} 
+                  
+            - name: Helm Apply 2 hosts
+              if: ${{ vars.HOST_MF_2 != ''}}
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.7
+              with:
+                aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                aws_region: ${{ env.CLUSTER_REGION }}
+                namespace: ${{ github.event.repository.name }}
+                helm_values: helm-values
+                release: landingpage
+                chart_name: orbitspot/orbitspot-front-nginx
+                chart_version: 1.1.0
                 sets: |
                   --set environment=${{ env.ENV}} \
                   --set region=${{ vars.AWS_REGION }} \
