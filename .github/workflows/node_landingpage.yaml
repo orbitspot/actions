@@ -24,12 +24,12 @@ jobs:
         contents: read
       steps:
         - name: Host setado
-          if: ${{ vars.HOST_MF_2 }} != ''
+          if: ${{ vars.HOST_MF_2 != ''}}
           run: |
             echo ${{ vars.HOST_MF_2 }}
 
         - name: Host nao setado
-          if: ${{ vars.HOST_MF_2 }} == ''
+          if: ${{ vars.HOST_MF_2 == ''}}
           run: |
             echo ${{ vars.HOST_MF_2 }}
 # 
