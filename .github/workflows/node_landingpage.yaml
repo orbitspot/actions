@@ -223,8 +223,8 @@ jobs:
                 chart_version: 1.1.0
                 sets: |
                  --set environment=${{ env.ENV}} \
-                 --set region=${{ vars.AWS_REGION }} \
-                 --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
+                 --set region=${{ env.CLUSTER_REGION }} \
+                 --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
                  --set 'containers[0].repository.tag=${{ github.sha }}' \
                  --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
                  --set ingress.rules[0].host=${{ vars.HOST_MF }} 
@@ -242,8 +242,8 @@ jobs:
                 chart_version: 1.1.0
                 sets: |
                   --set environment=${{ env.ENV}} \
-                  --set region=${{ vars.AWS_REGION }} \
-                  --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
+                  --set region=${{ env.CLUSTER_REGION }} \
+                  --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
                   --set 'containers[0].repository.tag=${{ github.sha }}' \
                   --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
                   --set ingress.rules[0].host=${{ vars.HOST_MF }} \
