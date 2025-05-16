@@ -1,6 +1,7 @@
 import sys
 import re
 import os
+
 def replace_properties_in_yaml(properties_path, yaml_path, prefix):
     # Carregar o arquivo properties em um dicionário
     properties = {}
@@ -13,6 +14,17 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix):
                     properties[key.strip()] = value.strip()
                 except ValueError as e:
                     print(f"Erro ao processar linha: {line} - {e}")
+
+    #  Definir valores padrão para propriedades, se ausentes
+    defaults = {
+        f"{prefix}.build.consumer.keda.maxReplicaCount": "5",
+        f"{prefix}.build.consumer.keda.minReplicaCount": "1"
+    }
+
+    for key, default_value in defaults.items():
+        if key not in properties:
+            print(f"[INFO] Propriedade '{key}' não encontrada. Aplicando valor padrão: {default_value}")
+            properties[key] = default_value
 
     # Ler o conteúdo do arquivo YAML
     with open(yaml_path, 'r') as yaml_file:
