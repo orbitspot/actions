@@ -29,6 +29,10 @@ runs:
             if len(value) > 0 and key not in devops_variables and not key.startswith("_"): # nao adiciona variaveis sem valor e reservadas para DEVOPS
               result_json.update({key: value}) 
 
+          print('**********************************************')
+          print()
+          print(result_json)
+          print()
           with open(f"${{ inputs.file_name }}.json", "w") as outfile:
             json.dump(result_json, outfile)
 
