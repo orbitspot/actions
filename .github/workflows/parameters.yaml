@@ -23,7 +23,7 @@ jobs:
         uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.7
         with:
           devops_config: ${{ vars._DEVOPS_CONFIG }}
-          branch: ${{ github.ref_name }}
+          branch: develop
 
   create-parameters-vars:
       name: Create parameters
