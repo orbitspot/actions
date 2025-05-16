@@ -28,7 +28,7 @@ jobs:
   create-parameters-vars:
       name: Create parameters
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
+      environment: development
       needs: [setup-config]
       permissions:
         id-token: write
@@ -44,7 +44,7 @@ jobs:
   create-parameters-secrets:
       name: Create parameters secrets
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
+      environment: development
       needs: [setup-config]
       permissions:
         id-token: write
@@ -60,7 +60,7 @@ jobs:
   apply-parameters:
       name: Apply parameters
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
+      environment: development
       needs: [setup-config, create-parameters-vars, create-parameters-secrets]
       env:
         CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
