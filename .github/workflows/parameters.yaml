@@ -36,7 +36,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-vars
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v18.7
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@fix/parameter-spacing
           with:
             environment_json: ${{ toJson(vars) }}
             file_name: variables
@@ -52,7 +52,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-secrets
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v18.7
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@fix/parameter-spacing
           with:
             environment_json: ${{ toJson(secrets) }}
             file_name: secrets
