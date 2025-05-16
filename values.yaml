@@ -1,0 +1,92 @@
+module: <GRAFANA-TAG>
+
+nodeSelector:
+    nodegroup-type: ${.<NOME-REPOSITORIO>.build.service.node_selector}
+
+csiSecrets:
+    enabled: true
+    serviceAccountName: "application-permission"
+
+istio:
+    enable: false
+    egress:
+        serviceEntries:
+            - ports:
+                  - number: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                    name: tcp
+                    protocol: TCP
+              hosts:
+                  - ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.host}
+        virtualService:
+            hosts:
+                - ${.<NOME-REPOSITORIO>.build.istio.ingress.host}
+            gateways:
+                - 'istio-system/orbit-egress'
+            tcp:
+                - match:
+                      - gateways:
+                            - 'istio-system/orbit-egress'
+                        port: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                  route:
+                      - destination:
+                            host: istio-egressgateway.istio-system.svc.cluster.local
+                            subset: postgres
+                            port:
+                                number: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                      - destination:
+                            host: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.host}
+                            port:
+                                number: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                        weight: 100
+
+keda:
+    secrets:
+        name: consumer-<NOME-REPOSITORIO>
+        data:
+            rabbitmq_http_host: ${.<NOME-REPOSITORIO>.build.secrets.rabbitmq_auth_host}
+
+    authentication:
+        name: consumer-<NOME-REPOSITORIO>-auth
+        spec:
+            secretTargetRef:
+                - key: rabbitmq_http_host
+                  name: consumer-<NOME-REPOSITORIO>
+                  parameter: host
+    scale:
+        spec:
+            pollingInterval: 30
+            cooldownPeriod: 600
+            idleReplicaCount: 0
+            maxReplicaCount: ${.<NOME-REPOSITORIO>.build.consumer.keda.maxReplicaCount}
+            minReplicaCount: ${.<NOME-REPOSITORIO>.build.consumer.keda.minReplicaCount}
+            scaleTargetRef:
+                name: consumer
+            triggers:
+                - type: rabbitmq
+                  authenticationRef:
+                      name: consumer-<NOME-REPOSITORIO>-auth
+                  metadata:
+                      protocol: amqp
+                      queueName: ${.<NOME-REPOSITORIO>.build.consumer.queue_name}
+                      mode: QueueLength
+                      value: '1'
+
+service:
+    type: ClusterIP
+
+containers:
+    - name: api
+      repository:
+          image: 931670397156.dkr.ecr.${region}.amazonaws.com/consumer-<NOME-REPOSITORIO>
+          tag: latest
+      ports:
+          - targetPort: 3000
+            port: 80
+            protocol: TCP
+      resources:
+          requests:
+              cpu: ${.<NOME-REPOSITORIO>.build.consumer.resources.requests.cpu}
+              memory: ${.<NOME-REPOSITORIO>.build.consumer.resources.requests.memory}
+          limits:
+              cpu: ${.<NOME-REPOSITORIO>.build.consumer.resources.limits.cpu}
+              memory: ${.<NOME-REPOSITORIO>.build.consumer.resources.limits.memory}
