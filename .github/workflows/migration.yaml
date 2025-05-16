@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.7
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.8
         with:
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
           branch: '${{ github.ref_name }}'
@@ -41,7 +41,7 @@ jobs:
       contents: read
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.7
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.8
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -57,7 +57,7 @@ jobs:
           bash co_login_commands.txt
 
       - name: Npm Building
-        uses: orbitspot/actions/.github/actions/npm-ci@v18.7
+        uses: orbitspot/actions/.github/actions/npm-ci@v18.8
         with:
           node_version: '20'
 
@@ -79,7 +79,7 @@ jobs:
           fetch-depth: 0
 
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.7
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.8
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -87,11 +87,11 @@ jobs:
 
       - name: Download Files from S3
         run: |
-          aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/Dockerfile Dockerfile
-          aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/migration.sh migration.sh
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/Dockerfile Dockerfile
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/migration.sh migration.sh
 
       - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@v18.7
+        uses: orbitspot/actions/.github/actions/docker@v18.8
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -131,7 +131,7 @@ jobs:
           path: code
       
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.7
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.8
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -149,7 +149,7 @@ jobs:
 
       - name: Download Helm from S3
         run: |
-          aws s3 cp s3://devops.orbitspot.com/build-github-actions/migration/values.yaml values.yaml
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/values.yaml values.yaml
           sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
           sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
           mkdir -p .github/helm/migration
@@ -205,7 +205,7 @@ jobs:
           fetch-depth: 0
 
       - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.7
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.8
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -213,7 +213,7 @@ jobs:
           cluster_name: '${{ env.CLUSTER_NAME }}'
 
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v18.7
+        uses: orbitspot/actions/.github/actions/helm-deploy@v18.8
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_region: '${{ env.CLUSTER_REGION }}'
