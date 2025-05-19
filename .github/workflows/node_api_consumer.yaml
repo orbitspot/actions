@@ -40,7 +40,6 @@ jobs:
             consumers="${{ inputs.consumers }}"
             consumers_array=$(jq -cn --arg c "$consumers" '$c | split(",")')
             full_array=$(jq -cn --arg c "$consumers" '$c | split(",") | ["api"] + .')
-
             echo "consumer_matrix=${consumers_array}" >> $GITHUB_OUTPUT
             echo "matrix=${full_array}" >> $GITHUB_OUTPUT
     setup-config:
