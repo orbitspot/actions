@@ -20,12 +20,28 @@ on:
         required: false
         type: string
         default: ''
-
+      consumers:
+        required: false
+        type: string
+        default: 'consumer'
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
 
 jobs:
+    generate-matrix:
+      runs-on: ubuntu-latest
+      outputs:
+        matrix: ${{ steps.set-matrix.outputs.matrix }}
+        consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
+      steps:
+        - id: set-matrix
+          run: |
+            consumers="${{ inputs.consumers }}"
+            consumers_array=$(echo "$consumers" | jq -R 'split(",")')
+            full_array=$(echo "$consumers" | jq -R 'split(",") | ["api"] + .')
+            echo "matrix=$full_array" >> $GITHUB_OUTPUT
+            echo "consumer_matrix=$consumers_array" >> $GITHUB_OUTPUT
     setup-config:
       name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
@@ -76,10 +92,10 @@ jobs:
         name: Docker Build Api
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [setup-config, building]
+        needs: [setup-config, building, generate-matrix]
         strategy:
             matrix:
-                artifacts: ['api', 'consumer']
+              artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
         permissions:
             id-token: write
             contents: read
@@ -115,8 +131,8 @@ jobs:
                 tag: ${{ github.sha }}
                 build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=${{ matrix.artifacts }}'
                 before_building: |
-                    cat base_script.sh scripts/${{ matrix.artifacts }}.sh > ${{ matrix.artifacts }}.sh
-                    cat ${{ matrix.artifacts }}.sh
+                  cat base_script.sh scripts/${{ matrix.artifacts }}.sh > ${{ matrix.artifacts }}.sh
+                  cat ${{ matrix.artifacts }}.sh
 
     create-service-account-role:
         name: Creating Aws Resources
@@ -160,7 +176,7 @@ jobs:
         needs: [setup-config, generate-docker]
         strategy:
             matrix:
-                artifacts: ['api', 'consumer']
+                artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
         permissions:
             id-token: write
             contents: read
@@ -314,44 +330,47 @@ jobs:
                       --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
     
     helm-cd-consumer:
-        name: K8s Deploy Consumer
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
-        needs: [setup-config, prepare-helm-replacements]
-        permissions:
-            id-token: write
-            contents: read
-        env:
-          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-          CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
-          ENV: '${{ needs.setup-config.outputs.ENV }}'
-        steps:
-            - uses: actions/checkout@v4
-              name: Checkout
-              with:
-                  ref: ${{ inputs.git_ref }}
-                  fetch-depth: 0
+      name: K8s Deploy ${{ matrix.artifacts }}
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: ${{ github.ref_name }}
+      needs: [setup-config, prepare-helm-replacements, generate-matrix]
+      strategy:
+        matrix:
+          artifacts: ${{ fromJson(needs.generate-matrix.outputs.consumer_matrix) }}
+      permissions:
+        id-token: write
+        contents: read
+      env:
+        CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+        CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
+        ENV: '${{ needs.setup-config.outputs.ENV }}'
+      steps:
+        - uses: actions/checkout@v4
+          name: Checkout
+          with:
+            ref: ${{ inputs.git_ref }}
+            fetch-depth: 0
 
-            - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.8
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-                  aws_region: ${{ env.CLUSTER_REGION }}
-                  cluster_name: ${{ env.CLUSTER_NAME }}
+        - name: configure
+          uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.8
+          with:
+            aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+            aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+            aws_region: ${{ env.CLUSTER_REGION }}
+            cluster_name: ${{ env.CLUSTER_NAME }}
 
-            - name: helm-apply
-              uses: orbitspot/actions/.github/actions/helm-deploy@v18.8
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_region: ${{ env.CLUSTER_REGION }}
-                  namespace: ${{ github.event.repository.name }}
-                  helm_values: helm-values-consumer
-                  release: consumer
-                  chart_name: orbitspot/orbitspot-terraform
-                  chart_version: 0.3.5
-                  sets: |
-                      --set environment=${{ env.ENV}} \
-                      --set region=${{ env.CLUSTER_REGION }} \
-                      --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/consumer-${{ github.event.repository.name }}' \
-                      --set 'containers[0].repository.tag=${{ github.sha }}'
+        - name: helm-apply
+          uses: orbitspot/actions/.github/actions/helm-deploy@v18.8
+          with:
+            aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+            aws_region: ${{ env.CLUSTER_REGION }}
+            namespace: ${{ github.event.repository.name }}
+            helm_values: helm-values-${{ matrix.artifacts }}
+            release: ${{ matrix.artifacts }}
+            chart_name: orbitspot/orbitspot-terraform
+            chart_version: 0.3.5
+            sets: |
+              --set environment=${{ env.ENV}} \
+              --set region=${{ env.CLUSTER_REGION }} \
+              --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
+              --set 'containers[0].repository.tag=${{ github.sha }}'
