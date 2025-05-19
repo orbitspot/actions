@@ -38,13 +38,15 @@ jobs:
         - id: set-matrix
           run: |
             consumers="${{ inputs.consumers }}"
-            consumers_array=$(echo "$consumers" | jq -R 'split(",")')
-            full_array=$(echo "$consumers" | jq -R 'split(",") | ["api"] + .')
-            echo "matrix=$full_array" >> $GITHUB_OUTPUT
-            echo "consumer_matrix=$consumers_array" >> $GITHUB_OUTPUT
+            consumers_array=$(jq -cn --arg c "$consumers" '$c | split(",")')
+            full_array=$(jq -cn --arg c "$consumers" '$c | split(",") | ["api"] + .')
+
+            echo "consumer_matrix=${consumers_array}" >> $GITHUB_OUTPUT
+            echo "matrix=${full_array}" >> $GITHUB_OUTPUT
     setup-config:
       name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      needs: [generate-matrix]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
