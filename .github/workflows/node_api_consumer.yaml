@@ -90,7 +90,7 @@ jobs:
                   customized_dockerfile: '${{ inputs.dockerfile_path  }}'
 
     generate-docker:
-        name: Docker Build Api
+        name: Docker Build
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, building, generate-matrix]
@@ -174,7 +174,7 @@ jobs:
         name: Building Helm Values
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [setup-config, generate-docker]
+        needs: [setup-config, generate-docker, generate-matrix]
         strategy:
             matrix:
                 artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
