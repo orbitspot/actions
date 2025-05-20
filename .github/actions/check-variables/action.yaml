@@ -1,0 +1,23 @@
+name: 'Check Variables'
+description: 'Check required variables'
+inputs:
+  variables:
+    description: 'Required variables'
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Check required variables
+    shell: bash
+    run: |
+      echo 'variables' '${{ inputs.variables }}'
+      variables_array=$(jq -cn --arg c "$consumers" '$c | split(",")')
+      echo 'array' $variables_array
+      for variable in "${variables_array[@]}"; do
+        echo "Variable: $item"
+        if [ -z $item ]; then
+            echo "❌ Input is missing!"
+            exit 1
+          fi
+      done
