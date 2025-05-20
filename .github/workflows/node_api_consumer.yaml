@@ -20,28 +20,39 @@ on:
         required: false
         type: string
         default: ''
-      consumers:
-        required: false
-        type: string
-        default: 'consumer'
+
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
 
 jobs:
     generate-matrix:
+      name: Generate Matrix of resources 
       runs-on: ubuntu-latest
       outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
         consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
       steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
         - id: set-matrix
+          shell: bash
           run: |
-            consumers="${{ inputs.consumers }}"
-            consumers_array=$(jq -cn --arg c "$consumers" '$c | split(",")')
-            full_array=$(jq -cn --arg c "$consumers" '$c | split(",") | ["api"] + .')
-            echo "consumer_matrix=${consumers_array}" >> $GITHUB_OUTPUT
-            echo "matrix=${full_array}" >> $GITHUB_OUTPUT
+            set -e
+
+            PROJECT_ROOT=$(git rev-parse --show-toplevel)
+            SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
+
+            scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
+
+            # Constrói JSON da matriz em formato compacto
+            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)
+            consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(. != "api")]')
+
+            echo "matrix=$matrix" >> $GITHUB_OUTPUT
+            echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
+
     setup-config:
       name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
@@ -177,7 +188,7 @@ jobs:
         needs: [setup-config, generate-docker, generate-matrix]
         strategy:
             matrix:
-                artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+                artifacts: ${{fromJson(needs.generate-matrix.outputs.matrix) }}
         permissions:
             id-token: write
             contents: read
@@ -222,7 +233,13 @@ jobs:
 
             - name: Download Helm from S3
               run: |
-                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/${{ matrix.artifacts }}/values.yaml values.yaml
+                if [ "${{ matrix.artifacts }}" = "api" ]; then
+                  s3_path="api"
+                else
+                  s3_path="consumer"
+                fi
+                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/$s3_path/values.yaml values.yaml
+                sed -i 's/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g' values.yaml  
                 sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
                 mkdir -p .github/helm/${{ matrix.artifacts }}
@@ -337,7 +354,7 @@ jobs:
       needs: [setup-config, prepare-helm-replacements, generate-matrix]
       strategy:
         matrix:
-          artifacts: ${{ fromJson(needs.generate-matrix.outputs.consumer_matrix) }}
+          artifacts: ${{fromJson(needs.generate-matrix.outputs.consumer-matrix) }}
       permissions:
         id-token: write
         contents: read
