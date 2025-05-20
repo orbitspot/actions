@@ -30,7 +30,7 @@ jobs:
         - name: Check required variables
           uses: orbitspot/actions/.github/actions/check-variables@feat/check-required-variables
           with:
-            variables: "${{ vars.AWS_REGION }}, ${{env.TESTE}}"
+            variables: "${{ vars.HOST_MF }}"
 
     setup-config:
       name: Set Up Config
