@@ -22,6 +22,16 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    check-variables:
+      name: Check required variables
+      runs-on: ubuntu-latest
+      # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      steps:
+        - name: Check required variables
+          uses: orbitspot/actions/.github/actions/check-variables@feat/check-required-variables
+          with:
+            variables: "${{ env.AWS_REGION }}, ${{env.TESTE}}"
+
     setup-config:
       name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
