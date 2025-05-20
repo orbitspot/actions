@@ -12,7 +12,8 @@ runs:
     shell: bash
     run: |
       variables=${{ inputs.variables }}
-      variables_array=$(echo "\"$variables\"" | jq -c 'split(",")')     
+      json_array=$(echo "\"$variables\"" | jq -c 'split(",")')
+      mapfile -t variables_array < <(echo "$json_array" | jq -r '.[]')   
       for item in "${variables_array[@]}"; do
         echo "Variable: [$item]"
         if [ -z $item ]; then
