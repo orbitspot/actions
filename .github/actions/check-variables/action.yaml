@@ -12,11 +12,9 @@ runs:
     shell: bash
     run: |
       variables=${{ inputs.variables }}
-      echo 'variables' '${{ inputs.variables }}' $variables
       variables_array=$(echo "\"$variables\"" | jq -c 'split(",")')     
-      echo 'array' $variables_array
       for item in "${variables_array[@]}"; do
-        echo "Variable: $item"
+        echo "Variable: [$item]"
         if [ -z $item ]; then
             echo "❌ Input is missing!"
             exit 1
