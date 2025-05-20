@@ -19,7 +19,8 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix, deployment_na
         yaml_content = yaml_file.read()
 
   
-    yaml_content = yaml_content.replace("<DEPLOYMENT-NAME>", deployment_name)
+    if deployment_name:
+        yaml_content = yaml_content.replace("<DEPLOYMENT-NAME>", deployment_name)
 
     # Substituir as chaves no YAML pelos valores do properties
     for key, value in properties.items():
