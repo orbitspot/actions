@@ -1,7 +1,7 @@
 import sys
 import re
 import os
-def replace_properties_in_yaml(properties_path, yaml_path, prefix, deployment_name):
+def replace_properties_in_yaml(properties_path, yaml_path, prefix):
     # Carregar o arquivo properties em um dicionário
     properties = {}
     with open(properties_path, 'r') as prop_file:
@@ -17,11 +17,6 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix, deployment_na
     # Ler o conteúdo do arquivo YAML
     with open(yaml_path, 'r') as yaml_file:
         yaml_content = yaml_file.read()
-
-  
-    if deployment_name:
-        yaml_content = yaml_content.replace("<DEPLOYMENT-NAME>", deployment_name)
-
     # Substituir as chaves no YAML pelos valores do properties
     for key, value in properties.items():
         placeholder = f"${{{prefix}.{key}}}"
@@ -39,11 +34,10 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix, deployment_na
 properties_path = os.getenv('PROPERTIES_PATH')
 yaml_path = os.getenv('YAML_PATH')
 prefix = os.getenv('PREFIX')
-deployment = os.getenv('DEPLOYMENT_NAME')
+
 
 print(f"Properties: {properties_path}")
 print(f"Yaml: {yaml_path}")
 print(f"Prefix: {prefix}")
-print(f"Deployment: {deployment}")
 
-replace_properties_in_yaml(properties_path, yaml_path, prefix, deployment)
+replace_properties_in_yaml(properties_path, yaml_path, prefix)
