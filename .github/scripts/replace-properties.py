@@ -18,6 +18,19 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix):
     with open(yaml_path, 'r') as yaml_file:
         yaml_content = yaml_file.read()
 
+    deployment = os.getenv('DEPLOYMENT_NAME', '')
+   
+
+    for key, value in properties.items():
+        # Determina o placeholder completo
+        if deployment and key.startswith(f"build.{deployment}."):
+            full_key = f"{prefix}.{key}"
+        elif not deployment or not key.startswith("build."):
+            full_key = f"{prefix}.{key}"
+        else:
+            # Ignora entradas de outro deployment
+            continue
+    placeholder = f"${{{full_key}}}"  
     # Substituir as chaves no YAML pelos valores do properties
     for key, value in properties.items():
         placeholder = f"${{{prefix}.{key}}}"

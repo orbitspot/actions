@@ -20,10 +20,7 @@ on:
         required: false
         type: string
         default: ''
-      consumers:
-        required: false
-        type: string
-        default: 'consumer'
+
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
@@ -35,13 +32,27 @@ jobs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
         consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
       steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
         - id: set-matrix
+          shell: bash
           run: |
-            consumers="${{ inputs.consumers }}"
-            consumers_array=$(jq -cn --arg c "$consumers" '$c | split(",")')
-            full_array=$(jq -cn --arg c "$consumers" '$c | split(",") | ["api"] + .')
-            echo "consumer_matrix=${consumers_array}" >> $GITHUB_OUTPUT
-            echo "matrix=${full_array}" >> $GITHUB_OUTPUT
+            set -e
+
+            # Caminho da raiz do repositório
+            PROJECT_ROOT=$(git rev-parse --show-toplevel)
+            SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
+
+            # Lista arquivos .sh no diretório e remove a extensão
+            scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
+
+            # Constrói JSON da matriz
+            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -s .)
+            consumer_matrix=$(echo "$matrix" | jq '[.[] | select(. != "api")]')
+
+            echo "matrix=$matrix" >> $GITHUB_OUTPUT
+            echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
     setup-config:
       name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
@@ -256,6 +267,7 @@ jobs:
               env:
                   PREFIX: .${{ github.event.repository.name }}
                   PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+                  DEPLOYMENT_NAME: ${{ matrix.artifacts }}
                   YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
               run: python code/.github/scripts/replace-properties.py
 
