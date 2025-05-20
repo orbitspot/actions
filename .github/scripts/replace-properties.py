@@ -46,4 +46,4 @@ print(f"Yaml: {yaml_path}")
 print(f"Prefix: {prefix}")
 print(f"Deployment: {deployment}")
 
-replace_properties_in_yaml(properties_path, yaml_path, prefix)
+replace_properties_in_yaml(properties_path, yaml_path, prefix, deployment)
