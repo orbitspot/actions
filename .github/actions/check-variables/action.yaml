@@ -11,8 +11,9 @@ runs:
   - name: Check required variables
     shell: bash
     run: |
-      echo 'variables' '${{ inputs.variables }}'
-      variables_array=$(echo '${{ inputs.variables }}' | jq -c 'split(",")')
+      variables=${{ inputs.variables }}
+      echo 'variables' '${{ inputs.variables }}' $variables
+      variables_array=$(echo "\"$variables\"" | jq -c 'split(",")')     
       echo 'array' $variables_array
       for variable in "${variables_array[@]}"; do
         echo "Variable: $item"
