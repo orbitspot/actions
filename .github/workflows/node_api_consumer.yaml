@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
     generate-matrix:
-      name: Generate Matrix of Dependencies
+      name: Generate Matrix of resources 
       runs-on: ubuntu-latest
       outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
