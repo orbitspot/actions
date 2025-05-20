@@ -40,19 +40,18 @@ jobs:
           run: |
             set -e
 
-            # Caminho da raiz do repositório
             PROJECT_ROOT=$(git rev-parse --show-toplevel)
             SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
 
-            # Lista arquivos .sh no diretório e remove a extensão
             scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
 
-            # Constrói JSON da matriz
-            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -s .)
-            consumer_matrix=$(echo "$matrix" | jq '[.[] | select(. != "api")]')
+            # Constrói JSON da matriz em formato compacto
+            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)
+            consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(. != "api")]')
 
             echo "matrix=$matrix" >> $GITHUB_OUTPUT
             echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
+
     setup-config:
       name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
