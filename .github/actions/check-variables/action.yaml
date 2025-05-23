@@ -12,8 +12,7 @@ runs:
     shell: bash
     run: |
       variables=${{ inputs.variables }}
-      bash --version
-      type read
+      compgen -c
       IFS=',' read -ra key_values <<< "$variables"
       echo 'key_values' $key_values
       for item in "${key_values[@]}"; do
