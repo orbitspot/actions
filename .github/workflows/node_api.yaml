@@ -33,7 +33,7 @@ jobs:
         - name: Check required variables
           uses: orbitspot/actions/.github/actions/check-variables@feat/check-required-variables
           with:
-            variables: "_PROPERTIES:${{ vars._PROPERTIES }}, _POLICY_JSON:${{ vars._POLICY_JSON }}"
+            variables: "_PROPERTIES:${{ vars._PROPERTIES }},_POLICY_JSON:${{ vars._POLICY_JSON }}"
 
     setup-config:
       name: Set Up Config
