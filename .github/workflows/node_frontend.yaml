@@ -24,7 +24,7 @@ concurrency:
 jobs:
     check-variables:
       name: Check required variables
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: 'ubuntu-latest'
       steps:
         - name: Check required variables
           uses: orbitspot/actions/.github/actions/check-variables@feat/check-required-variables
