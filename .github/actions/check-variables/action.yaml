@@ -1,0 +1,27 @@
+name: 'Check Variables'
+description: 'Check required variables'
+inputs:
+  variables:
+    description: 'Required variables'
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Check required variables
+    shell: bash
+    run: |
+      variables=${{ inputs.variables }}
+      json_array=$(echo "\"$variables\"" | jq -c 'split(",")')
+      mapfile -t variables_array < <(echo "$json_array" | jq -r '.[]')
+      if [ ${#variables_array[@]} -eq 0 ]; then
+        echo "❌ Input is missing!"
+        exit 1
+      fi   
+      for item in "${variables_array[@]}"; do
+        echo "Variable: [$item]"
+        if [ -z $item ]; then
+            echo "❌ Input is missing!"
+            exit 1
+          fi
+      done
