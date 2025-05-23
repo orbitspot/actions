@@ -26,9 +26,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+    check-variables:
+      name: Check required variables
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      steps:
+        - name: Check required variables
+          uses: orbitspot/actions/.github/actions/check-variables@feat/check-required-variables
+          with:
+            variables: "_PROPERTIES:${{ vars._PROPERTIES }}, _POLICY_JSON:${{ vars._POLICY_JSON }}"
+
     setup-config:
       name: Set Up Config
       runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      needs: [check-variables]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'

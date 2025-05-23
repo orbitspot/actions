@@ -12,16 +12,19 @@ runs:
     shell: bash
     run: |
       variables=${{ inputs.variables }}
-      json_array=$(echo "\"$variables\"" | jq -c 'split(",")')
-      mapfile -t variables_array < <(echo "$json_array" | jq -r '.[]')
-      if [ ${#variables_array[@]} -eq 0 ]; then
-        echo "❌ Input is missing!"
-        exit 1
-      fi   
-      for item in "${variables_array[@]}"; do
-        echo "Variable: [$item]"
-        if [ -z $item ]; then
-            echo "❌ Input is missing!"
+      IFS=',' read -ra key_values <<< "$variables"
+
+      for item in "${key_values[@]}"; do
+        echo "Key value: [$item]"
+
+        key="${item%%:*}"
+        value="${item#*:}"
+
+        echo 'key' $key
+        echo 'value' $value
+
+        if [ -z $value ]; then
+            echo "❌" $key "is missing!"
             exit 1
           fi
       done

@@ -29,8 +29,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+    check-variables:
+      name: Check required variables
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      steps:
+        - name: Check required variables
+          uses: orbitspot/actions/.github/actions/check-variables@feat/check-required-variables
+          with:
+            variables: "_PROPERTIES:${{ vars._PROPERTIES }}, _POLICY_JSON:${{ vars._POLICY_JSON }}"
+
     generate-matrix:
       runs-on: ubuntu-latest
+      needs: [check-variables]
       outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
         consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
@@ -42,6 +52,7 @@ jobs:
             full_array=$(jq -cn --arg c "$consumers" '$c | split(",") | ["api"] + .')
             echo "consumer_matrix=${consumers_array}" >> $GITHUB_OUTPUT
             echo "matrix=${full_array}" >> $GITHUB_OUTPUT
+    
     setup-config:
       name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]

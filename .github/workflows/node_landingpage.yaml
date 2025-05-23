@@ -22,7 +22,7 @@ jobs:
         - name: Check required variables
           uses: orbitspot/actions/.github/actions/check-variables@feat/check-required-variables
           with:
-            variables: "${{ vars.HOST_MF }}"
+            variables: "HOST_MF:${{ vars.HOST_MF }}, ACM_ARN:${{ vars.ACM_ARN }}"
 
     setup-config:
       name: Set Up Config
