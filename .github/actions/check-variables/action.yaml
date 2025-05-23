@@ -13,7 +13,7 @@ runs:
     run: |
       variables=${{ inputs.variables }}
       IFS=',' read -ra key_values <<< "$variables"
-
+      echo 'key_values' $key_values
       for item in "${key_values[@]}"; do
         echo "Key value: [$item]"
 
