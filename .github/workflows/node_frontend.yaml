@@ -25,7 +25,6 @@ jobs:
     check-variables:
       name: Check required variables
       runs-on: 'ubuntu-latest'
-      container: bash:latest
       # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       steps:
         - name: Check required variables
