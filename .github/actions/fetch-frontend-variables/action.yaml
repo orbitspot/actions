@@ -22,6 +22,8 @@ runs:
     run: |
       echo 'config=${{ inputs.frontend_config }}' >> $GITHUB_ENV
       echo 'branch=${{ inputs.branch }}' >> $GITHUB_ENV
+      echo 'variables=${{ inputs.variables_json }}' >> $GITHUB_ENV
+      echo 'secrets=${{ inputs.secrets_json }}' >> $GITHUB_ENV
   
   - name: Set config as output
     shell: bash
@@ -34,16 +36,20 @@ runs:
         printf '%s="%s"\n' $key $value >> .env
       done
 
-      jq -r 'to_entries[] | @sh "\(.key)=\(.value)"' ${{ inputs.variables_json }} | while read -r line; do
+      jq -r 'to_entries[] | @sh "\(.key)=\(.value)"' variables | while read -r line; do
         key="${line%%=*}"
         value="${line#*=}"
         printf '%s="%s"\n' "$key" "$value" >> .env
       done
 
-      jq -r 'to_entries[] | @sh "\(.key)=\(.value)"' ${{ inputs.secrets_json }} | while read -r line; do
-        key="${line%%=*}"
-        value="${line#*=}"
-        printf '%s="%s"\n' "$key" "$value" >> .env
-      done
+      if [ -n secrets ] && echo secrets | jq -e 'type == "object"' > /dev/null; then
+        echo secrets | jq -r 'to_entries[] | @sh "\(.key)=\(.value)"' | while read -r line; do
+          key="${line%%=*}"
+          value="${line#*=}"
+          printf '%s="%s"\n' "$key" "$value" >> .env
+        done
+      else
+        echo "No secrets to write to .env"
+      fi
 
       cat .env
