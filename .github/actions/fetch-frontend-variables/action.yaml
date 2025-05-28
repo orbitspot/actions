@@ -17,39 +17,106 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Determine configuration variable
-    shell: bash
-    run: |
-      echo 'config=${{ inputs.frontend_config }}' >> $GITHUB_ENV
-      echo 'branch=${{ inputs.branch }}' >> $GITHUB_ENV
-      echo 'variables=${{ inputs.variables_json }}' >> $GITHUB_ENV
-      echo 'secrets=${{ inputs.secrets_json }}' >> $GITHUB_ENV
+  # - name: Determine configuration variable
+  #   shell: bash
+  #   run: |
+  #     echo 'config=${{ inputs.frontend_config }}' >> $GITHUB_ENV
+  #     echo 'branch=${{ inputs.branch }}' >> $GITHUB_ENV
+  #     echo 'variables=${{ inputs.variables_json }}' >> $GITHUB_ENV
+  #     echo 'secrets=${{ inputs.secrets_json }}' >> $GITHUB_ENV
   
-  - name: Set config as output
-    shell: bash
-    id: set-output
-    run: |
-      keys=$(echo "$config" | jq -r --arg branch "$branch" '.[$branch] | keys_unsorted[]')
-      for key in $keys; do
-        value=$(echo "$config" | jq -r --arg branch "$branch" --arg key "$key" '.[$branch][$key]')
-        echo "$key" "$value"
-        printf '%s="%s"\n' $key $value >> .env
-      done
+  # - name: Set config as output
+  #   shell: bash
+  #   id: set-output
+  #   run: |
+  #     keys=$(echo "$config" | jq -r --arg branch "$branch" '.[$branch] | keys_unsorted[]')
+  #     for key in $keys; do
+  #       value=$(echo "$config" | jq -r --arg branch "$branch" --arg key "$key" '.[$branch][$key]')
+  #       echo "$key" "$value"
+  #       printf '%s="%s"\n' $key $value >> .env
+  #     done
 
-      jq -r 'to_entries[] | @sh "\(.key)=\(.value)"' variables | while read -r line; do
-        key="${line%%=*}"
-        value="${line#*=}"
-        printf '%s="%s"\n' "$key" "$value" >> .env
-      done
+  #     jq -r 'to_entries[] | @sh "\(.key)=\(.value)"' variables | while read -r line; do
+  #       key="${line%%=*}"
+  #       value="${line#*=}"
+  #       printf '%s="%s"\n' "$key" "$value" >> .env
+  #     done
 
-      if [ -n secrets ] && echo secrets | jq -e 'type == "object"' > /dev/null; then
-        echo secrets | jq -r 'to_entries[] | @sh "\(.key)=\(.value)"' | while read -r line; do
-          key="${line%%=*}"
-          value="${line#*=}"
-          printf '%s="%s"\n' "$key" "$value" >> .env
-        done
-      else
-        echo "No secrets to write to .env"
-      fi
+  #     if [ -n secrets ] && echo secrets | jq -e 'type == "object"' > /dev/null; then
+  #       echo secrets | jq -r 'to_entries[] | @sh "\(.key)=\(.value)"' | while read -r line; do
+  #         key="${line%%=*}"
+  #         value="${line#*=}"
+  #         printf '%s="%s"\n' "$key" "$value" >> .env
+  #       done
+  #     else
+  #       echo "No secrets to write to .env"
+  #     fi
 
-      cat .env
+  #     cat .env
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.x
+
+    - name: Generate JSON and set output
+      shell: python
+      run: |
+          import json
+          import os
+
+          secrets_json = ${{ inputs.secrets_json }}
+          variables_json = ${{ inputs.secrets_json }}
+          config_json = ${{ inputs.frontend_config }}
+          branch = ${{ inputs.branch }}
+
+          try:
+              secrets = json.loads(secrets_json)
+              variables = json.loads(secrets_json)
+              config = json.loads(config_json)
+              config = config[branch]
+          except json.JSONDecodeError:
+              print("Invalid JSON input")
+              exit(1)
+
+          with open(".env", "a") as f:
+              for key, raw_value in secrets.items():
+                  # Try to parse value as nested JSON if it's a string
+                  if isinstance(raw_value, str):
+                      try:
+                          parsed_value = json.loads(raw_value)
+                          value = json.dumps(parsed_value)
+                      except json.JSONDecodeError:
+                          value = raw_value
+                  else:
+                      value = raw_value
+
+                  # Ensure string and properly escaped
+                  f.write(f'{key}="{value}"\n')
+              for key, raw_value in variables.items():
+                  # Try to parse value as nested JSON if it's a string
+                  if isinstance(raw_value, str):
+                      try:
+                          parsed_value = json.loads(raw_value)
+                          value = json.dumps(parsed_value)
+                      except json.JSONDecodeError:
+                          value = raw_value
+                  else:
+                      value = raw_value
+
+                  # Ensure string and properly escaped
+                  f.write(f'{key}="{value}"\n')
+
+              for key, raw_value in config.items():
+                  # Try to parse value as nested JSON if it's a string
+                  if isinstance(raw_value, str):
+                      try:
+                          parsed_value = json.loads(raw_value)
+                          value = json.dumps(parsed_value)
+                      except json.JSONDecodeError:
+                          value = raw_value
+                  else:
+                      value = raw_value
+
+                  # Ensure string and properly escaped
+                  f.write(f'{key}="{value}"\n')
+    
