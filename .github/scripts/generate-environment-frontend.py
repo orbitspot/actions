@@ -11,9 +11,9 @@ print(frontend_config)
 print(branch)
 
 try:
-    secrets = secrets_json
-    variables = secrets_json
-    config = frontend_config
+    secrets = json.loads(secrets_json)
+    variables = json.loads(secrets_json)
+    config = json.loads(frontend_config)
     config = config[branch]
 except json.JSONDecodeError:
     print("Invalid JSON input")
