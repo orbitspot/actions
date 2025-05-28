@@ -74,9 +74,9 @@ runs:
           print(branch)
 
           try:
-              secrets = json.loads(secrets_json)
-              variables = json.loads(secrets_json)
-              config = json.loads(config_json)
+              secrets = secrets_json
+              variables = secrets_json
+              config = config_json
               config = config[branch]
           except json.JSONDecodeError:
               print("Invalid JSON input")
