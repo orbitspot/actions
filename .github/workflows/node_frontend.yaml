@@ -24,7 +24,7 @@ concurrency:
 jobs:
     setup-config:
       name: Set Up Config
-      runs-on: ubuntu-latest
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -36,12 +36,12 @@ jobs:
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.8
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: 'develop'
+            branch: '${{ github.ref_name }}'
 
     building:
         name: Building
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config]
         permissions:
             id-token: write
@@ -61,57 +61,48 @@ jobs:
 
             - name: Bash Co Login
               run: |
-                  bash co_login_commands.txt
-        
-            - uses: actions/checkout@v4
-              name: Checkout
-              with:
-                  repository: 'orbitspot/actions'
-                  ref: fix-variable-fetch-frontend
-                  path: code
+                  bash co_login_commands.txt 
         
             - name: Cache dependences
               uses: actions/cache@v4
               with:
                   path: ~/.npm
                   key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
-        
-            - name: Install Yarn
-              run: npm install -g yarn
             
-            # - name: Fetch fronted variables
-            #   uses: orbitspot/actions/.github/actions/fetch-frontend-variables@fix-variable-fetch-frontend
-            #   with:
-            #     frontend_config: '${{ vars._FRONTEND_CONFIG }}'
-            #     branch: 'develop'
-            #     variables_json: '${{ toJson(vars) }}'
-            #     secrets_json: '${{ toJson(secrets) }}'
+            - uses: actions/checkout@v4
+              name: Checkout
+              with:
+                  repository: 'orbitspot/actions'
+                  ref: fix-variable-fetch-frontend
+                  path: code
 
             - name: Fetch fronted variables
               env:
-                frontend_config: ${{ vars._FRONTEND_CONFIG }}
-                branch: 'develop'
-                variables_json: ${{ toJson(vars) }}
-                secrets_json: ${{ toJson(secrets) }}
+                  frontend_config: ${{ vars._FRONTEND_CONFIG }}
+                  branch: '${{ github.ref_name }}'
+                  variables_json: ${{ toJson(vars) }}
+                  secrets_json: ${{ toJson(secrets) }}
               run: |
-                pip install pyyaml
-                python code/.github/scripts/generate-environment-frontend.py
-                cat .env
+                  python code/.github/scripts/generate-environment-frontend.py
+                  cat .env
             
             - uses: actions/checkout@v4
               name: Checkout
               with:
                   fetch-depth: 0
-                  ref: develop
+                  ref: ${{ github.ref_name }}
+            
+            - name: Install Yarn
+              run: npm install -g yarn
 
             - name: Yarn Building
               shell: bash
               run: |
-                echo 'PUBLIC_PATH="https://${{ vars.HOST_MF }}/"' >> .env
-                cat .env
-                yarn
-                yarn build
-        
+                  echo 'PUBLIC_PATH="https://${{ vars.HOST_MF }}/"' >> .env
+                  cat .env
+                  yarn
+                  yarn build
+          
             - name: Zip Docker Content
               shell: bash
               run: |
@@ -130,8 +121,8 @@ jobs:
 
     generate-docker:
         name: Docker Build
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
             id-token: write
@@ -168,8 +159,8 @@ jobs:
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
             id-token: write
@@ -203,8 +194,8 @@ jobs:
 
     helm-deploy:
         name: K8s Deploy
-        runs-on: ubuntu-latest
-        environment: develop
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [ setup-config, create-service-account-role, generate-docker ]
         permissions:
             id-token: write
@@ -218,7 +209,7 @@ jobs:
             - uses: actions/checkout@v4
               name: Checkout
               with:
-                  ref: develop
+                  ref: ${{ github.ref_name }}
                   fetch-depth: 0
 
             - name: configure

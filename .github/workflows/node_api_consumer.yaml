@@ -28,7 +28,7 @@ concurrency:
 jobs:
     generate-matrix:
       name: Generate Matrix of resources 
-      runs-on: ubuntu-latest
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
         consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
@@ -55,7 +55,7 @@ jobs:
 
     setup-config:
       name: Set Up Config
-      runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       needs: [generate-matrix]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
@@ -68,11 +68,11 @@ jobs:
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.8
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: 'develop'
+            branch: '${{ github.ref_name }}'
     
     building:
         name: Building
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         needs: [setup-config]
         permissions:
             id-token: write
@@ -102,8 +102,8 @@ jobs:
 
     generate-docker:
         name: Docker Build
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: develop
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, building, generate-matrix]
         strategy:
             matrix:
@@ -148,8 +148,8 @@ jobs:
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: develop
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, generate-docker]
         permissions:
             id-token: write
@@ -183,8 +183,8 @@ jobs:
 
     prepare-helm-replacements:
         name: Building Helm Values
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: develop
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, generate-docker, generate-matrix]
         strategy:
             matrix:
@@ -287,8 +287,8 @@ jobs:
 
     helm-cd-api:
         name: K8s Deploy Api
-        runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: develop
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
         needs: [setup-config, prepare-helm-replacements]
         permissions:
             id-token: write
@@ -322,7 +322,7 @@ jobs:
                   helm_values: helm-values-api
                   release: api
                   chart_name: orbitspot/orbitspot-microservices
-                  chart_version: 0.0.0
+                  chart_version: 3.0.2
                   sets: |
                       --set environment=${{ env.ENV}} \
                       --set region=${{ env.CLUSTER_REGION }} \
@@ -339,7 +339,7 @@ jobs:
                   helm_values: helm-values-api
                   release: api
                   chart_name: orbitspot/orbitspot-microservices
-                  chart_version: 0.0.0
+                  chart_version: 3.0.2
                   sets: |
                       --set environment=${{ env.ENV}} \
                       --set region=${{ env.CLUSTER_REGION }} \
@@ -349,8 +349,8 @@ jobs:
     
     helm-cd-consumer:
       name: K8s Deploy ${{ matrix.artifacts }}
-      runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: develop
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: ${{ github.ref_name }}
       needs: [setup-config, prepare-helm-replacements, generate-matrix]
       strategy:
         matrix:

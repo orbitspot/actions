@@ -47,18 +47,29 @@ jobs:
                 role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
                 role-session-name: "${{ vars.AWS_ROLE_NAME }}"
                 aws-region: "us-east-1"
+           
+            - uses: actions/checkout@v4
+              name: Checkout
+              with:
+                  repository: 'orbitspot/actions'
+                  ref: fix-variable-fetch-frontend
+                  path: code
+
+            - name: Fetch landingpage variables
+              env:
+                frontend_config: ${{ vars._LANDINGPAGE_CONFIG }}
+                branch: '${{ github.ref_name }}'
+                variables_json: ${{ toJson(vars) }}
+                secrets_json: ${{ toJson(secrets) }}
+              run: |
+                python code/.github/scripts/generate-environment-frontend.py
+                cat .env
 
             - uses: actions/checkout@v4
               name: Checkout
               with:
                 ref: ${{ inputs.git_ref }}
                 fetch-depth: 0
-
-            - name: Fetch fronted variables
-              uses: orbitspot/actions/.github/actions/fetch-frontend-variables@v18.8
-              with:
-                frontend_config: '${{ vars._LANDINGPAGE_CONFIG }}'
-                branch: '${{ github.ref_name }}'
 
             - name: Generate Build Args
               uses: orbitspot/actions/.github/actions/generate-build-args@v18.8
@@ -69,7 +80,7 @@ jobs:
             - name: Download Dockerfile from S3
               run: |
                 aws s3 sync s3://devops.orbitspot.com/build-github-actions/v1/deploy/landingpage .
-
+            
             - name: docker-build
               uses: orbitspot/actions/.github/actions/docker@v18.8
               with:
@@ -220,7 +231,7 @@ jobs:
                 helm_values: helm-values
                 release: landingpage
                 chart_name: orbitspot/orbitspot-front-nginx
-                chart_version: 1.1.0
+                chart_version: 1.1.1
                 sets: |
                  --set environment=${{ env.ENV}} \
                  --set region=${{ env.CLUSTER_REGION }} \
@@ -239,7 +250,7 @@ jobs:
                 helm_values: helm-values
                 release: landingpage
                 chart_name: orbitspot/orbitspot-front-nginx
-                chart_version: 1.1.0
+                chart_version: 1.1.1
                 sets: |
                   --set environment=${{ env.ENV}} \
                   --set region=${{ env.CLUSTER_REGION }} \
