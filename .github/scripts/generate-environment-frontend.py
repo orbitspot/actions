@@ -5,10 +5,6 @@ secrets_json = os.getenv("secrets_json", "{}")
 variables_json = os.getenv("variables_json", "{}")
 frontend_config = os.getenv("frontend_config", "{}")
 branch = os.getenv("branch")
-print(secrets_json)
-print(variables_json)
-print(frontend_config)
-print(branch)
 
 try:
     secrets = json.loads(secrets_json)
@@ -20,6 +16,9 @@ except json.JSONDecodeError:
     exit(1)
 
 with open(".env", "a") as f:
+    print(secrets)
+    print(variables)
+    print(config)
     for key, raw_value in secrets.items():
         # Try to parse value as nested JSON if it's a string
         if isinstance(raw_value, str):
@@ -33,6 +32,7 @@ with open(".env", "a") as f:
 
         # Ensure string and properly escaped
         f.write(f'{key}="{value}"\n')
+
     for key, raw_value in variables.items():
         # Try to parse value as nested JSON if it's a string
         if isinstance(raw_value, str):
