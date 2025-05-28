@@ -33,7 +33,7 @@ with open(".env", "a") as f:
             value = raw_value
 
         # Ensure string and properly escaped
-        if key not in devops_variables and not key.startswith("_"): :
+        if key not in devops_variables and not key.startswith("_"):
             f.write(f'{key}="{value}"\n')
 
     for key, raw_value in variables.items():
@@ -48,7 +48,7 @@ with open(".env", "a") as f:
             value = raw_value
 
         # Ensure string and properly escaped
-        if key not in devops_variables and not key.startswith("_")::
+        if key not in devops_variables and not key.startswith("_"):
             f.write(f'{key}="{value}"\n')
 
     for key, raw_value in config.items():
@@ -63,5 +63,5 @@ with open(".env", "a") as f:
             value = raw_value
 
         # Ensure string and properly escaped
-        if key not in devops_variables and not key.startswith("_")::
+        if key not in devops_variables and not key.startswith("_"):
             f.write(f'{key}="{value}"\n')
