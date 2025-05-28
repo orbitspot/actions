@@ -17,7 +17,7 @@ concurrency:
 jobs:
     setup-config:
       name: Set Up Config
-      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ubuntu-latest
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -28,12 +28,12 @@ jobs:
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.8
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: '${{ github.ref_name }}'
+            branch: 'develop'
 
     building:
         name: Building
-        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [setup-config]
         permissions:
           id-token: write
@@ -58,7 +58,7 @@ jobs:
             - name: Fetch landingpage variables
               env:
                 frontend_config: ${{ vars._LANDINGPAGE_CONFIG }}
-                branch: '${{ github.ref_name }}'
+                branch: 'develop'
                 variables_json: ${{ toJson(vars) }}
                 secrets_json: ${{ toJson(secrets) }}
               run: |
@@ -75,7 +75,7 @@ jobs:
               uses: orbitspot/actions/.github/actions/generate-build-args@v18.8
               with:
                 landingpage_config: '${{ vars._LANDINGPAGE_CONFIG }}'
-                branch: '${{ github.ref_name }}'
+                branch: 'develop'
                 
             - name: Download Dockerfile from S3
               run: |
@@ -93,8 +93,8 @@ jobs:
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [setup-config, building]
         permissions:
             id-token: write
@@ -127,8 +127,8 @@ jobs:
 
     prepare-helm-replacements:
       name: Building Helm Values
-      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
+      runs-on: ubuntu-latest
+      environment: develop
       needs: [setup-config, building]
       permissions:
           id-token: write
@@ -139,7 +139,7 @@ jobs:
           - uses: actions/checkout@v4
             name: Checkout
             with:
-                ref: '${{ github.ref_name }}'
+                ref: 'develop'
                 fetch-depth: 0
 
           - name: Configurar Python
@@ -202,8 +202,8 @@ jobs:
 
     helm-deploy:
         name: K8s Deploy
-        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        environment: develop
         needs: [ setup-config, prepare-helm-replacements ]
         permissions:
             id-token: write
