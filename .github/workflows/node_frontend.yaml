@@ -68,7 +68,7 @@ jobs:
               with:
                   repository: 'orbitspot/actions'
                   ref: fix-variable-fetch-frontend
-                  fetch-depth: 0
+                  path: code
         
             # - name: Cache dependences
             #   uses: actions/cache@v4
