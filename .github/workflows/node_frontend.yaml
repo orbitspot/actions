@@ -83,6 +83,8 @@ jobs:
               with:
                 frontend_config: '${{ vars._FRONTEND_CONFIG }}'
                 branch: 'develop'
+                variables_json: ${{ toJson(vars) }}
+                secrets_json: ${{ toJson(secrets) }}
                 
             - name: Yarn Building
               shell: bash
