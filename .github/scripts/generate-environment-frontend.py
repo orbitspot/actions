@@ -8,7 +8,7 @@ branch = os.getenv("branch")
 
 try:
     secrets = json.loads(secrets_json)
-    variables = json.loads(secrets_json)
+    variables = json.loads(variables_json)
     config = json.loads(frontend_config)
     config = config[branch]
 except json.JSONDecodeError:
