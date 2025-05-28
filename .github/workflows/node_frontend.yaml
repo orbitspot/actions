@@ -42,7 +42,7 @@ jobs:
         name: Building
         runs-on: ubuntu-latest
         environment: develop
-        # needs: [setup-config]
+        needs: [setup-config]
         permissions:
             id-token: write
             contents: read
@@ -97,7 +97,13 @@ jobs:
                 pip install pyyaml
                 python code/.github/scripts/generate-environment-frontend.py
                 cat .env
-  
+            
+            - uses: actions/checkout@v4
+              name: Checkout
+              with:
+                  fetch-depth: 0
+                  ref: develop
+
             - name: Yarn Building
               shell: bash
               run: |
