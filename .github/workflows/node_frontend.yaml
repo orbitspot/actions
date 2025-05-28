@@ -95,7 +95,7 @@ jobs:
                 secrets_json: ${{ toJson(secrets) }}
               run: |
                 pip install pyyaml
-                python code/.github/scripts/fetch-frontend-variables.py
+                python code/.github/scripts/generate-environment-frontend.py
                 cat env.yaml
   
             - name: Yarn Building
