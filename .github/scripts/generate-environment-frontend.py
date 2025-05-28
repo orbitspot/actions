@@ -3,17 +3,17 @@ import os
 
 secrets_json = os.getenv("secrets_json", "{}")
 variables_json = os.getenv("variables_json", "{}")
-config_json = os.getenv("config_json", "{}")
+frontend_config = os.getenv("frontend_config", "{}")
 branch = os.getenv("branch")
 print(secrets_json)
 print(variables_json)
-print(config_json)
+print(frontend_config)
 print(branch)
 
 try:
     secrets = secrets_json
     variables = secrets_json
-    config = config_json
+    config = frontend_config
     config = config[branch]
 except json.JSONDecodeError:
     print("Invalid JSON input")
