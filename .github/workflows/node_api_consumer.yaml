@@ -65,7 +65,7 @@ jobs:
       steps:
         - name: Fetch devops variables
           id: set-output
-          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.8
+          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.9
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
             branch: '${{ github.ref_name }}'
@@ -79,7 +79,7 @@ jobs:
             contents: read
         steps:
             - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.8
+              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -95,7 +95,7 @@ jobs:
                   bash co_login_commands.txt
 
             - name: Npm Building
-              uses: orbitspot/actions/.github/actions/npm-ci@v18.8
+              uses: orbitspot/actions/.github/actions/npm-ci@v18.9
               with:
                   node_version: '${{ inputs.version }}'
                   customized_dockerfile: '${{ inputs.dockerfile_path  }}'
@@ -115,7 +115,7 @@ jobs:
           CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
         steps:
           - name: Authenticate
-            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.8
+            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.9
             with:
               aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
               aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -133,7 +133,7 @@ jobs:
               mv ${{ inputs.dockerfile_path }} Dockerfile
     
           - name: docker-build
-            uses: orbitspot/actions/.github/actions/docker@v18.8
+            uses: orbitspot/actions/.github/actions/docker@v18.9
             with:
                 aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                 aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -160,7 +160,7 @@ jobs:
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - name: create-role
-              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.8
+              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.9
               with:
                   role: '${{ github.event.repository.name }}-${{ env.ENV }}'
                   namespace: ${{ github.event.repository.name }}
@@ -171,7 +171,7 @@ jobs:
                   policy: ${{ vars._POLICY_JSON }}
 
             - name: create-namespace
-              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.8
+              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -212,10 +212,10 @@ jobs:
               with:
                   repository: 'orbitspot/actions'
                   path: code
-                  ref: 'v18.8'
+                  ref: 'v18.9'
 
             - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.8
+              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.9
               with:
                 aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
                 aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -305,7 +305,7 @@ jobs:
                   fetch-depth: 0
 
             - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.8
+              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -314,7 +314,7 @@ jobs:
 
             - name: helm-apply
               if: inputs.enabled_old_host == ''
-              uses: orbitspot/actions/.github/actions/helm-deploy@v18.8
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_region: ${{ env.CLUSTER_REGION }}
@@ -331,7 +331,7 @@ jobs:
             
             - name: helm-apply
               if: inputs.enabled_old_host != ''
-              uses: orbitspot/actions/.github/actions/helm-deploy@v18.8
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_region: ${{ env.CLUSTER_REGION }}
@@ -370,7 +370,7 @@ jobs:
             fetch-depth: 0
 
         - name: configure
-          uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.8
+          uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.9
           with:
             aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
             aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -378,7 +378,7 @@ jobs:
             cluster_name: ${{ env.CLUSTER_NAME }}
 
         - name: helm-apply
-          uses: orbitspot/actions/.github/actions/helm-deploy@v18.8
+          uses: orbitspot/actions/.github/actions/helm-deploy@v18.9
           with:
             aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
             aws_region: ${{ env.CLUSTER_REGION }}
