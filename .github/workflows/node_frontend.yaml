@@ -63,11 +63,11 @@ jobs:
             #   run: |
             #       bash co_login_commands.txt
         
-            # - uses: actions/checkout@v4
-            #   name: Checkout
-            #   with:
-            #       ref: develop
-            #       fetch-depth: 0
+            - uses: actions/checkout@v4
+              name: Checkout
+              with:
+                  ref: develop
+                  fetch-depth: 0
         
             # - name: Cache dependences
             #   uses: actions/cache@v4
@@ -78,14 +78,25 @@ jobs:
             - name: Install Yarn
               run: npm install -g yarn
             
+            # - name: Fetch fronted variables
+            #   uses: orbitspot/actions/.github/actions/fetch-frontend-variables@fix-variable-fetch-frontend
+            #   with:
+            #     frontend_config: '${{ vars._FRONTEND_CONFIG }}'
+            #     branch: 'develop'
+            #     variables_json: '${{ toJson(vars) }}'
+            #     secrets_json: '${{ toJson(secrets) }}'
+
             - name: Fetch fronted variables
-              uses: orbitspot/actions/.github/actions/fetch-frontend-variables@fix-variable-fetch-frontend
-              with:
-                frontend_config: '${{ vars._FRONTEND_CONFIG }}'
+              env:
+                frontend_config: ${{ vars._FRONTEND_CONFIG }}
                 branch: 'develop'
-                variables_json: '${{ toJson(vars) }}'
-                secrets_json: '${{ toJson(secrets) }}'
-                
+                variables_json: ${{ toJson(vars) }}
+                secrets_json: ${{ toJson(secrets) }}
+              run: |
+                pip install pyyaml
+                python code/.github/scripts/fetch-frontend-variables.py
+                cat env.yaml
+  
             - name: Yarn Building
               shell: bash
               run: |
