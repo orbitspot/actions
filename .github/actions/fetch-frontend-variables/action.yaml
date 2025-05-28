@@ -67,7 +67,7 @@ runs:
           secrets_json = ${{ inputs.secrets_json }}
           variables_json = ${{ inputs.secrets_json }}
           config_json = ${{ inputs.frontend_config }}
-          branch = ${{ inputs.branch }}
+          branch = "${{ inputs.branch }}"
           print(secrets_json)
           print(variables_json)
           print(config_json)
