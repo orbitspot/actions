@@ -73,7 +73,7 @@ jobs:
               name: Checkout
               with:
                   repository: 'orbitspot/actions'
-                  ref: fix-variable-fetch-frontend
+                  ref: v18.9
                   path: code
 
             - name: Fetch fronted variables

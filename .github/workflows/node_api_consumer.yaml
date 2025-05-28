@@ -28,7 +28,7 @@ concurrency:
 jobs:
     generate-matrix:
       name: Generate Matrix of resources 
-      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ubuntu-latest
       outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
         consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
