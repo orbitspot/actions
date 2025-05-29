@@ -104,7 +104,8 @@ jobs:
         run: |
           python code/.github/scripts/generate-environment-frontend.py
           cat .env
-          mv .env ../
+          mv .env ../ 
+          # Fazendo isso porque o checkout deleta a pasta corrente
 
       - uses: actions/checkout@v4
         name: Checkout
@@ -118,6 +119,7 @@ jobs:
       - name: Yarn Building
         shell: bash
         run: |
+          #Fazendo isso porque na etapa Fetch fronted variables joguei o .env pra pasta acima
           mv ../.env .env
           echo 'PUBLIC_PATH="https://${{ vars.HOST_MF }}/"' >> .env
           cat .env
