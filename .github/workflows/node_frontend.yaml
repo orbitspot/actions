@@ -104,6 +104,7 @@ jobs:
         run: |
           python code/.github/scripts/generate-environment-frontend.py
           cat .env
+          pwd
 
       - uses: actions/checkout@v4
         name: Checkout
@@ -117,7 +118,7 @@ jobs:
       - name: Yarn Building
         shell: bash
         run: |
-          cat .env
+          pwd
           echo 'PUBLIC_PATH="https://${{ vars.HOST_MF }}/"' >> .env
           cat .env
           yarn
