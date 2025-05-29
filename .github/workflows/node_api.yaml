@@ -16,10 +16,6 @@ on:
         required: false
         type: string
         default: ''
-      enabled_old_host:
-        required: false
-        type: string
-        default: ''
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -213,7 +209,7 @@ jobs:
                 mv values.yaml .github/helm/api/values.yaml
             
             - name: Download Old Ingress Config from S3
-              if: ${{ inputs.enabled_old_host != '' }}
+              if: ${{ vars.OLD_INGRESS_HOST != ''}}
               run: |
                 aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/api/old_ingress_values.yaml old_ingress_values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' old_ingress_values.yaml
@@ -281,7 +277,7 @@ jobs:
                   cluster_name: ${{ env.CLUSTER_NAME }}
 
             - name: helm-apply
-              if: inputs.enabled_old_host == ''
+              if: ${{ vars.OLD_INGRESS_HOST == ''}}
               uses: orbitspot/actions/.github/actions/helm-deploy@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
@@ -298,7 +294,7 @@ jobs:
                       --set 'containers[0].repository.tag=${{ github.sha }}'
 
             - name: helm-apply
-              if: inputs.enabled_old_host != ''
+              if: ${{ vars.OLD_INGRESS_HOST != ''}}
               uses: orbitspot/actions/.github/actions/helm-deploy@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
