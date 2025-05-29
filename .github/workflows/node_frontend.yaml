@@ -95,15 +95,6 @@ jobs:
           ref: v18.9
           path: code
 
-      - uses: actions/checkout@v4
-        name: Checkout
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref_name }}
-
-      - name: Install Yarn
-        run: npm install -g yarn
-
       - name: Fetch fronted variables
         env:
           frontend_config: ${{ vars._FRONTEND_CONFIG }}
@@ -114,9 +105,19 @@ jobs:
           python code/.github/scripts/generate-environment-frontend.py
           cat .env
 
+      - uses: actions/checkout@v4
+        name: Checkout
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
       - name: Yarn Building
         shell: bash
         run: |
+          cat .env
           echo 'PUBLIC_PATH="https://${{ vars.HOST_MF }}/"' >> .env
           cat .env
           yarn
