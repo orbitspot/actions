@@ -22,25 +22,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-    check-variables:
-      name: Check required variables
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      steps:
-        - name: Check required variables
-          uses: orbitspot/actions/.github/actions/check-variables@feat/check-required-variables
-          with:
-            variables: "_PROPERTIES:${{ vars._PROPERTIES }},_POLICY_JSON:${{ vars._POLICY_JSON }}"
-
     setup-config:
       name: Set Up Config
       runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      needs: [check-variables]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
         ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
+        - name: Setup Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.x'
+        
+        - name: Checkout script repository
+          uses: actions/checkout@v4
+          with:
+            repository: 'orbitspot/actions'
+            path: code
+            ref: 'feat/check-required-variables'
+        
+        - name: Check required variables
+          uses: orbitspot/actions/.github/actions/check-required-variables@feat/check-required-variables
+          with:
+            variables_json: ${{ toJson(vars) }}
+            setup: 'api'
+
         - name: Fetch devops variables
           id: set-output
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.9
