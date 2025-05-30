@@ -16,14 +16,7 @@ on:
         required: false
         type: string
         default: ''
-      enabled_old_host:
-        required: false
-        type: string
-        default: ''
-      consumers:
-        required: false
-        type: string
-        default: 'consumer'
+
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
@@ -39,20 +32,33 @@ jobs:
             variables: "_PROPERTIES:${{ vars._PROPERTIES }},_POLICY_JSON:${{ vars._POLICY_JSON }}"
 
     generate-matrix:
+      name: Generate Matrix of resources 
       runs-on: ubuntu-latest
       needs: [check-variables]
       outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
         consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
       steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
         - id: set-matrix
+          shell: bash
           run: |
-            consumers="${{ inputs.consumers }}"
-            consumers_array=$(jq -cn --arg c "$consumers" '$c | split(",")')
-            full_array=$(jq -cn --arg c "$consumers" '$c | split(",") | ["api"] + .')
-            echo "consumer_matrix=${consumers_array}" >> $GITHUB_OUTPUT
-            echo "matrix=${full_array}" >> $GITHUB_OUTPUT
-    
+            set -e
+
+            PROJECT_ROOT=$(git rev-parse --show-toplevel)
+            SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
+
+            scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
+
+            # Constrói JSON da matriz em formato compacto
+            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)
+            consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(. != "api")]')
+
+            echo "matrix=$matrix" >> $GITHUB_OUTPUT
+            echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
+
     setup-config:
       name: Set Up Config
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
@@ -65,7 +71,7 @@ jobs:
       steps:
         - name: Fetch devops variables
           id: set-output
-          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.8
+          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.9
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
             branch: '${{ github.ref_name }}'
@@ -79,7 +85,7 @@ jobs:
             contents: read
         steps:
             - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.8
+              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -95,7 +101,7 @@ jobs:
                   bash co_login_commands.txt
 
             - name: Npm Building
-              uses: orbitspot/actions/.github/actions/npm-ci@v18.8
+              uses: orbitspot/actions/.github/actions/npm-ci@v18.9
               with:
                   node_version: '${{ inputs.version }}'
                   customized_dockerfile: '${{ inputs.dockerfile_path  }}'
@@ -115,7 +121,7 @@ jobs:
           CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
         steps:
           - name: Authenticate
-            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.8
+            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.9
             with:
               aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
               aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -133,7 +139,7 @@ jobs:
               mv ${{ inputs.dockerfile_path }} Dockerfile
     
           - name: docker-build
-            uses: orbitspot/actions/.github/actions/docker@v18.8
+            uses: orbitspot/actions/.github/actions/docker@v18.9
             with:
                 aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                 aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -160,7 +166,7 @@ jobs:
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - name: create-role
-              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.8
+              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.9
               with:
                   role: '${{ github.event.repository.name }}-${{ env.ENV }}'
                   namespace: ${{ github.event.repository.name }}
@@ -171,7 +177,7 @@ jobs:
                   policy: ${{ vars._POLICY_JSON }}
 
             - name: create-namespace
-              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.8
+              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -188,7 +194,7 @@ jobs:
         needs: [setup-config, generate-docker, generate-matrix]
         strategy:
             matrix:
-                artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+                artifacts: ${{fromJson(needs.generate-matrix.outputs.matrix) }}
         permissions:
             id-token: write
             contents: read
@@ -212,10 +218,10 @@ jobs:
               with:
                   repository: 'orbitspot/actions'
                   path: code
-                  ref: 'v18.8'
+                  ref: 'v18.9'
 
             - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.8
+              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.9
               with:
                 aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
                 aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -233,14 +239,20 @@ jobs:
 
             - name: Download Helm from S3
               run: |
-                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/${{ matrix.artifacts }}/values.yaml values.yaml
+                if [ "${{ matrix.artifacts }}" = "api" ]; then
+                  s3_path="api"
+                else
+                  s3_path="consumer"
+                fi
+                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/$s3_path/values.yaml values.yaml
+                sed -i 's/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g' values.yaml  
                 sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
                 mkdir -p .github/helm/${{ matrix.artifacts }}
                 mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
 
             - name: Download Old Ingress Config from S3
-              if: ${{ (inputs.enabled_old_host != '') && (matrix.artifacts == 'api') }}
+              if: (${{ vars.OLD_INGRESS_HOST != ''}}) && (matrix.artifacts == 'api') }}
               run: |
                 aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/${{ matrix.artifacts }}/old_ingress_values.yaml old_ingress_values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' old_ingress_values.yaml
@@ -299,7 +311,7 @@ jobs:
                   fetch-depth: 0
 
             - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.8
+              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -307,8 +319,8 @@ jobs:
                   cluster_name: ${{ env.CLUSTER_NAME }}
 
             - name: helm-apply
-              if: inputs.enabled_old_host == ''
-              uses: orbitspot/actions/.github/actions/helm-deploy@v18.8
+              if: ${{ vars.OLD_INGRESS_HOST == ''}}
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_region: ${{ env.CLUSTER_REGION }}
@@ -316,7 +328,7 @@ jobs:
                   helm_values: helm-values-api
                   release: api
                   chart_name: orbitspot/orbitspot-microservices
-                  chart_version: 3.0.1
+                  chart_version: 3.0.2
                   sets: |
                       --set environment=${{ env.ENV}} \
                       --set region=${{ env.CLUSTER_REGION }} \
@@ -324,8 +336,8 @@ jobs:
                       --set 'containers[0].repository.tag=${{ github.sha }}' 
             
             - name: helm-apply
-              if: inputs.enabled_old_host != ''
-              uses: orbitspot/actions/.github/actions/helm-deploy@v18.8
+              if: ${{ vars.OLD_INGRESS_HOST != ''}}
+              uses: orbitspot/actions/.github/actions/helm-deploy@v18.9
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_region: ${{ env.CLUSTER_REGION }}
@@ -333,7 +345,7 @@ jobs:
                   helm_values: helm-values-api
                   release: api
                   chart_name: orbitspot/orbitspot-microservices
-                  chart_version: 3.0.1
+                  chart_version: 3.0.2
                   sets: |
                       --set environment=${{ env.ENV}} \
                       --set region=${{ env.CLUSTER_REGION }} \
@@ -348,7 +360,7 @@ jobs:
       needs: [setup-config, prepare-helm-replacements, generate-matrix]
       strategy:
         matrix:
-          artifacts: ${{ fromJson(needs.generate-matrix.outputs.consumer_matrix) }}
+          artifacts: ${{fromJson(needs.generate-matrix.outputs.consumer-matrix) }}
       permissions:
         id-token: write
         contents: read
@@ -364,7 +376,7 @@ jobs:
             fetch-depth: 0
 
         - name: configure
-          uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.8
+          uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.9
           with:
             aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
             aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -372,7 +384,7 @@ jobs:
             cluster_name: ${{ env.CLUSTER_NAME }}
 
         - name: helm-apply
-          uses: orbitspot/actions/.github/actions/helm-deploy@v18.8
+          uses: orbitspot/actions/.github/actions/helm-deploy@v18.9
           with:
             aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
             aws_region: ${{ env.CLUSTER_REGION }}

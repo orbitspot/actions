@@ -17,7 +17,7 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix):
     # Ler o conteúdo do arquivo YAML
     with open(yaml_path, 'r') as yaml_file:
         yaml_content = yaml_file.read()
-
+        
     # Substituir as chaves no YAML pelos valores do properties
     for key, value in properties.items():
         placeholder = f"${{{prefix}.{key}}}"
