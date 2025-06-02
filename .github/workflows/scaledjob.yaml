@@ -35,6 +35,7 @@ jobs:
           shell: bash
           run: |
             set -e
+
             PROJECT_ROOT=$(git rev-parse --show-toplevel)
             SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
 
