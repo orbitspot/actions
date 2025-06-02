@@ -234,16 +234,17 @@ jobs:
 
             - name: Append Properties
               run: |
-                  RABBITMQ_BASE64=$(echo -n "${{ secrets.BROKER_AMQP }}" | base64 -w0)
                   echo "${{ vars._PROPERTIES }}" >> values.properties
-                  echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
-                  echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
+                  RABBITMQ_BASE64=$(echo -n "${{ secrets.BROKER_AMQP }}" | base64 -w0)
                   echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
-
+            - name: Verificar onde está o values.properties
+              run: |
+                pwd
+                ls -la
             - name: replace-data
               env:
                   PREFIX: .${{ github.event.repository.name }}
-                  PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+                  PROPERTIES_PATH: ${{github.workspace}}/values.properties
                   YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
               run: python code/.github/scripts/replace-properties.py
 
