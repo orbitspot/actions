@@ -51,7 +51,7 @@ jobs:
 
     setup-config:
       name: Set Up Config
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ubuntu-latest
       needs: [generate-matrix]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
@@ -68,7 +68,7 @@ jobs:
     
     building:
         name: Building
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ubuntu-latest
         needs: [setup-config]
         permissions:
             id-token: write
@@ -98,7 +98,7 @@ jobs:
 
     generate-docker:
         name: Docker Build
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ubuntu-latest
         environment: ${{ github.ref_name }}
         needs: [setup-config, building, generate-matrix]
         strategy:
@@ -144,7 +144,7 @@ jobs:
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ubuntu-latest
         environment: ${{ github.ref_name }}
         needs: [setup-config, generate-docker]
         permissions:
@@ -179,7 +179,7 @@ jobs:
 
     prepare-helm-replacements:
         name: Building Helm Values
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ubuntu-latest
         environment: ${{ github.ref_name }}
         needs: [setup-config, generate-docker, generate-matrix]
         strategy:
@@ -283,7 +283,7 @@ jobs:
 
     helm-cd-api:
         name: K8s Deploy Api
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: ubuntu-latest
         environment: ${{ github.ref_name }}
         needs: [setup-config, prepare-helm-replacements]
         permissions:
@@ -345,7 +345,7 @@ jobs:
     
     helm-cd-consumer:
       name: K8s Deploy ${{ matrix.artifacts }}
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ubuntu-latest
       environment: ${{ github.ref_name }}
       needs: [setup-config, prepare-helm-replacements, generate-matrix]
       strategy:
