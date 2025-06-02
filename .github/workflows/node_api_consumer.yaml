@@ -99,7 +99,7 @@ jobs:
     generate-docker:
         name: Docker Build
         runs-on: ubuntu-latest
-        environment: ${{ github.ref_name }}
+        environment: develop
         needs: [setup-config, building, generate-matrix]
         strategy:
             matrix:
@@ -145,7 +145,7 @@ jobs:
     create-service-account-role:
         name: Creating Aws Resources
         runs-on: ubuntu-latest
-        environment: ${{ github.ref_name }}
+        environment: develop
         needs: [setup-config, generate-docker]
         permissions:
             id-token: write
@@ -180,7 +180,7 @@ jobs:
     prepare-helm-replacements:
         name: Building Helm Values
         runs-on: ubuntu-latest
-        environment: ${{ github.ref_name }}
+        environment: develop
         needs: [setup-config, generate-docker, generate-matrix]
         strategy:
             matrix:
@@ -284,7 +284,7 @@ jobs:
     helm-cd-api:
         name: K8s Deploy Api
         runs-on: ubuntu-latest
-        environment: ${{ github.ref_name }}
+        environment: develop
         needs: [setup-config, prepare-helm-replacements]
         permissions:
             id-token: write
@@ -346,7 +346,7 @@ jobs:
     helm-cd-consumer:
       name: K8s Deploy ${{ matrix.artifacts }}
       runs-on: ubuntu-latest
-      environment: ${{ github.ref_name }}
+      environment: develop
       needs: [setup-config, prepare-helm-replacements, generate-matrix]
       strategy:
         matrix:
