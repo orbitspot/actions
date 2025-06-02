@@ -229,6 +229,8 @@ jobs:
                 sed -i 's/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g' values.yaml  
                 sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
+                sed -i 's/<AWS_ACCOUNT_ID>/${{ vars.AWS_ACCOUNT_NUMBER }}/g' values.yaml
+                sed -i 's/<AWS_REGION>/${{ needs.setup-config.outputs.CLUSTER_REGION }}/g' values.yaml
                 mkdir -p .github/helm/${{ matrix.artifacts }}
                 mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
 
@@ -237,10 +239,7 @@ jobs:
                   echo "${{ vars._PROPERTIES }}" >> values.properties
                   RABBITMQ_BASE64=$(echo -n "${{ secrets.BROKER_AMQP }}" | base64 -w0)
                   echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
-            - name: Verificar onde está o values.properties
-              run: |
-                pwd
-                ls -la
+
             - name: replace-data
               env:
                   PREFIX: .${{ github.event.repository.name }}
