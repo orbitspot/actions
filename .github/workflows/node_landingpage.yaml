@@ -47,7 +47,18 @@ jobs:
                 role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
                 role-session-name: "${{ vars.AWS_ROLE_NAME }}"
                 aws-region: "us-east-1"
-           
+            
+            - name: Configurar Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.x'
+
+            - uses: actions/checkout@v4
+              name: Checkout
+              with:
+                ref: ${{ inputs.git_ref }}
+                fetch-depth: 0
+
             - uses: actions/checkout@v4
               name: Checkout
               with:
@@ -64,12 +75,6 @@ jobs:
               run: |
                 python code/.github/scripts/generate-environment-frontend.py
                 cat .env
-
-            - uses: actions/checkout@v4
-              name: Checkout
-              with:
-                ref: ${{ inputs.git_ref }}
-                fetch-depth: 0
 
             - name: Generate Build Args
               uses: orbitspot/actions/.github/actions/generate-build-args@v18.9
