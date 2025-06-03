@@ -49,6 +49,7 @@ jobs:
             echo "matrix=$matrix" >> $GITHUB_OUTPUT
             echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
             echo $consumer_matrix
+            echo $matrix
 
     setup-config:
       name: Set Up Config
