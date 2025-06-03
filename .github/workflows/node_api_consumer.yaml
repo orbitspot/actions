@@ -181,7 +181,7 @@ jobs:
 
     prepare-helm-replacements:
         name: Building Helm Values
-        runs-on: ubuntu-latest
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: develop
         needs: [setup-config, generate-docker, generate-matrix]
         strategy:
