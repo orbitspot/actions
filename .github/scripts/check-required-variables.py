@@ -18,7 +18,7 @@ match setup:
     case 'frontend':
         required=['HOST_MF']
     case 'landingpage':
-        required=['HOST_MF','ACM_ARN']
+        required=['HOST_MF','ACM_ARN', '_PROPERTIES']
     case _:
         exit(1)
 
