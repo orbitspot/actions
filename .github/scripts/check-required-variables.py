@@ -5,7 +5,6 @@ variables_json = os.getenv("variables_json", "{}")
 setup = os.getenv("setup", {})
 
 try:
-    print(variables_json)
     variables = json.loads(variables_json)
 except json.JSONDecodeError:
     print("Invalid JSON input")
