@@ -24,7 +24,6 @@ match setup:
         exit(1)
 
 for item in required:
-    print(variables[item])
-    if variables[item] == '':
+    if item not in variables or variables[item] == '':
       exit(1)
 
