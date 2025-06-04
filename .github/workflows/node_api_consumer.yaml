@@ -46,7 +46,7 @@ jobs:
             ref: 'feat/check-required-variables'
         
         - name: Check required variables
-          uses: orbitspot/actions/.github/actions/check-required-variables@feat/check-required-variables
+          uses: orbitspot/actions/.github/scripts/check-required-variables@feat/check-required-variables
           with:
             variables_json: ${{ toJson(vars) }}
             setup: 'api'
