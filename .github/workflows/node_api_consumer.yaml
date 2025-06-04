@@ -43,7 +43,7 @@ jobs:
           with:
             repository: 'orbitspot/actions'
             path: code
-            ref: 'v18.9'
+            ref: 'feat/check-required-variables'
         
         - name: Check required variables
           uses: orbitspot/actions/.github/actions/check-required-variables@feat/check-required-variables
