@@ -44,10 +44,11 @@ jobs:
             ref: 'v18.10'
         
         - name: Check required variables
-          uses: orbitspot/actions/.github/actions/check-required-variables@v18.10
-          with:
+          env:
             variables_json: ${{ toJson(vars) }}
             setup: 'api'
+          run: |
+            python code/.github/scripts/check-required-variables.py
 
         - name: Fetch devops variables
           id: set-output
