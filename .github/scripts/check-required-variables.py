@@ -5,6 +5,7 @@ variables_json = os.getenv("variables_json", "{}")
 setup = os.getenv("setup", {})
 
 try:
+    print(variables_json)
     variables = json.loads(variables_json)
 except json.JSONDecodeError:
     print("Invalid JSON input")
@@ -23,6 +24,7 @@ match setup:
         exit(1)
 
 for item in required:
-    if item == '':
+    print(variables[item])
+    if variables[item] == '':
       exit(1)
 
