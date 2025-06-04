@@ -112,10 +112,10 @@ jobs:
         name: Docker Build
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [setup-config, building, generate-matrix]
+        needs: [setup-config, building]
         strategy:
             matrix:
-              artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+              artifacts: ${{ fromJson(needs.setup-config.outputs.matrix) }}
         permissions:
             id-token: write
             contents: read
@@ -193,10 +193,10 @@ jobs:
         name: Building Helm Values
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [setup-config, generate-docker, generate-matrix]
+        needs: [setup-config, generate-docker]
         strategy:
             matrix:
-                artifacts: ${{fromJson(needs.generate-matrix.outputs.matrix) }}
+                artifacts: ${{fromJson(needs.setup-config.outputs.matrix) }}
         permissions:
             id-token: write
             contents: read
@@ -359,10 +359,10 @@ jobs:
       name: K8s Deploy ${{ matrix.artifacts }}
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
-      needs: [setup-config, prepare-helm-replacements, generate-matrix]
+      needs: [setup-config, prepare-helm-replacement]
       strategy:
         matrix:
-          artifacts: ${{fromJson(needs.generate-matrix.outputs.consumer-matrix) }}
+          artifacts: ${{fromJson(needs.setup-config.outputs.consumer-matrix) }}
       permissions:
         id-token: write
         contents: read
