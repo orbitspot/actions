@@ -24,5 +24,6 @@ match setup:
 
 for item in required:
     if item not in variables or variables[item] == '':
+      print("❌", item, "is missing!")
       exit(1)
 
