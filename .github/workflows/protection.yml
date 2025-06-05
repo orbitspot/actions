@@ -1,94 +1,74 @@
-name: Protection
+name: Push node
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      repository_name:
-        description: "Nome do Repositório que será protegido"
+      module:
         required: true
         type: string
-
-      branch_name:
-        description: "Nome da branch que será utilizada na proteção"
+      grafana_tag:
         required: true
-        default: master
-        type: choice
-        options:
-          - master
-          - develop
-          - homolog
+        type: string
+      version:
+        required: true
+        type: string
+      dockerfile_path:
+        required: false
+        type: string
+        default: ''
 
 concurrency:
-  group: '${{ github.workflow }}'
+  group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
 
 jobs:
-  terraform:
-    name: terraform
-    environment: ${{ github.ref_name }}
-    runs-on: [timeflow, linux, self-hosted, x64]
-    permissions:
-        id-token: write
-        contents: read
-    steps:
-      - name: Checking parameters
-        run: |
-          echo "O Repositório escolhido foi: ${{ github.event.inputs.repository_name }}"
-          echo "A branch escolhida foi: ${{ github.event.inputs.branch_name }}"
-
-      - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
-          role-session-name: "${{ vars.AWS_ROLE_NAME }}"
-          aws-region: "us-east-1"
-          
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-            node-version: '20'
-  
-      - name: Setup
-        uses: hashicorp/setup-terraform@v3
-        with:
-            terraform_version: "1.5.0"
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          repository: orbitspot/infra-github-protections
-          path: infra-github-protections # nome na pasta de destino dentro do runner
-          token: "${{ secrets.GIT_TOKEN }}"
-      
-      - name: Terraform Init
-        shell: bash
-        env:
-          TF_VAR_repository_name: "${{ github.event.inputs.branch_name }}"
-          TF_VAR_branch_pattern: "${{ github.event.inputs.repository_name }}"
-          TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-          TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
-        run: |
-          cd infra-github-protections/terraform/
-          terraform init -backend-config=bucket=terraform-orbit -backend-config=key=branch-protections/${{ github.event.inputs.repository_name }}/${{ github.event.inputs.branch_name }}.tfstate -backend-config=region=us-east-1 -no-color
+    setup-config:
+      name: Set Up Config
+      runs-on: ubuntu-latest
+      outputs:
+        CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
+        CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
+        ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
+        ENV: '${{ steps.set-output.outputs.ENV }}'
+      steps:
+        - name: Fetch devops variables
+          id: set-output
+          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.9
+          with:
+            devops_config: '${{ vars._DEVOPS_CONFIG }}'
+            branch: '${{ github.ref_name }}'
     
-      - name: Terraform Plan
-        shell: bash
+    create-service-account-role:
+        name: Creating Aws Resources
+        runs-on: ubuntu-latest
+        environment: ${{ github.ref_name }}
+        needs: [setup-config]
+        permissions:
+            id-token: write
+            contents: read
         env:
-          TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
-          TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
-          TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-          TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
-        run: |
-          cd infra-github-protections/terraform/
-          terraform plan -no-color
-    
-      - name: Terraform Apply
-        shell: bash
-        env:
-          TF_VAR_repository_name: "${{ github.event.inputs.repository_name }}"
-          TF_VAR_branch_pattern: "${{ github.event.inputs.branch_name }}"
-          TF_VAR_token: "${{ secrets.GIT_TOKEN }}"
-          TF_VAR_GITHUB_OWNER: "${{ github.repository_owner }}"
-        run: |
-          cd infra-github-protections/terraform/
-          terraform apply -auto-approve -no-color
+          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+          CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
+          ENV: '${{ needs.setup-config.outputs.ENV }}'
+        steps:
+            - name: create-role
+              uses: orbitspot/actions/.github/actions/create-role-service-account@v18.9
+              with:
+                  role: 'events-exporter-${{ env.ENV }}'
+                  namespace: events-exporter
+                  service_account_name: 'application-permission'
+                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+                  aws_region: ${{ vars._AWS_REGION }}
+                  policy: ${{ vars._POLICY_JSON }}
+
+            - name: create-namespace
+              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v18.9
+              with:
+                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+                  aws_region: ${{ env.CLUSTER_REGION }}
+                  cluster_name: ${{ env.CLUSTER_NAME }}
+                  namespace: events-exporter
+                  role_arn: 'arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/events-exporter-${{ env.ENV }}'
+                  service_account_name: 'application-permission'
