@@ -305,5 +305,4 @@ jobs:
                   --set 'keda.secrets.data.rabbitmq_http_host=${{ vars.BROKER_AMQP_TRIGGER }}' \
                   --set 'containers[0].repository.tag=${{ github.sha }}' \
                   --set 'containers[0].environments.SERVICE_TYPE=${{ matrix.artifacts }}'
-
             
