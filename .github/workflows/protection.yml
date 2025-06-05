@@ -36,12 +36,12 @@ jobs:
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@v18.9
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: '${{ github.ref_name }}'
+            branch: 'develop'
     
     create-service-account-role:
         name: Creating Aws Resources
         runs-on: ubuntu-latest
-        environment: ${{ github.ref_name }}
+        environment: develop
         needs: [setup-config]
         permissions:
             id-token: write
