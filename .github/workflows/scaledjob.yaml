@@ -301,7 +301,6 @@ jobs:
             chart_version: 0.1.3
             sets: |
                   --set environment=${{ vars.ENV}} \
-                  --set region=${{ vars.AWS_REGION }} \
                   --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{vars.AWS_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
                   --set 'keda.secrets.data.rabbitmq_http_host=${{ vars.BROKER_AMQP_TRIGGER }}' \
                   --set 'containers[0].repository.tag=${{ github.sha }}' \
