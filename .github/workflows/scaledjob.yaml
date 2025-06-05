@@ -305,6 +305,6 @@ jobs:
                   --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.us-east-1.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
                   --set 'keda.secrets.data.rabbitmq_http_host=${{ vars.BROKER_AMQP_TRIGGER }}'
                   --set 'containers[0].repository.tag=${{ github.sha }}' \
-                  --set 'containers[0].environments.SERVICE_TYPE=${{ matrix.artifacts }}' \
+                  --set 'containers[0].environments.SERVICE_TYPE=${{ matrix.artifacts }}'
 
             
