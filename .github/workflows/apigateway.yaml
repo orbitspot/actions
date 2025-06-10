@@ -45,7 +45,7 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Start
-        uses: orbitspot/actions/.github/actions/api-gateway@v19.0
+        uses: orbitspot/actions/.github/actions/api-gateway@v18.10
         env:
           TF_VAR_branch: '${{ github.ref_name }}'
           TF_VAR_api_gateway: '${{ vars.API_GATEWAY }}'
