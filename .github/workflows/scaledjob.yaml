@@ -229,7 +229,7 @@ jobs:
 
             - name: Download Helm from S3
               run: |
-                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/scaledjob/teste/values.yaml values.yaml
+                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v2/deploy/scaledjob/values.yaml values.yaml
                 sed -i 's/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g' values.yaml  
                 sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
