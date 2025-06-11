@@ -19,7 +19,7 @@ on:
       restart_policy:
         required: false
         type: string
-        default: OnFailure
+        default: Never
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
