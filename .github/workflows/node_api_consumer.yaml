@@ -66,8 +66,8 @@ jobs:
             scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
 
             # Constrói JSON da matriz em formato compacto
-            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)
-            consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(. != "api")]')
+            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs '[.[] | {artifact: ., chart_type: (if . == "api" then "api" else "consumer" end)}]')
+            consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(.artifact != "api")]')
 
             echo "matrix=$matrix" >> $GITHUB_OUTPUT
             echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
@@ -191,109 +191,97 @@ jobs:
                   service_account_name: 'application-permission'
 
     prepare-helm-replacements:
-        name: Building Helm Values
-        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-        environment: ${{ github.ref_name }}
-        needs: [setup-config, generate-docker]
-        strategy:
-            matrix:
-                artifacts: ${{fromJson(needs.setup-config.outputs.matrix) }}
-        permissions:
-            id-token: write
-            contents: read
-        env:
-          ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
-          ENV: '${{ needs.setup-config.outputs.ENV }}'
-        steps:
-            - uses: actions/checkout@v4
-              name: Checkout
-              with:
-                  ref: '${{ inputs.git_ref }}'
-                  fetch-depth: 0
+      name: Building Helm Values
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: ${{ github.ref_name }}
+      needs: [setup-config, generate-docker]
+      strategy:
+        matrix:
+          include: ${{ fromJson(needs.setup-config.outputs.matrix) }}
+      permissions:
+        id-token: write
+        contents: read
+      env:
+        ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
+        ENV: '${{ needs.setup-config.outputs.ENV }}'
+      steps:
+        - uses: actions/checkout@v4
+          name: Checkout
+          with:
+            ref: '${{ inputs.git_ref }}'
+            fetch-depth: 0
 
-            - name: Configurar Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: '3.x'
+        - name: Configurar Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.x'
 
-            - name: Checkout script repository
-              uses: actions/checkout@v4
-              with:
-                  repository: 'orbitspot/actions'
-                  path: code
-                  ref: 'v19.0'
+        - name: Checkout script repository
+          uses: actions/checkout@v4
+          with:
+            repository: 'orbitspot/actions'
+            path: code
+            ref: 'v19.0'
 
-            - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
-              with:
-                aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-                aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-                aws_region: us-east-1
+        - name: Authenticate
+          uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
+          with:
+            aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+            aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
+            aws_region: us-east-1
 
-            - name: Generate Yaml from Parameters 
-              env:
-                environments: ${{ toJson(vars) }}
-                secrets: ${{ toJson(secrets) }}
-                repository_name: ${{ github.event.repository.name }}
-              run: |
-                pip install pyyaml
-                python code/.github/scripts/generate-environment-yaml.py
-                cat variables.yaml
+        - name: Generate Yaml from Parameters
+          env:
+            environments: ${{ toJson(vars) }}
+            secrets: ${{ toJson(secrets) }}
+            repository_name: ${{ github.event.repository.name }}
+          run: |
+            pip install pyyaml
+            python code/.github/scripts/generate-environment-yaml.py
+            cat variables.yaml
 
-            - name: Download Helm from S3
-              run: |
-                if [ "${{ matrix.artifacts }}" = "api" ]; then
-                  s3_path="api"
-                else
-                  s3_path="consumer"
-                fi
-                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/$s3_path/values.yaml values.yaml
-                sed -i 's/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g' values.yaml  
-                sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
-                sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
-                mkdir -p .github/helm/${{ matrix.artifacts }}
-                mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
+        - name: Preparar values.yaml
+          uses: orbitspot/actions/prepare-helm-chart-values@v19.1
+          with:
+            chart_type: ${{ matrix.chart_type }}
+            deployment_name: ${{ matrix.artifact }}
+            grafana_tag: ${{ inputs.grafana_tag }}
+          env:
+            BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
+            DB_PORT: ${{ vars.DB_PORT }}
+            DB_HOST: ${{ vars.DB_HOST }}
+            _PROPERTIES: ${{ vars._PROPERTIES }}
 
-            - name: Download Old Ingress Config from S3
-              if: (${{ vars.OLD_INGRESS_HOST != ''}}) && (matrix.artifacts == 'api') }}
-              run: |
-                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/${{ matrix.artifacts }}/old_ingress_values.yaml old_ingress_values.yaml
-                sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' old_ingress_values.yaml
-                cat old_ingress_values.yaml >> .github/helm/${{ matrix.artifacts }}/values.yaml
-                echo "build.acm_arn=${{ env.ACM_ARN }}" >> values.properties
-                echo "build.environment=${{ env.ENV }}" >> values.properties
-                sed -i 's/ClusterIP/NodePort/g' .github/helm/api/values.yaml
-                cat .github/helm/${{ matrix.artifacts }}/values.yaml
+        - name: Download Old Ingress Config from S3
+          if: ${{ matrix.artifact == 'api' && vars.OLD_INGRESS_HOST != '' }}
+          run: |
+            aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/api/old_ingress_values.yaml old_ingress_values.yaml
+            sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' old_ingress_values.yaml
+            cat old_ingress_values.yaml >> .github/helm/${{ matrix.artifact }}/values.yaml
+            echo "build.acm_arn=${{ env.ACM_ARN }}" >> values.properties
+            echo "build.environment=${{ env.ENV }}" >> values.properties
+            sed -i 's/ClusterIP/NodePort/g' .github/helm/api/values.yaml
 
-            - name: Append Properties
-              run: |
-                  RABBITMQ_BASE64=$(echo -n "${{ secrets.BROKER_AMQP }}" | base64 -w0)
-                  echo "${{ vars._PROPERTIES }}" >> values.properties
-                  echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
-                  echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
-                  echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
+        - name: replace-data
+          env:
+            PREFIX: .${{ github.event.repository.name }}
+            PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+            YAML_PATH: .github/helm/${{ matrix.artifact }}/values.yaml
+          run: python code/.github/scripts/replace-properties.py
 
-            - name: replace-data
-              env:
-                  PREFIX: .${{ github.event.repository.name }}
-                  PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
-                  YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
-              run: python code/.github/scripts/replace-properties.py
+        - name: append-parameters
+          run: |
+            parameters=$(cat variables.yaml)
+            echo "" >> .github/helm/${{ matrix.artifact }}/values.yaml
+            echo "$parameters" >> .github/helm/${{ matrix.artifact }}/values.yaml
+            cat .github/helm/${{ matrix.artifact }}/values.yaml
 
-            - name: append-parameters
-              run: |
-                  parameters=$(cat variables.yaml)
-                  echo "" >> .github/helm/${{ matrix.artifacts }}/values.yaml
-                  echo "$parameters" >> .github/helm/${{ matrix.artifacts }}/values.yaml
-                  cat .github/helm/${{ matrix.artifacts }}/values.yaml
-
-            - name: upload
-              uses: actions/upload-artifact@v4
-              with:
-                  name: helm-values-${{ matrix.artifacts }}
-                  path: .github/helm/${{ matrix.artifacts }}/values.yaml
-                  retention-days: 1
-
+        - name: upload
+          uses: actions/upload-artifact@v4
+          with:
+            name: helm-values-${{ matrix.artifact }}
+            path: .github/helm/${{ matrix.artifact }}/values.yaml
+            retention-days: 1
     helm-cd-api:
         name: K8s Deploy Api
         runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
