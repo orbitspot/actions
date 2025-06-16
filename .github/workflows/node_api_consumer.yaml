@@ -44,7 +44,7 @@ jobs:
           with:
             repository: 'orbitspot/actions'
             path: code
-            ref: 'fix-v18.9-pt2'
+            ref: 'v18.10'
         
         - name: Check required variables
           env:
