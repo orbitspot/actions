@@ -277,7 +277,7 @@ jobs:
             - name: replace-data
               env:
                   PREFIX: .${{ github.event.repository.name }}
-                  PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+                  PROPERTIES_PATH: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
                   YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
               run: python code/.github/scripts/replace-properties.py
 
@@ -358,7 +358,7 @@ jobs:
                       --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
     
     helm-cd-consumer:
-      name: K8s Deploy ${{ matrix.artifacts }}
+      name: K8s Deploy Consumer
       runs-on: ubuntu-latest
       environment: develop
       needs: [setup-config, prepare-helm-replacements]
