@@ -25,6 +25,7 @@ jobs:
     setup-config:
       name: Set Up Config
       runs-on: ubuntu-latest
+      environment: ${{ github.ref_name }}
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -255,7 +256,7 @@ jobs:
                 mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
 
             - name: Download Old Ingress Config from S3
-              if: (${{ vars.OLD_INGRESS_HOST != ''}}) && (matrix.artifacts == 'api') }}
+              if: ${{ vars.OLD_INGRESS_HOST != '' && matrix.artifacts == 'api' }}
               run: |
                 aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/${{ matrix.artifacts }}/old_ingress_values.yaml old_ingress_values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' old_ingress_values.yaml
@@ -295,7 +296,7 @@ jobs:
                   retention-days: 1
 
     helm-cd-api:
-        name: K8s Deploy Api
+        name: K8s Deploy api
         runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, prepare-helm-replacements]
