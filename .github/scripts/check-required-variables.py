@@ -2,6 +2,8 @@ import json
 import os
 
 variables_json = os.getenv("variables_json", "{}")
+print("vars-------------")
+print(variables_json)
 setup = os.getenv("setup", {})
 
 try:
