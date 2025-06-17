@@ -21,6 +21,7 @@ runs:
         mkdir -p .github/helm/${{ inputs.deployment_name }}
         mv values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
+    
     - run: |
         RABBITMQ_BASE64=$(echo -n "${{ secrets.BROKER_AMQP }}" | base64 -w0)
         echo "${{ vars._PROPERTIES }}" >> values.properties
@@ -28,3 +29,5 @@ runs:
         echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
         echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
       shell: bash
+
+      
