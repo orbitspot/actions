@@ -257,19 +257,13 @@ jobs:
             - name: Download Old Ingress Config from S3
               if: ${{ vars.OLD_INGRESS_HOST != '' && matrix.artifacts == 'api' }}
               run: |
-                if [ "${{ matrix.artifacts }}" = "api" ]; then
-                  s3_path="api"
-                else
-                  s3_path="consumer"
-                fi
-                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/$s3_path/old_ingress_values.yaml old_ingress_values.yaml
+
+                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/api/old_ingress_values.yaml old_ingress_values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' old_ingress_values.yaml
                 cat old_ingress_values.yaml >> .github/helm/${{ matrix.artifacts }}/values.yaml
                 echo "build.acm_arn=${{ env.ACM_ARN }}" >> values.properties
                 echo "build.environment=${{ env.ENV }}" >> values.properties
-                if [ "${{ matrix.artifacts }}" = "api" ]; then
-                  sed -i 's/ClusterIP/NodePort/g' .github/helm/api/values.yaml
-                fi
+                sed -i 's/ClusterIP/NodePort/g' .github/helm/api/values.yaml
                 cat .github/helm/${{ matrix.artifacts }}/values.yaml
 
             - name: Append Properties
