@@ -257,7 +257,6 @@ jobs:
             - name: Download Old Ingress Config from S3
               if: ${{ vars.OLD_INGRESS_HOST != '' && matrix.artifacts == 'api' }}
               run: |
-
                 aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/api/old_ingress_values.yaml old_ingress_values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' old_ingress_values.yaml
                 cat old_ingress_values.yaml >> .github/helm/${{ matrix.artifacts }}/values.yaml
