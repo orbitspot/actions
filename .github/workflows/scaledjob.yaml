@@ -229,7 +229,7 @@ jobs:
 
             - name: Download Helm from S3
               run: |
-                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v2/deploy/scaledjob/values.yaml values.yaml
+                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/scaledjob/values.yaml values.yaml
                 sed -i 's/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g' values.yaml  
                 sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
                 sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
@@ -303,7 +303,7 @@ jobs:
             helm_values: helm-values-${{ matrix.artifacts }}
             release: ${{ matrix.artifacts }}
             chart_name: orbitspot/orbitspot-job
-            chart_version: 0.1.4
+            chart_version: 0.1.5
             sets: |
                   --set environment=${{env.ENV}} \
                   --set region=${{ env.CLUSTER_REGION }} \
