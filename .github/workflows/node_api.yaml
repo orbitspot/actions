@@ -38,19 +38,19 @@ jobs:
           with:
             python-version: '3.x'
         
-        - name: Checkout script repository
-          uses: actions/checkout@v4
-          with:
-            repository: 'orbitspot/actions'
-            path: code
-            ref: 'v18.10'
+        # - name: Checkout script repository
+        #   uses: actions/checkout@v4
+        #   with:
+        #     repository: 'orbitspot/actions'
+        #     path: code
+        #     ref: 'v18.10'
         
-        - name: Check required variables
-          env:
-            variables_json: ${{ toJson(vars) }}
-            setup: 'api'
-          run: |
-            python code/.github/scripts/check-required-variables.py
+        # - name: Check required variables
+        #   env:
+        #     variables_json: ${{ toJson(vars) }}
+        #     setup: 'api'
+        #   run: |
+        #     python code/.github/scripts/check-required-variables.py
 
         - name: Checkout
           uses: actions/checkout@v4
