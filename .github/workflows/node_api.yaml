@@ -74,6 +74,10 @@ jobs:
         with:
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
           branch: '${{ github.ref_name }}'
+      - name: Echo variables
+        run: |
+            echo "All vars:"
+            echo "${{ toJson(vars) }}"
 
   building:
     name: Building
