@@ -1,0 +1,109 @@
+module: <GRAFANA-TAG>
+
+nodeSelector:
+    nodegroup-type: ${.<NOME-REPOSITORIO>.build.service.node_selector}
+
+csiSecrets:
+    enabled: true
+    serviceAccountName: "application-permission"
+
+keda:
+    scale:
+        spec:
+            cooldownPeriod: 300
+            maxReplicaCount: ${.<NOME-REPOSITORIO>.build.service.keda.maxReplicaCount}
+            minReplicaCount: ${.<NOME-REPOSITORIO>.build.service.keda.minReplicaCount}
+            scaleTargetRef:
+                name: api
+            triggers:
+                - type: cpu
+                  metricType: Utilization
+                  metadata:
+                      value: '90'
+
+istio:
+    enable: true
+    egress:
+        serviceEntries:
+            - ports:
+                  - number: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                    name: tcp
+                    protocol: TCP
+              hosts:
+                  - ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.host}
+        virtualService:
+            hosts:
+                - ${.<NOME-REPOSITORIO>.build.istio.ingress.host}
+            gateways:
+                - 'istio-system/orbit-egress'
+            tcp:
+                - match:
+                      - gateways:
+                        - 'istio-system/orbit-egress'
+                        port: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                  route:
+                      - destination:
+                            host: istio-egressgateway.istio-system.svc.cluster.local
+                            subset: postgres
+                            port:
+                                number: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                      - destination:
+                            host: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.host}
+                            port:
+                                number: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                        weight: 100
+    ingress:
+        virtualService:
+            hosts:
+                - ${.<NOME-REPOSITORIO>.build.istio.ingress.host}
+                - 'api.<NOME-REPOSITORIO>.svc.cluster.local'
+            gateways:
+                - 'istio-system/orbit-ingress'
+            http:
+                - match:
+                      - uri:
+                            prefix: '/<NOME-REPOSITORIO>/'
+                  rewrite:
+                      uri: '/'
+                  route:
+                      - destination:
+                            host: api
+                            port:
+                                number: 80
+
+service:
+    type: ClusterIP
+
+containers:
+    - name: api
+      repository:
+          image: 931670397156.dkr.ecr.${region}.amazonaws.com/api-<NOME-REPOSITORIO>
+          tag: latest
+      ports:
+          - targetPort: 3000
+            port: 80
+            protocol: TCP
+      resources:
+          requests:
+              cpu: ${.<NOME-REPOSITORIO>.build.api.resources.requests.cpu}
+              memory: ${.<NOME-REPOSITORIO>.build.api.resources.requests.memory}
+          limits:
+              cpu: ${.<NOME-REPOSITORIO>.build.api.resources.limits.cpu}
+              memory: ${.<NOME-REPOSITORIO>.build.api.resources.limits.memory}
+      livenessProbe:
+          httpGet:
+              path: /health
+              port: 3000
+          successThreshold: 1
+          failureThreshold: 5
+          initialDelaySeconds: 25
+          periodSeconds: 80
+          timeoutSeconds: 10
+      readinessProbe:
+          httpGet:
+              path: /health
+              port: 3000
+          successThreshold: 1
+          failureThreshold: 15
+          initialDelaySeconds: 10
+          periodSeconds: 80
