@@ -89,7 +89,14 @@ jobs:
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
             branch: '${{ github.ref_name }}'
-    
+        - name: Log Matrix Values
+          run: |
+            echo "MATRIX FROM generate-matrix:"
+            echo '${{ needs.generate-matrix.outputs.matrix }}'
+            echo "--------------------------------"
+            echo "CONSUMER_MATRIX FROM generate-matrix:"
+            echo '${{ needs.generate-matrix.outputs.consumer_matrix }}'
+          shell: bash
     building:
         name: Building
         runs-on: ubuntu-latest
