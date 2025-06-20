@@ -57,8 +57,6 @@ jobs:
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
         ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
-        matrix: ${{ steps.set-matrix.outputs.matrix }}
-        consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
       steps:
         - name: Setup Python
           uses: actions/setup-python@v5
@@ -134,7 +132,7 @@ jobs:
         needs: [setup-config, building]
         strategy:
             matrix:
-              artifacts: ${{ fromJson(needs.setup-config.outputs.matrix) }}
+              artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
         permissions:
             id-token: write
             contents: read
@@ -215,7 +213,7 @@ jobs:
       needs: [setup-config, generate-docker]
       strategy:
         matrix:
-          include: ${{ fromJson(needs.setup-config.outputs.matrix) }}
+          include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
       permissions:
         id-token: write
         contents: read
@@ -360,7 +358,7 @@ jobs:
       needs: [setup-config, prepare-helm-replacements]
       strategy:
         matrix:
-          artifacts: ${{fromJson(needs.setup-config.outputs.consumer-matrix) }}
+          artifacts: ${{fromJson(needs.generate-matrix.outputs.consumer-matrix) }}
       permissions:
         id-token: write
         contents: read
