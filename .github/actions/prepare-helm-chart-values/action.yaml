@@ -7,6 +7,9 @@ inputs:
   grafana_tag:
     description: "Tag do Grafana"
     required: true
+  BROKER_AMQP:
+    description: "Consumer amqp broker"
+    required: false
 runs:
   using: "composite"
   steps:
@@ -16,7 +19,7 @@ runs:
         if [[ "${{ inputs.deployment_name }}" == "api" ]]; then
           echo "chart_type=node_api" >> $GITHUB_ENV
         else
-          echo "chart_type=node_consumer" >> $GITHUB_ENV
+          echo "chart_type=consumer" >> $GITHUB_ENV
         fi
       shell: bash
 
@@ -32,9 +35,12 @@ runs:
 
     - name: Gerar values.properties
       run: |
-        RABBITMQ_BASE64=$(echo -n "${{ secrets.BROKER_AMQP }}" | base64 -w0)
         echo "${{ vars._PROPERTIES }}" >> values.properties
         echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
         echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
-        echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
+
+        if [[ -n "${{ inputs.BROKER_AMQP }}" ]]; then
+          RABBITMQ_BASE64=$(echo -n "${{ inputs.BROKER_AMQP }}" | base64 -w0)
+          echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
+        fi
       shell: bash
