@@ -10,6 +10,12 @@ inputs:
   BROKER_AMQP:
     description: "Consumer amqp broker"
     required: false
+
+outputs:
+  properties_path:
+    description: "Caminho do arquivo values.properties gerado"
+    value: values.properties
+
 runs:
   using: "composite"
   steps:
