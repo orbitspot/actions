@@ -22,9 +22,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+    generate-matrix:
+      runs-on: ubuntu-latest
+      outputs:
+        matrix: ${{ steps.set-matrix.outputs.matrix }}
+        consumer_matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Set Matrix Outputs
+          id: set-matrix
+          run: |
+            set -e
+
+            PROJECT_ROOT=$(git rev-parse --show-toplevel)
+            SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
+
+            scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
+
+            # Constrói JSON da matriz
+            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs '[.[] | {artifact: ., chart_type: (if . == "api" then "api" else "consumer" end)}]')
+            consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(.artifact != "api")]')
+
+            echo "matrix=$matrix" >> $GITHUB_OUTPUT
+            echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
+          shell: bash
     setup-config:
       name: Set Up Config
       runs-on: ubuntu-latest
+      needs: [generate-matrix]
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -55,22 +82,6 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v4
 
-        - id: set-matrix
-          shell: bash
-          run: |
-            set -e
-
-            PROJECT_ROOT=$(git rev-parse --show-toplevel)
-            SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
-
-            scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
-
-            # Constrói JSON da matriz em formato compacto
-            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs '[.[] | {artifact: ., chart_type: (if . == "api" then "api" else "consumer" end)}]')
-            consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(.artifact != "api")]')
-
-            echo "matrix=$matrix" >> $GITHUB_OUTPUT
-            echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
 
         - name: Fetch devops variables
           id: set-output
