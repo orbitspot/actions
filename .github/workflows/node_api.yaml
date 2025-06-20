@@ -22,377 +22,341 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-    generate-matrix:
-      runs-on: ubuntu-latest
-      outputs:
-        matrix: ${{ steps.set-matrix.outputs.matrix }}
-        consumer_matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+  setup-config:
+    name: Set Up Config and Generate Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
+      CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
+      ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
+      ENV: '${{ steps.set-output.outputs.ENV }}'
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      consumer_matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-        - name: Set Matrix Outputs
-          id: set-matrix
-          run: |
-            set -e
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            PROJECT_ROOT=$(git rev-parse --show-toplevel)
-            SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
+      - name: Fetch devops variables
+        id: set-output
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v19.0
+        with:
+          devops_config: '${{ vars._DEVOPS_CONFIG }}'
+          branch: '${{ github.ref_name }}'
 
-            scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
+      - name: Set Matrix Outputs
+        id: set-matrix
+        run: |
+          set -e
+          PROJECT_ROOT=$(git rev-parse --show-toplevel)
+          SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
+          scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
+          matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs '[.[] | {artifact: ., chart_type: (if . == "api" then "api" else "consumer" end)}]')
+          consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(.artifact != "api")]')
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
+        shell: bash
 
-            # Constrói JSON da matriz
-            matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs '[.[] | {artifact: ., chart_type: (if . == "api" then "api" else "consumer" end)}]')
-            consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(.artifact != "api")]')
+  building:
+    name: Building
+    runs-on: ubuntu-latest
+    needs: [setup-config]
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Authenticate
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
+        with:
+          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+          aws_region: 'us-east-1'
 
-            echo "matrix=$matrix" >> $GITHUB_OUTPUT
-            echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
-          shell: bash
-    setup-config:
-      name: Set Up Config
-      runs-on: ubuntu-latest
-      needs: [generate-matrix]
-      outputs:
-        CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
-        CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
-        ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
-        ENV: '${{ steps.set-output.outputs.ENV }}'
-      steps:
-        - name: Setup Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: '3.x'
-        
-        # - name: Checkout script repository
-        #   uses: actions/checkout@v4
-        #   with:
-        #     repository: 'orbitspot/actions'
-        #     path: code
-        #     ref: 'v18.10'
-        
-        # - name: Check required variables
-        #   env:
-        #     variables_json: ${{ toJson(vars) }}
-        #     setup: 'api'
-        #   run: |
-        #     python code/.github/scripts/check-required-variables.py
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '${{ inputs.version }}'
 
-        - name: Checkout
-          uses: actions/checkout@v4
+      - name: Bash Co Login
+        run: bash co_login_commands.txt
 
+      - name: Npm Building
+        uses: orbitspot/actions/.github/actions/npm-ci@v19.0
+        with:
+          node_version: '${{ inputs.version }}'
+          customized_dockerfile: '${{ inputs.dockerfile_path }}'
 
-        - name: Fetch devops variables
-          id: set-output
-          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v19.0
-          with:
-            devops_config: '${{ vars._DEVOPS_CONFIG }}'
-            branch: '${{ github.ref_name }}'
-        - name: Log Matrix Values
-          run: |
-            echo "MATRIX FROM generate-matrix:"
-            echo '${{ needs.generate-matrix.outputs.matrix }}'
-            echo "--------------------------------"
-            echo "CONSUMER_MATRIX FROM generate-matrix:"
-            echo '${{ needs.generate-matrix.outputs.consumer_matrix }}'
-          shell: bash
-    building:
-        name: Building
-        runs-on: ubuntu-latest
-        needs: [setup-config]
-        permissions:
-            id-token: write
-            contents: read
-        steps:
-            - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-                  aws_region: 'us-east-1'
+  generate-docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    needs: [setup-config, building]
+    strategy:
+      matrix:
+        artifacts: ${{ fromJson(needs.setup-config.outputs.matrix) }}
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+    steps:
+      - name: Authenticate
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
+        with:
+          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
+          aws_region: us-east-1
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: '${{ inputs.version }}'
+      - name: Download Dockerfile from S3
+        if: ${{ inputs.dockerfile_path == '' }}
+        run: |
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/node/${{ inputs.version }}/Dockerfile Dockerfile
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
 
-            - name: Bash Co Login
-              run: |
-                  bash co_login_commands.txt
+      - name: Copy Dockerfile from original repository
+        if: ${{ inputs.dockerfile_path != '' }}
+        run: mv ${{ inputs.dockerfile_path }} Dockerfile
 
-            - name: Npm Building
-              uses: orbitspot/actions/.github/actions/npm-ci@v19.0
-              with:
-                  node_version: '${{ inputs.version }}'
-                  customized_dockerfile: '${{ inputs.dockerfile_path  }}'
+      - name: docker-build
+        uses: orbitspot/actions/.github/actions/docker@v19.0
+        with:
+          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+          aws_region: ${{ env.CLUSTER_REGION }}
+          content: 'building'
+          image: '${{ matrix.artifacts }}-${{ github.event.repository.name }}'
+          tag: ${{ github.sha }}
+          build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=${{ matrix.artifacts }}'
+          before_building: |
+            cat base_script.sh scripts/${{ matrix.artifacts }}.sh > ${{ matrix.artifacts }}.sh
+            cat ${{ matrix.artifacts }}.sh
 
-    generate-docker:
-        name: Docker Build
-        runs-on: ubuntu-latest
-        environment: ${{ github.ref_name }}
-        needs: [setup-config, building]
-        strategy:
-            matrix:
-              artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-        permissions:
-            id-token: write
-            contents: read
+  create-service-account-role:
+    name: Creating Aws Resources
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    needs: [setup-config, generate-docker]
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+      CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
+      ENV: '${{ needs.setup-config.outputs.ENV }}'
+    steps:
+      - name: create-role
+        uses: orbitspot/actions/.github/actions/create-role-service-account@v19.0
+        with:
+          role: '${{ github.event.repository.name }}-${{ env.ENV }}'
+          namespace: ${{ github.event.repository.name }}
+          service_account_name: 'application-permission'
+          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+          aws_region: ${{ vars._AWS_REGION }}
+          policy: ${{ vars._POLICY_JSON }}
+
+      - name: create-namespace
+        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v19.0
+        with:
+          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+          aws_region: ${{ env.CLUSTER_REGION }}
+          cluster_name: ${{ env.CLUSTER_NAME }}
+          namespace: ${{ github.event.repository.name }}
+          role_arn: 'arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ github.event.repository.name }}-${{ env.ENV }}'
+          service_account_name: 'application-permission'
+
+  prepare-helm-replacements:
+    name: Building Helm Values
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    needs: [setup-config, generate-docker]
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
+      ENV: '${{ needs.setup-config.outputs.ENV }}'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: '${{ inputs.git_ref }}'
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Checkout script repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'orbitspot/actions'
+          path: code
+          ref: 'v19.0'
+
+      - name: Authenticate
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
+        with:
+          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
+          aws_region: us-east-1
+
+      - name: Generate Yaml from Parameters
         env:
-          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-        steps:
-          - name: Authenticate
-            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
-            with:
-              aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-              aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-              aws_region: us-east-1
-    
-          - name: Download Dockerfile from S3
-            if: ${{ inputs.dockerfile_path == ''}}
-            run: |
-              aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/node/${{ inputs.version }}/Dockerfile Dockerfile
-              aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
+          environments: ${{ toJson(vars) }}
+          secrets: ${{ toJson(secrets) }}
+          repository_name: ${{ github.event.repository.name }}
+        run: |
+          pip install pyyaml
+          python code/.github/scripts/generate-environment-yaml.py
+          cat variables.yaml
 
-          - name: Copy Dockerfile from original repository
-            if: ${{ inputs.dockerfile_path != '' }}
-            run: |
-              mv ${{ inputs.dockerfile_path }} Dockerfile
-    
-          - name: docker-build
-            uses: orbitspot/actions/.github/actions/docker@v19.0
-            with:
-                aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-                aws_region: ${{ env.CLUSTER_REGION }}
-                content: 'building'
-                image: '${{ matrix.artifacts }}-${{ github.event.repository.name }}'
-                tag: ${{ github.sha }}
-                build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=${{ matrix.artifacts }}'
-                before_building: |
-                  cat base_script.sh scripts/${{ matrix.artifacts }}.sh > ${{ matrix.artifacts }}.sh
-                  cat ${{ matrix.artifacts }}.sh
-
-    create-service-account-role:
-        name: Creating Aws Resources
-        runs-on: ubuntu-latest
-        environment: ${{ github.ref_name }}
-        needs: [setup-config, generate-docker]
-        permissions:
-            id-token: write
-            contents: read
+      - name: Preparar values.yaml
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@beta-infra-api-example
+        with:
+          chart_type: ${{ matrix.chart_type }}
+          deployment_name: ${{ matrix.artifact }}
+          grafana_tag: ${{ inputs.grafana_tag }}
         env:
-          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-          CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
-          ENV: '${{ needs.setup-config.outputs.ENV }}'
-        steps:
-            - name: create-role
-              uses: orbitspot/actions/.github/actions/create-role-service-account@v19.0
-              with:
-                  role: '${{ github.event.repository.name }}-${{ env.ENV }}'
-                  namespace: ${{ github.event.repository.name }}
-                  service_account_name: 'application-permission'
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-                  aws_region: ${{ vars._AWS_REGION }}
-                  policy: ${{ vars._POLICY_JSON }}
+          BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
+          DB_PORT: ${{ vars.DB_PORT }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          _PROPERTIES: ${{ vars._PROPERTIES }}
 
-            - name: create-namespace
-              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v19.0
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-                  aws_region: ${{ env.CLUSTER_REGION }}
-                  cluster_name: ${{ env.CLUSTER_NAME }}
-                  namespace: ${{ github.event.repository.name }}
-                  role_arn: 'arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ github.event.repository.name }}-${{ env.ENV }}'
-                  service_account_name: 'application-permission'
-
-    prepare-helm-replacements:
-      name: Building Helm Values
-      runs-on: ubuntu-latest
-      environment: ${{ github.ref_name }}
-      needs: [setup-config, generate-docker]
-      strategy:
-        matrix:
-          include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-      permissions:
-        id-token: write
-        contents: read
-      env:
-        ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
-        ENV: '${{ needs.setup-config.outputs.ENV }}'
-      steps:
-        - uses: actions/checkout@v4
-          name: Checkout
-          with:
-            ref: '${{ inputs.git_ref }}'
-            fetch-depth: 0
-
-        - name: Configurar Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: '3.x'
-
-        - name: Checkout script repository
-          uses: actions/checkout@v4
-          with:
-            repository: 'orbitspot/actions'
-            path: code
-            ref: 'v19.0'
-
-        - name: Authenticate
-          uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
-          with:
-            aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-            aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-            aws_region: us-east-1
-
-        - name: Generate Yaml from Parameters
-          env:
-            environments: ${{ toJson(vars) }}
-            secrets: ${{ toJson(secrets) }}
-            repository_name: ${{ github.event.repository.name }}
-          run: |
-            pip install pyyaml
-            python code/.github/scripts/generate-environment-yaml.py
-            cat variables.yaml
-
-        - name: Preparar values.yaml
-          uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@beta-infra-api-example
-          with:
-            chart_type: ${{ matrix.chart_type }}
-            deployment_name: ${{ matrix.artifact }}
-            grafana_tag: ${{ inputs.grafana_tag }}
-          env:
-            BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
-            DB_PORT: ${{ vars.DB_PORT }}
-            DB_HOST: ${{ vars.DB_HOST }}
-            _PROPERTIES: ${{ vars._PROPERTIES }}
-
-
-        - name: replace-data
-          env:
-            PREFIX: .${{ github.event.repository.name }}
-            PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
-            YAML_PATH: .github/helm/${{ matrix.artifact }}/values.yaml
-          run: python code/.github/scripts/replace-properties.py
-
-        - name: append-parameters
-          run: |
-            parameters=$(cat variables.yaml)
-            echo "" >> .github/helm/${{ matrix.artifact }}/values.yaml
-            echo "$parameters" >> .github/helm/${{ matrix.artifact }}/values.yaml
-            cat .github/helm/${{ matrix.artifact }}/values.yaml
-
-        - name: upload
-          uses: actions/upload-artifact@v4
-          with:
-            name: helm-values-${{ matrix.artifact }}
-            path: .github/helm/${{ matrix.artifact }}/values.yaml
-            retention-days: 1
-    helm-cd-api:
-        name: K8s Deploy Api
-        runs-on: ubuntu-latest
-        environment: ${{ github.ref_name }}
-        needs: [setup-config, prepare-helm-replacements]
-        permissions:
-            id-token: write
-            contents: read
+      - name: replace-data
         env:
-          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-          CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
-          ENV: '${{ needs.setup-config.outputs.ENV }}'
-        steps:
-            - uses: actions/checkout@v4
-              name: Checkout
-              with:
-                  ref: ${{ inputs.git_ref }}
-                  fetch-depth: 0
+          PREFIX: .${{ github.event.repository.name }}
+          PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+          YAML_PATH: .github/helm/${{ matrix.artifact }}/values.yaml
+        run: python code/.github/scripts/replace-properties.py
 
-            - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v19.0
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-                  aws_region: ${{ env.CLUSTER_REGION }}
-                  cluster_name: ${{ env.CLUSTER_NAME }}
+      - name: append-parameters
+        run: |
+          parameters=$(cat variables.yaml)
+          echo "" >> .github/helm/${{ matrix.artifact }}/values.yaml
+          echo "$parameters" >> .github/helm/${{ matrix.artifact }}/values.yaml
+          cat .github/helm/${{ matrix.artifact }}/values.yaml
 
-            - name: helm-apply
-              if: ${{ vars.OLD_INGRESS_HOST == ''}}
-              uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_region: ${{ env.CLUSTER_REGION }}
-                  namespace: ${{ github.event.repository.name }}
-                  helm_values: helm-values-api
-                  release: api
-                  chart_name: orbitspot/orbitspot-microservices
-                  chart_version: 3.0.2
-                  sets: |
-                      --set environment=${{ env.ENV}} \
-                      --set region=${{ env.CLUSTER_REGION }} \
-                      --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
-                      --set 'containers[0].repository.tag=${{ github.sha }}' 
-            
-            - name: helm-apply
-              if: ${{ vars.OLD_INGRESS_HOST != ''}}
-              uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_region: ${{ env.CLUSTER_REGION }}
-                  namespace: ${{ github.event.repository.name }}
-                  helm_values: helm-values-api
-                  release: api
-                  chart_name: orbitspot/orbitspot-microservices
-                  chart_version: 3.0.2
-                  sets: |
-                      --set environment=${{ env.ENV}} \
-                      --set region=${{ env.CLUSTER_REGION }} \
-                      --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
-                      --set 'containers[0].repository.tag=${{ github.sha }}' \
-                      --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
-    
-    helm-cd-consumer:
-      name: K8s Deploy ${{ matrix.artifacts }}
-      runs-on: ubuntu-latest
-      environment: ${{ github.ref_name }}
-      needs: [setup-config, prepare-helm-replacements]
-      strategy:
-        matrix:
-          artifacts: ${{fromJson(needs.generate-matrix.outputs.consumer-matrix) }}
-      permissions:
-        id-token: write
-        contents: read
-      env:
-        CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-        CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
-        ENV: '${{ needs.setup-config.outputs.ENV }}'
-      steps:
-        - uses: actions/checkout@v4
-          name: Checkout
-          with:
-            ref: ${{ inputs.git_ref }}
-            fetch-depth: 0
+      - name: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: helm-values-${{ matrix.artifact }}
+          path: .github/helm/${{ matrix.artifact }}/values.yaml
+          retention-days: 1
 
-        - name: configure
-          uses: orbitspot/actions/.github/actions/kubernetes-auth@v19.0
-          with:
-            aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-            aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-            aws_region: ${{ env.CLUSTER_REGION }}
-            cluster_name: ${{ env.CLUSTER_NAME }}
+  helm-cd-api:
+    name: K8s Deploy Api
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    needs: [setup-config, prepare-helm-replacements]
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+      CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
+      ENV: '${{ needs.setup-config.outputs.ENV }}'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.git_ref }}
+          fetch-depth: 0
 
-        - name: helm-apply
-          uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
-          with:
-            aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-            aws_region: ${{ env.CLUSTER_REGION }}
-            namespace: ${{ github.event.repository.name }}
-            helm_values: helm-values-${{ matrix.artifacts }}
-            release: ${{ matrix.artifacts }}
-            chart_name: orbitspot/orbitspot-terraform
-            chart_version: 0.3.5
-            sets: |
-              --set environment=${{ env.ENV}} \
-              --set region=${{ env.CLUSTER_REGION }} \
-              --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
-              --set 'containers[0].repository.tag=${{ github.sha }}'
+      - name: configure
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v19.0
+        with:
+          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+          aws_region: ${{ env.CLUSTER_REGION }}
+          cluster_name: ${{ env.CLUSTER_NAME }}
+
+      - name: helm-apply
+        if: ${{ vars.OLD_INGRESS_HOST == '' }}
+        uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
+        with:
+          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_region: ${{ env.CLUSTER_REGION }}
+          namespace: ${{ github.event.repository.name }}
+          helm_values: helm-values-api
+          release: api
+          chart_name: orbitspot/orbitspot-microservices
+          chart_version: 3.0.2
+          sets: |
+            --set environment=${{ env.ENV }} \
+            --set region=${{ env.CLUSTER_REGION }} \
+            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.tag=${{ github.sha }}'
+
+      - name: helm-apply
+        if: ${{ vars.OLD_INGRESS_HOST != '' }}
+        uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
+        with:
+          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_region: ${{ env.CLUSTER_REGION }}
+          namespace: ${{ github.event.repository.name }}
+          helm_values: helm-values-api
+          release: api
+          chart_name: orbitspot/orbitspot-microservices
+          chart_version: 3.0.2
+          sets: |
+            --set environment=${{ env.ENV }} \
+            --set region=${{ env.CLUSTER_REGION }} \
+            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.tag=${{ github.sha }}' \
+            --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
+
+  helm-cd-consumer:
+    name: K8s Deploy ${{ matrix.artifacts }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    needs: [setup-config, prepare-helm-replacements]
+    strategy:
+      matrix:
+        artifacts: ${{ fromJson(needs.generate-matrix.outputs.consumer-matrix) }}
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+      CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
+      ENV: '${{ needs.setup-config.outputs.ENV }}'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.git_ref }}
+          fetch-depth: 0
+
+      - name: configure
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v19.0
+        with:
+          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+          aws_region: ${{ env.CLUSTER_REGION }}
+          cluster_name: ${{ env.CLUSTER_NAME }}
+
+      - name: helm-apply
+        uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
+        with:
+          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_region: ${{ env.CLUSTER_REGION }}
+          namespace: ${{ github.event.repository.name }}
+          helm_values: helm-values-${{ matrix.artifacts }}
+          release: ${{ matrix.artifacts }}
+          chart_name: orbitspot/orbitspot-terraform
+          chart_version: 0.3.5
+          sets: |
+            --set environment=${{ env.ENV }} \
+            --set region=${{ env.CLUSTER_REGION }} \
+            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.tag=${{ github.sha }}'
