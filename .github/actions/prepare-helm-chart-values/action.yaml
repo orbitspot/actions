@@ -48,9 +48,9 @@ runs:
 
     - name: Gerar values.properties
       run: |
-        echo "${{ inputs._PROPERTIES }}" >> values.properties
-        echo "build.istio.egress.databases.default.port=${{ inputs.DB_PORT }}" >> values.properties
-        echo "build.istio.egress.databases.default.host=${{ inputs.DB_HOST }}" >> values.properties
+        echo "${{ env._PROPERTIES }}" | tr '\r' '\n' > values.properties
+        echo "build.istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
+        echo "build.istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
 
         if [[ -n "${{ inputs.BROKER_AMQP }}" ]]; then
           RABBITMQ_BASE64=$(echo -n "${{ inputs.BROKER_AMQP }}" | base64 -w0)

@@ -77,7 +77,7 @@ jobs:
       - name: Echo variables
         run: |
             echo "All vars:"
-            echo "${{ toJson(vars) }}"
+            echo "${{ vars._PROPERTIES }}"
 
   building:
     name: Building
