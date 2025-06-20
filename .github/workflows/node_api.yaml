@@ -23,23 +23,50 @@ concurrency:
 
 jobs:
   setup-config:
-    name: Set Up Config and Generate Matrix
+    name: Set Up Config
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
     outputs:
       CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-      consumer_matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
+      consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
     steps:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
+      - name: Checkout script repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'orbitspot/actions'
+          path: code
+          ref: 'v18.10'
+
+      - name: Check required variables
+        env:
+          variables_json: ${{ toJson(vars) }}
+          setup: 'api'
+        run: |
+          python code/.github/scripts/check-required-variables.py
+
       - name: Checkout
         uses: actions/checkout@v4
+
+      - id: set-matrix
+        shell: bash
+        run: |
+          set -e
+          PROJECT_ROOT=$(git rev-parse --show-toplevel)
+          SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
+          scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
+          matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)
+          consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(. != "api")]')
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
 
       - name: Fetch devops variables
         id: set-output
@@ -47,19 +74,6 @@ jobs:
         with:
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
           branch: '${{ github.ref_name }}'
-
-      - name: Set Matrix Outputs
-        id: set-matrix
-        run: |
-          set -e
-          PROJECT_ROOT=$(git rev-parse --show-toplevel)
-          SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
-          scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
-          matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs '[.[] | {artifact: ., chart_type: (if . == "api" then "api" else "consumer" end)}]')
-          consumer_matrix=$(echo "$matrix" | jq -c '[.[] | select(.artifact != "api")]')
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
-          echo "consumer_matrix=$consumer_matrix" >> $GITHUB_OUTPUT
-        shell: bash
 
   building:
     name: Building
@@ -177,7 +191,7 @@ jobs:
     needs: [setup-config, generate-docker]
     strategy:
       matrix:
-        include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+        artifacts: ${{ fromJson(needs.setup-config.outputs.matrix) }}
     permissions:
       id-token: write
       contents: read
@@ -185,8 +199,8 @@ jobs:
       ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        name: Checkout
         with:
           ref: '${{ inputs.git_ref }}'
           fetch-depth: 0
@@ -223,8 +237,7 @@ jobs:
       - name: Preparar values.yaml
         uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@beta-infra-api-example
         with:
-          chart_type: ${{ matrix.chart_type }}
-          deployment_name: ${{ matrix.artifact }}
+          deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
         env:
           BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
@@ -236,25 +249,25 @@ jobs:
         env:
           PREFIX: .${{ github.event.repository.name }}
           PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
-          YAML_PATH: .github/helm/${{ matrix.artifact }}/values.yaml
+          YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
         run: python code/.github/scripts/replace-properties.py
 
       - name: append-parameters
         run: |
           parameters=$(cat variables.yaml)
-          echo "" >> .github/helm/${{ matrix.artifact }}/values.yaml
-          echo "$parameters" >> .github/helm/${{ matrix.artifact }}/values.yaml
-          cat .github/helm/${{ matrix.artifact }}/values.yaml
+          echo "" >> .github/helm/${{ matrix.artifacts }}/values.yaml
+          echo "$parameters" >> .github/helm/${{ matrix.artifacts }}/values.yaml
+          cat .github/helm/${{ matrix.artifacts }}/values.yaml
 
       - name: upload
         uses: actions/upload-artifact@v4
         with:
-          name: helm-values-${{ matrix.artifact }}
-          path: .github/helm/${{ matrix.artifact }}/values.yaml
+          name: helm-values-${{ matrix.artifacts }}
+          path: .github/helm/${{ matrix.artifacts }}/values.yaml
           retention-days: 1
 
   helm-cd-api:
-    name: K8s Deploy Api
+    name: K8s Deploy api
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     needs: [setup-config, prepare-helm-replacements]
@@ -266,8 +279,8 @@ jobs:
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        name: Checkout
         with:
           ref: ${{ inputs.git_ref }}
           fetch-depth: 0
@@ -280,7 +293,7 @@ jobs:
           aws_region: ${{ env.CLUSTER_REGION }}
           cluster_name: ${{ env.CLUSTER_NAME }}
 
-      - name: helm-apply
+      - name: helm-apply (sem ingress antigo)
         if: ${{ vars.OLD_INGRESS_HOST == '' }}
         uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
         with:
@@ -297,7 +310,7 @@ jobs:
             --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}'
 
-      - name: helm-apply
+      - name: helm-apply (com OLD_INGRESS_HOST)
         if: ${{ vars.OLD_INGRESS_HOST != '' }}
         uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
         with:
@@ -322,7 +335,7 @@ jobs:
     needs: [setup-config, prepare-helm-replacements]
     strategy:
       matrix:
-        artifacts: ${{ fromJson(needs.generate-matrix.outputs.consumer-matrix) }}
+        artifacts: ${{ fromJson(needs.setup-config.outputs.consumer-matrix) }}
     permissions:
       id-token: write
       contents: read
@@ -331,8 +344,8 @@ jobs:
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        name: Checkout
         with:
           ref: ${{ inputs.git_ref }}
           fetch-depth: 0
