@@ -1,7 +1,7 @@
 module: <GRAFANA-TAG>
 
 nodeSelector:
-    nodegroup-type: ${.<NOME-REPOSITORIO>.build.service.node_selector}
+    nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
 
 csiSecrets:
     enabled: true
@@ -12,45 +12,45 @@ istio:
     egress:
         serviceEntries:
             - ports:
-                  - number: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                  - number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
                     name: tcp
                     protocol: TCP
               hosts:
-                  - ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.host}
+                  - ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.host}
         virtualService:
             hosts:
-                - ${.<NOME-REPOSITORIO>.build.istio.ingress.host}
+                - ${.<REPOSITORY-NAME>.build.istio.ingress.host}
             gateways:
                 - 'istio-system/orbit-egress'
             tcp:
                 - match:
                       - gateways:
                             - 'istio-system/orbit-egress'
-                        port: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                        port: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
                   route:
                       - destination:
                             host: istio-egressgateway.istio-system.svc.cluster.local
                             subset: postgres
                             port:
-                                number: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                                number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
                       - destination:
-                            host: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.host}
+                            host: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.host}
                             port:
-                                number: ${.<NOME-REPOSITORIO>.build.istio.egress.databases.default.port}
+                                number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
                         weight: 100
 
 keda:
     secrets:
-        name: consumer-<NOME-REPOSITORIO>
+        name: consumer-<REPOSITORY-NAME>
         data:
-            rabbitmq_http_host: ${.<NOME-REPOSITORIO>.build.secrets.rabbitmq_auth_host}
+            rabbitmq_http_host: ${.<REPOSITORY-NAME>.build.secrets.rabbitmq_auth_host}
 
     authentication:
-        name: consumer-<NOME-REPOSITORIO>-auth
+        name: consumer-<REPOSITORY-NAME>-auth
         spec:
             secretTargetRef:
                 - key: rabbitmq_http_host
-                  name: consumer-<NOME-REPOSITORIO>
+                  name: consumer-<REPOSITORY-NAME>
                   parameter: host
     scale:
         spec:
@@ -64,10 +64,10 @@ keda:
             triggers:
                 - type: rabbitmq
                   authenticationRef:
-                      name: consumer-<NOME-REPOSITORIO>-auth
+                      name: consumer-<REPOSITORY-NAME>-auth
                   metadata:
                       protocol: amqp
-                      queueName: ${.<NOME-REPOSITORIO>.build.consumer.queue_name}
+                      queueName: ${.<REPOSITORY-NAME>.build.consumer.queue_name}
                       mode: QueueLength
                       value: '1'
 
@@ -77,7 +77,7 @@ service:
 containers:
     - name: consumer
       repository:
-          image: 931670397156.dkr.ecr.${region}.amazonaws.com/consumer-<NOME-REPOSITORIO>
+          image: 931670397156.dkr.ecr.${region}.amazonaws.com/consumer-<REPOSITORY-NAME>
           tag: latest
       ports:
           - targetPort: 3000
@@ -85,8 +85,8 @@ containers:
             protocol: TCP
       resources:
           requests:
-              cpu: ${.<NOME-REPOSITORIO>.build.consumer.resources.requests.cpu}
-              memory: ${.<NOME-REPOSITORIO>.build.consumer.resources.requests.memory}
+              cpu: ${.<REPOSITORY-NAME>.build.consumer.resources.requests.cpu}
+              memory: ${.<REPOSITORY-NAME>.build.consumer.resources.requests.memory}
           limits:
-              cpu: ${.<NOME-REPOSITORIO>.build.consumer.resources.limits.cpu}
-              memory: ${.<NOME-REPOSITORIO>.build.consumer.resources.limits.memory}
+              cpu: ${.<REPOSITORY-NAME>.build.consumer.resources.limits.cpu}
+              memory: ${.<REPOSITORY-NAME>.build.consumer.resources.limits.memory}
