@@ -1,92 +1,91 @@
 module: <GRAFANA-TAG>
 
 nodeSelector:
-    nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
+  nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
 
 csiSecrets:
-    enabled: true
-    serviceAccountName: "application-permission"
+  enabled: true
+  serviceAccountName: "application-permission"
 
 istio:
-    enable: false
-    egress:
-        serviceEntries:
-            - ports:
-                  - number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
-                    name: tcp
-                    protocol: TCP
-              hosts:
-                  - ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.host}
-        virtualService:
-            hosts:
-                - ${.<REPOSITORY-NAME>.build.istio.ingress.host}
-            gateways:
+  enable: false
+  egress:
+    serviceEntries:
+      - ports:
+          - number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
+            name: tcp
+            protocol: TCP
+        hosts:
+          - ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.host}
+    virtualService:
+      hosts:
+        - ${.<REPOSITORY-NAME>.build.istio.ingress.host}
+      gateways:
+        - 'istio-system/orbit-egress'
+      tcp:
+        - match:
+            - gateways:
                 - 'istio-system/orbit-egress'
-            tcp:
-                - match:
-                      - gateways:
-                            - 'istio-system/orbit-egress'
-                        port: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
-                  route:
-                      - destination:
-                            host: istio-egressgateway.istio-system.svc.cluster.local
-                            subset: postgres
-                            port:
-                                number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
-                      - destination:
-                            host: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.host}
-                            port:
-                                number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
-                        weight: 100
+              port: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
+          route:
+            - destination:
+                host: istio-egressgateway.istio-system.svc.cluster.local
+                subset: postgres
+                port:
+                  number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
+            - destination:
+                host: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.host}
+                port:
+                  number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
+              weight: 100
 
 keda:
-    secrets:
-        name: consumer-<REPOSITORY-NAME>
-        data:
-            rabbitmq_http_host: ${.<REPOSITORY-NAME>.build.secrets.rabbitmq_auth_host}
+  secrets:
+    name: <REPOSITORY-NAME>-<DEPLOYMENT-NAME>
 
-    authentication:
-        name: consumer-<REPOSITORY-NAME>-auth
-        spec:
-            secretTargetRef:
-                - key: rabbitmq_http_host
-                  name: consumer-<REPOSITORY-NAME>
-                  parameter: host
-    scale:
-        spec:
-            pollingInterval: 30
-            cooldownPeriod: 600
-            maxReplicaCount: 5
-            minReplicaCount: 1
-            idleReplicaCount: 0
-            scaleTargetRef:
-                name: consumer
-            triggers:
-                - type: rabbitmq
-                  authenticationRef:
-                      name: consumer-<REPOSITORY-NAME>-auth
-                  metadata:
-                      protocol: amqp
-                      queueName: ${.<REPOSITORY-NAME>.build.consumer.queue_name}
-                      mode: QueueLength
-                      value: '1'
+  authentication:
+    name: <REPOSITORY-NAME>-<DEPLOYMENT-NAME>
+    spec:
+      secretTargetRef:
+        - key: rabbitmq_http_host
+          name: <REPOSITORY-NAME>-<DEPLOYMENT-NAME>
+          parameter: host
+
+  scale:
+    spec:
+      pollingInterval: 30
+      cooldownPeriod: 600 # 10 minutos
+      maxReplicaCount: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
+      minReplicaCount: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.minReplicaCount}
+      idleReplicaCount: 0
+      scaleTargetRef:
+        name: consumer
+      triggers:
+      - type: rabbitmq
+        authenticationRef:
+          name: consumer-<REPOSITORY-NAME>-<DEPLOYMENT-NAME>
+        metadata:
+            protocol: amqp
+            queueName: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.queue_name}
+            mode: QueueLength
+            value: '1'
 
 service:
-    type: ClusterIP
+  type: ClusterIP
 
 containers:
-    - name: consumer
-      repository:
-          image: 931670397156.dkr.ecr.${region}.amazonaws.com/consumer-<REPOSITORY-NAME>
-          tag: latest
-      ports:
-          - targetPort: 3000
-            port: 80
-            protocol: TCP
-      resources:
-          requests:
-              cpu: ${.<REPOSITORY-NAME>.build.consumer.resources.requests.cpu}
-              memory: ${.<REPOSITORY-NAME>.build.consumer.resources.requests.memory}
-          limits:
-              cpu: ${.<REPOSITORY-NAME>.build.consumer.resources.limits.cpu}
-              memory: ${.<REPOSITORY-NAME>.build.consumer.resources.limits.memory}
+  - name: consumer
+    repository:
+        image: 931670397156.dkr.ecr.${region}.amazonaws.com/<DEPLOYMENT-NAME>-<REPOSITORY-NAME>
+        tag: latest
+    ports:
+      - targetPort: 3000
+        port: 80
+        protocol: TCP
+    resources:
+      requests:
+        cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
+        memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
+      limits:
+        cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
+        memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
