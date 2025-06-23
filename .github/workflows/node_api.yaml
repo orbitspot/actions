@@ -338,6 +338,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     needs: [setup-config, prepare-helm-replacements]
+    if: ${{ needs.setup-config.outputs.consumer-matrix != '[]' }}
     strategy:
       matrix:
         artifacts: ${{ fromJson(needs.setup-config.outputs.consumer-matrix) }}
