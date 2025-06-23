@@ -29,7 +29,9 @@ runs:
     - name: Determinar chart_type
       id: set_chart_type
       run: |
-        if [[ "${{ inputs.deployment_name }}" == "api" ]]; then
+        if [[ "${{ inputs.deployment_name }}" == *"migration"* ]]; then
+          echo "chart_type=migration" >> $GITHUB_ENV
+        elif [[ "${{ inputs.deployment_name }}" == "api" ]]; then
           echo "chart_type=node_api" >> $GITHUB_ENV
         else
           echo "chart_type=consumer" >> $GITHUB_ENV
