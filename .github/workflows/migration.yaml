@@ -151,7 +151,7 @@ jobs:
         id: prepare_helm
         uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@beta-infra-api-example
         with:
-          deployment_name: ${{ matrix.artifacts }}
+          deployment_name: 'migration-${{ github.event.repository.name }}'
           grafana_tag: ${{ inputs.grafana_tag }}
         env:
           BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
