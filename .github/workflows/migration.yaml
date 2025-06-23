@@ -147,26 +147,22 @@ jobs:
           python code/.github/scripts/generate-environment-yaml.py
           cat variables.yaml
 
-      - name: Download Helm from S3
-        run: |
-          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/values.yaml values.yaml
-          sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
-          sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
-          mkdir -p .github/helm/migration
-          mv values.yaml .github/helm/migration/values.yaml
-          cat .github/helm/migration/values.yaml
-
-      - name: Append Properties
-        run: |
-          echo "${{ vars._PROPERTIES }}" > values.properties
-          echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
-          echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
-          cat .github/helm/migration/values.yaml
+      - name: Preparar values.yaml
+        id: prepare_helm
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@beta-infra-api-example
+        with:
+          deployment_name: ${{ matrix.artifacts }}
+          grafana_tag: ${{ inputs.grafana_tag }}
+        env:
+          BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
+          DB_PORT: ${{ vars.DB_PORT }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          _PROPERTIES: ${{ vars._PROPERTIES }}
 
       - name: replace-data
         env:
           PREFIX: '.${{ github.event.repository.name }}'
-          PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+          PROPERTIES_PATH: ${{ steps.prepare_helm.outputs.properties_path }}
           YAML_PATH: .github/helm/migration/values.yaml
         run: python code/.github/scripts/replace-properties.py
 
