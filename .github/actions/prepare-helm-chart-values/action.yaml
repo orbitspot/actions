@@ -10,7 +10,9 @@ inputs:
   BROKER_AMQP:
     description: "Consumer amqp broker"
     required: false
-
+  OLD_INGRESS_HOST:
+    description: "Está no ingress antigo"
+    required: false
 outputs:
   properties_path:
     description: "Caminho do arquivo values.properties gerado"
@@ -23,7 +25,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: 'orbitspot/actions'
-        path: helm-values
+        path: actions
         ref: 'beta-infra-api-example'
 
     - name: Determinar chart_type
@@ -44,7 +46,7 @@ runs:
 
     - name: Copiar e preparar values.yaml
       run: |
-        cp helm-values/helm-values/${{ env.chart_type }}/values.yaml values.yaml
+        cp actions/helm-values/${{ env.chart_type }}/values.yaml values.yaml
         sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
         sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
@@ -52,6 +54,19 @@ runs:
         mv values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
 
+    - name: Copiar e preparar values.yaml (old)
+      if: ${{ vars.OLD_INGRESS_HOST != '' && inputs.deployment_name == 'api' }}
+      run: |
+        cp actions/helm-values/api/old_ingress_values.yaml values.yaml
+        sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
+        sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
+        sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
+        mkdir -p .github/helm/${{ inputs.deployment_name }}
+        echo "build.acm_arn=${{ env.ACM_ARN }}" >> values.properties
+        echo "build.environment=${{ env.ENV }}" >> values.properties
+        mv values.yaml .github/helm/api/values.yaml
+      shell: bash
+  
     - name: Gerar values.properties
       run: |
         echo "${{ env._PROPERTIES }}" | tr '\r' '\n' > values.properties

@@ -193,7 +193,7 @@ jobs:
               path: helm-values
               ref: 'beta-infra-api-example'
 
-          - name: Download Helm from S3 - 1 Host
+          - name: Copy Helm from S3 - 1 Host
             if: ${{ vars.HOST_MF_2 == ''}}
             run: |
               cp helm-values/helm-values/landingpage/one_host_values.yaml values.yaml
@@ -203,7 +203,7 @@ jobs:
               mv values.yaml .github/helm/next/values.yaml
               cat .github/helm/next/values.yaml
        
-          - name: Download Helm from S3 - 2 Hosts
+          - name: Copy Helm from S3 - 2 Hosts
             if: ${{ vars.HOST_MF_2 != ''}}
             run: |
               cp helm-values/helm-values/landingpage/two_hosts_values.yaml values.yaml 
