@@ -245,19 +245,23 @@ jobs:
                   aws_region: ${{ env.CLUSTER_REGION }}
                   cluster_name: ${{ env.CLUSTER_NAME }}
 
-            - name: Download Helm from S3
-              run: |
-                aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/frontend/values.yaml values.yaml
-                sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
-                mkdir -p .github/helm/nginx
-                mv values.yaml .github/helm/nginx/values.yaml
-                cat .github/helm/nginx/values.yaml
-            
+            - name: Preparar values.yaml
+              id: prepare_helm
+              uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@beta-infra-api-example
+              with:
+                deployment_name: 'frontend'
+                grafana_tag: ${{ inputs.grafana_tag }}
+              env:
+                BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
+                DB_PORT: ${{ vars.DB_PORT }}
+                DB_HOST: ${{ vars.DB_HOST }}
+                _PROPERTIES: ${{ vars._PROPERTIES }}
+
             - name: upload
               uses: actions/upload-artifact@v4
               with:
                   name: helm-values
-                  path: .github/helm/nginx/values.yaml
+                  path: .github/helm/frontend/values.yaml
                   retention-days: 1
 
             - name: helm-apply
