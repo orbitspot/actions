@@ -1,7 +1,7 @@
 module: <GRAFANA-TAG>
 
 nodeSelector:
-  nodegroup-type: ${.<NOME-REPOSITORIO>.build.service.node_selector}
+  nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
 
 csiSecrets:
   enabled: true
@@ -11,41 +11,41 @@ containers:
   - name: consumer
     resources:
       requests:
-        cpu: ${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
-        memory: ${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
+        cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
+        memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
       limits:
-        cpu: ${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
-        memory: ${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
+        cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
+        memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
 
 
 keda:
   secrets:
-    name: consumer-<NOME-REPOSITORIO>
+    name: consumer-<REPOSITORY-NAME>
 
   authentication:
-    name: consumer-<NOME-REPOSITORIO>
+    name: consumer-<REPOSITORY-NAME>
     spec:
       secretTargetRef:
         - key: rabbitmq_http_host
-          name: consumer-<NOME-REPOSITORIO>
+          name: consumer-<REPOSITORY-NAME>
           parameter: host
 
   pollingInterval: 30
-  maxReplicaCount: ${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
-  failedJobsHistoryLimit: ${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
-  successfulJobsHistoryLimit: ${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
-  activeDeadlineSeconds: ${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.keda.activeDeadlineSeconds}
+  maxReplicaCount: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
+  failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
+  successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
+  activeDeadlineSeconds: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.activeDeadlineSeconds}
   restartPolicy: <RESTART-POLICY>
   
   triggers:
     - type: rabbitmq
       authenticationRef:
-        name: consumer-<NOME-REPOSITORIO>
+        name: consumer-<REPOSITORY-NAME>
       metadata:
         protocol: amqp
-        queueName: ${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.queue_name}
+        queueName: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.queue_name}
         mode: QueueLength
-        value: "${.<NOME-REPOSITORIO>.build.<DEPLOYMENT-NAME>.queue_min_messages}"
+        value: "${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.queue_min_messages}"
 
 service:
   type: ClusterIP
