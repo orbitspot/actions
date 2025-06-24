@@ -186,10 +186,17 @@ jobs:
               aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
               aws_region: us-east-1
 
+          - name: Checkout script repository
+            uses: actions/checkout@v4
+            with:
+              repository: 'orbitspot/actions'
+              path: helm-values
+              ref: 'beta-infra-api-example'
+
           - name: Download Helm from S3 - 1 Host
             if: ${{ vars.HOST_MF_2 == ''}}
             run: |
-              aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/landingpage/one_host_values.yaml values.yaml
+              cp helm-values/helm-values/landingpage/one_host_values.yaml values.yaml
               sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
               sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
               mkdir -p .github/helm/next
@@ -199,7 +206,7 @@ jobs:
           - name: Download Helm from S3 - 2 Hosts
             if: ${{ vars.HOST_MF_2 != ''}}
             run: |
-              aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/landingpage/two_hosts_values.yaml values.yaml
+              cp helm-values/helm-values/landingpage/two_hosts_values.yaml values.yaml 
               sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
               sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
               mkdir -p .github/helm/next
