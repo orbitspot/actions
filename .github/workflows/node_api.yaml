@@ -249,6 +249,7 @@ jobs:
           DB_PORT: ${{ vars.DB_PORT }}
           DB_HOST: ${{ vars.DB_HOST }}
           _PROPERTIES: ${{ vars._PROPERTIES }}
+          OLD_INGRESS_HOST: ${{ vars.OLD_INGRESS_HOST }}
 
       - name: replace-data
         env:
