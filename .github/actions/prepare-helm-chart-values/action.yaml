@@ -55,7 +55,7 @@ runs:
       shell: bash
 
     - name: Copiar e preparar values.yaml (old)
-      if: ${{ vars.OLD_INGRESS_HOST != '' && inputs.deployment_name == 'api' }}
+      if: ${{ inputs.OLD_INGRESS_HOST != '' && inputs.deployment_name == 'api' }}
       run: |
         cp actions/helm-values/api/old_ingress_values.yaml values.yaml
         sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
