@@ -49,6 +49,7 @@ jobs:
       name: Set Up Config
       runs-on: ubuntu-latest
       needs: [generate-matrix]
+      environment: ${{ github.ref_name }}
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
