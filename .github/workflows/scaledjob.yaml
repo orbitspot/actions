@@ -55,6 +55,9 @@ jobs:
         ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
+        - name: Print secrets
+          run: |
+            echo "BROKER_AMQP_SCALED_JOB_BASE64=${{ secrets.BROKER_AMQP_SCALED_JOB_BASE64 }}"  
         - name: Fetch devops variables
           id: set-output
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@v19.0
@@ -300,7 +303,7 @@ jobs:
                   --set environment=${{env.ENV}} \
                   --set region=${{ env.CLUSTER_REGION }} \
                   --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
-                  --set 'keda.secrets.data.rabbitmq_http_host=YW1xcDovL2RldmVsb3BtZW50LW9yYml0c3BvdDowckJpNzVQMDdfZDNWZUwwcEBhbXFwLmRldi5vcmJpdHNwb3QuY29tOjU2NzIvYXJjaA==' \
+                  --set 'keda.secrets.data.rabbitmq_http_host=${{ secrets.BROKER_AMQP_SCALED_JOB_BASE64 }}' \
                   --set 'containers[0].repository.tag=${{ github.sha }}' \
                   --set 'containers[0].environments.SERVICE_TYPE=${{ matrix.artifacts }}'
             
