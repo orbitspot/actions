@@ -20,14 +20,14 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v19.0
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.0
         with:
           devops_config: ${{ vars._DEVOPS_CONFIG }}
           branch: ${{ github.ref_name }}
 
   create-parameters-vars:
       name: Create parameters
-      runs-on: ubuntu-latest
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       needs: [setup-config]
       permissions:
@@ -36,14 +36,14 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-vars
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v19.0
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v20.0
           with:
             environment_json: ${{ toJson(vars) }}
             file_name: variables
 
   create-parameters-secrets:
       name: Create parameters secrets
-      runs-on: ubuntu-latest
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       needs: [setup-config]
       permissions:
@@ -52,14 +52,14 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-secrets
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v19.0
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v20.0
           with:
             environment_json: ${{ toJson(secrets) }}
             file_name: secrets
 
   apply-parameters:
       name: Apply parameters
-      runs-on: ubuntu-latest
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       needs: [setup-config, create-parameters-vars, create-parameters-secrets]
       env:
@@ -79,10 +79,10 @@ jobs:
           terraform_version: "1.5.0"
               
       - name: Start terraform
-        uses: orbitspot/actions/.github/actions/parameter-store@v19.0
+        uses: orbitspot/actions/.github/actions/parameter-store@v20.0
         with:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
           aws_region: "${{ env.CLUSTER_REGION }}"
-          tag: 'v19.0'
+          tag: 'v20.0'
 

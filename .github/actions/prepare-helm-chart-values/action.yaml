@@ -26,7 +26,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: actions
-        ref: 'beta-infra-api-example'
+        ref: 'v20.0'
 
     - name: Determinar chart_type
       id: set_chart_type
