@@ -1,0 +1,58 @@
+name: Validar Workflows dos Repositórios
+
+on:
+  workflow_dispatch:
+
+jobs:
+  disparar-e-validar:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repositorio:
+          - infra-api-example
+          - infra-api-consumer-example
+          - infra-scaledjob-example
+          - infra-api-migration-example
+          - infra-frontend-example
+          - infra-landingpage-example
+
+    steps:
+      - name: Disparar workflow no repositório ${{ matrix.repositorio }}
+        id: trigger
+        run: |
+          repo="${{ matrix.repositorio }}"
+          branch="develop"
+          
+          # Disparar workflow (push) via GitHub API
+          response=$(curl -s -X POST \
+            -H "Authorization: token ${{ secrets.GIT_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/orbitspot/$repo/actions/workflows/push.yml/dispatches \
+            -d "{\"ref\":\"$branch\"}")
+          
+          echo "Workflow disparado no repositório $repo"
+
+      - name: Aguardar conclusão (exemplo básico com delay)
+        run: |
+          echo "Aguardando 600 segundos antes de validar status..."
+          sleep 600
+
+      - name: Validar status do workflow
+        run: |
+          repo="${{ matrix.repositorio }}"
+          run_id=$(curl -s \
+            -H "Authorization: token ${{ secrets.GIT_TOKEN }}" \
+            https://api.github.com/repos/orbitspot/$repo/actions/runs \
+            | jq -r '.workflow_runs[] | select(.head_branch == "develop") | select(.name == "Push") | .id' | head -n 1)
+
+          status=$(curl -s \
+            -H "Authorization: token ${{ secrets.GIT_TOKEN }}" \
+            https://api.github.com/repos/orbitspot/$repo/actions/runs/$run_id \
+            | jq -r '.conclusion')
+
+          echo "Status do repositório $repo: $status"
+
+          if [[ "$status" != "success" ]]; then
+            echo "❌ Workflow falhou em $repo"
+            exit 1
+          fi
