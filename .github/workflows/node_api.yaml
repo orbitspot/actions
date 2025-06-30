@@ -25,7 +25,7 @@ jobs:
     setup-config:
       name: Set Up Config
       runs-on: ubuntu-latest
-      environment: ${{ github.ref_name }}
+      environment: develop
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
