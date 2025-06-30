@@ -190,13 +190,13 @@ jobs:
             uses: actions/checkout@v4
             with:
               repository: 'orbitspot/actions'
-              path: helm-values
+              path: actions
               ref: 'beta-infra-api-example'
 
           - name: Copy Helm from S3 - 1 Host
             if: ${{ vars.HOST_MF_2 == ''}}
             run: |
-              cp helm-values/helm-values/landingpage/one_host_values.yaml values.yaml
+              cp actions/helm-values/landingpage/one_host_values.yaml values.yaml
               sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
               sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
               mkdir -p .github/helm/next
@@ -206,7 +206,7 @@ jobs:
           - name: Copy Helm from S3 - 2 Hosts
             if: ${{ vars.HOST_MF_2 != ''}}
             run: |
-              cp helm-values/helm-values/landingpage/two_hosts_values.yaml values.yaml 
+              cp actions/helm-values/landingpage/two_hosts_values.yaml values.yaml 
               sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
               sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
               mkdir -p .github/helm/next
@@ -221,7 +221,7 @@ jobs:
           - name: replace-data
             env:
                 PREFIX: .${{ github.event.repository.name }}
-                PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+                PROPERTIES_PATH: values.properties
                 YAML_PATH: .github/helm/next/values.yaml
             run: python code/.github/scripts/replace-properties.py && cat .github/helm/next/values.yaml
 
