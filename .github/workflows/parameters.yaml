@@ -18,6 +18,11 @@ jobs:
     outputs:
       CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
     steps:
+      - name: Clean up machine
+        run: |
+          rm -rf /opt/actions-runner/_work/*
+          df -h
+
       - name: Fetch devops variables
         id: set-output
         uses: orbitspot/actions/.github/actions/fetch-devops-variables@v19.0
