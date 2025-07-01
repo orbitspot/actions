@@ -63,43 +63,44 @@ jobs:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
             branch: '${{ github.ref_name }}'
         
-        - name: Check repos
-          run: |
-            pwd
-            ls
-            rm -rf /opt/actions-runner/_work/*
-            pwd
-            ls
 
-#     building:
-#         name: Building
-#         runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-#         needs: [setup-config]
-#         permissions:
-#             id-token: write
-#             contents: read
-#         steps:
-#             - name: Authenticate
-#               uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
-#               with:
-#                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-#                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-#                   aws_region: 'us-east-1'
+    building:
+        name: Building
+        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        needs: [setup-config]
+        permissions:
+            id-token: write
+            contents: read
+        steps:
+            - name: Authenticate
+              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
+              with:
+                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+                  aws_region: 'us-east-1'
 
-#             - name: Set up Node.js
-#               uses: actions/setup-node@v4
-#               with:
-#                   node-version: '${{ inputs.version }}'
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '${{ inputs.version }}'
 
-#             - name: Bash Co Login
-#               run: |
-#                   bash co_login_commands.txt
+            - name: Bash Co Login
+              run: |
+                  bash co_login_commands.txt
 
-#             - name: Npm Building
-#               uses: orbitspot/actions/.github/actions/npm-ci@v19.0
-#               with:
-#                   node_version: '${{ inputs.version }}'
-#                   customized_dockerfile: '${{ inputs.dockerfile_path  }}'
+            - name: Npm Building
+              uses: orbitspot/actions/.github/actions/npm-ci@v19.0
+              with:
+                  node_version: '${{ inputs.version }}'
+                  customized_dockerfile: '${{ inputs.dockerfile_path  }}'
+            
+            - name: Check repos
+              run: |
+                pwd
+                ls
+                rm -rf /opt/actions-runner/_work/*
+                pwd
+                ls
 
 #     generate-docker:
 #         name: Docker Build Api
