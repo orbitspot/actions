@@ -48,7 +48,7 @@ jobs:
             else
               git add "$file"
               git commit -m "chore: atualiza versão do workflow para @$version"
-              git push origin develop
+              git push origin develop -f
               echo "✅ Commit e push realizados com sucesso."
             fi
           else
