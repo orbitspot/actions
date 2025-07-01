@@ -36,6 +36,7 @@ jobs:
           run: |
             pwd
             ls
+            df -h
             
         - name: Setup Python
           uses: actions/setup-python@v5
@@ -98,6 +99,7 @@ jobs:
               run: |
                 pwd
                 ls
+                df -h
                 rm -rf /opt/actions-runner/_work/*
                 pwd
                 ls
