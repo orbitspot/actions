@@ -35,8 +35,8 @@ jobs:
           if [[ -f "$file" ]]; then
             echo "✏️  Atualizando versão do workflow reusable para @$version"
 
-            # Substitui qualquer valor após @ no uses: orbitspot/actions/.github/workflows/*.yaml@XYZ
-            sed -i "s|\(orbitspot/actions/.github/workflows/.*\.yaml\)@[^'\"]\+|\1@$version|g" "$file"
+            # Substitui qualquer valor (ou vazio) após @ no uses: orbitspot/actions/.github/workflows/*.yaml@XYZ
+            sed -i "s|\(orbitspot/actions/.github/workflows/.*\.yaml\)@\([^'\"]*\)|\1@$version|g" "$file"
 
             # Configura o autor do commit
             git config user.name "github-actions[bot]"
