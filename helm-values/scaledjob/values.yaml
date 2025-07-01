@@ -1,0 +1,51 @@
+module: <GRAFANA-TAG>
+
+nodeSelector:
+  nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
+
+csiSecrets:
+  enabled: true
+  serviceAccountName: "application-permission"
+
+containers:
+  - name: consumer
+    resources:
+      requests:
+        cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
+        memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
+      limits:
+        cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
+        memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
+
+
+keda:
+  secrets:
+    name: consumer-<REPOSITORY-NAME>
+
+  authentication:
+    name: consumer-<REPOSITORY-NAME>
+    spec:
+      secretTargetRef:
+        - key: rabbitmq_http_host
+          name: consumer-<REPOSITORY-NAME>
+          parameter: host
+
+  pollingInterval: 30
+  maxReplicaCount: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
+  failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
+  successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
+  activeDeadlineSeconds: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.activeDeadlineSeconds}
+  restartPolicy: <RESTART-POLICY>
+  
+  triggers:
+    - type: rabbitmq
+      authenticationRef:
+        name: consumer-<REPOSITORY-NAME>
+      metadata:
+        protocol: amqp
+        queueName: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.queue_name}
+        mode: QueueLength
+        value: "${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.queue_min_messages}"
+
+service:
+  type: ClusterIP

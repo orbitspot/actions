@@ -19,7 +19,7 @@ concurrency:
 jobs:
   setup-config:
     name: Set Up Config
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     outputs:
       CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v19.0
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.0
         with:
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
           branch: '${{ github.ref_name }}'
@@ -41,7 +41,7 @@ jobs:
       contents: read
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.0
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -57,7 +57,7 @@ jobs:
           bash co_login_commands.txt
 
       - name: Npm Building
-        uses: orbitspot/actions/.github/actions/npm-ci@v19.0
+        uses: orbitspot/actions/.github/actions/npm-ci@v20.0
         with:
           node_version: '20'
 
@@ -79,7 +79,7 @@ jobs:
           fetch-depth: 0
 
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.0
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -91,7 +91,7 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/migration.sh migration.sh
 
       - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@v19.0
+        uses: orbitspot/actions/.github/actions/docker@v20.0
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -131,7 +131,7 @@ jobs:
           path: code
       
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.0
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -147,26 +147,22 @@ jobs:
           python code/.github/scripts/generate-environment-yaml.py
           cat variables.yaml
 
-      - name: Download Helm from S3
-        run: |
-          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/values.yaml values.yaml
-          sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
-          sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
-          mkdir -p .github/helm/migration
-          mv values.yaml .github/helm/migration/values.yaml
-          cat .github/helm/migration/values.yaml
-
-      - name: Append Properties
-        run: |
-          echo "${{ vars._PROPERTIES }}" > values.properties
-          echo "build.istio.egress.databases.default.port=${{ vars.DB_PORT }}" >> values.properties
-          echo "build.istio.egress.databases.default.host=${{ vars.DB_HOST }}" >> values.properties
-          cat .github/helm/migration/values.yaml
+      - name: Preparar values.yaml
+        id: prepare_helm
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.0
+        with:
+          deployment_name: 'migration'
+          grafana_tag: ${{ inputs.grafana_tag }}
+        env:
+          BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
+          DB_PORT: ${{ vars.DB_PORT }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          _PROPERTIES: ${{ vars._PROPERTIES }}
 
       - name: replace-data
         env:
           PREFIX: '.${{ github.event.repository.name }}'
-          PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+          PROPERTIES_PATH: ${{ steps.prepare_helm.outputs.properties_path }}
           YAML_PATH: .github/helm/migration/values.yaml
         run: python code/.github/scripts/replace-properties.py
 
@@ -205,7 +201,7 @@ jobs:
           fetch-depth: 0
 
       - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v19.0
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.0
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -213,7 +209,7 @@ jobs:
           cluster_name: '${{ env.CLUSTER_NAME }}'
 
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
+        uses: orbitspot/actions/.github/actions/helm-deploy@v20.0
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_region: '${{ env.CLUSTER_REGION }}'
