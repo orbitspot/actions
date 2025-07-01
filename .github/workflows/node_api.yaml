@@ -68,6 +68,8 @@ jobs:
             pwd
             ls
             rm -rf /opt/actions-runner/_work/*
+            pwd
+            ls
 
 #     building:
 #         name: Building
