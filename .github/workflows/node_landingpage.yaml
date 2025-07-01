@@ -24,6 +24,11 @@ jobs:
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
+        - name: Clean up machine
+          run: |
+            rm -rf /opt/actions-runner/_work/*
+            df -h
+
         - name: Setup Python
           uses: actions/setup-python@v5
           with:
