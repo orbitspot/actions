@@ -32,7 +32,7 @@ jobs:
 
   create-parameters-vars:
       name: Create parameters
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       needs: [setup-config]
       permissions:
