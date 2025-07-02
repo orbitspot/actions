@@ -35,7 +35,6 @@ keda:
   failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
   successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
   activeDeadlineSeconds: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.activeDeadlineSeconds}
-  restartPolicy: <RESTART-POLICY>
   
   triggers:
     - type: rabbitmq
