@@ -17,7 +17,8 @@ concurrency:
 jobs:
     setup-config:
       name: Set Up Config
-      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: ubuntu-latest
+      environment: ${{ github.ref_name }}
       outputs:
         CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
@@ -44,14 +45,14 @@ jobs:
 
         - name: Fetch devops variables
           id: set-output
-          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v19.0
+          uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.0
           with:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
             branch: '${{ github.ref_name }}'
 
     building:
         name: Building
-        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config]
         permissions:
@@ -82,7 +83,7 @@ jobs:
               name: Checkout
               with:
                   repository: 'orbitspot/actions'
-                  ref: v19.0
+                  ref: v20.0
                   path: code
 
             - name: Fetch landingpage variables
@@ -96,7 +97,7 @@ jobs:
                 cat .env
 
             - name: Generate Build Args
-              uses: orbitspot/actions/.github/actions/generate-build-args@v19.0
+              uses: orbitspot/actions/.github/actions/generate-build-args@v20.0
               with:
                 landingpage_config: '${{ vars._LANDINGPAGE_CONFIG }}'
                 branch: '${{ github.ref_name }}'
@@ -106,7 +107,7 @@ jobs:
                 aws s3 sync s3://devops.orbitspot.com/build-github-actions/v1/deploy/landingpage .
             
             - name: docker-build
-              uses: orbitspot/actions/.github/actions/docker@v19.0
+              uses: orbitspot/actions/.github/actions/docker@v20.0
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -117,7 +118,7 @@ jobs:
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
@@ -129,7 +130,7 @@ jobs:
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - name: create-role
-              uses: orbitspot/actions/.github/actions/create-role-service-account@v19.0
+              uses: orbitspot/actions/.github/actions/create-role-service-account@v20.0
               with:
                   role: "${{ github.event.repository.name }}-${{ env.ENV }}"
                   namespace: ${{ github.event.repository.name }}
@@ -139,7 +140,7 @@ jobs:
                   aws_region: ${{ vars._AWS_REGION }}
 
             - name: create-namespace
-              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v19.0
+              uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.0
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -151,7 +152,7 @@ jobs:
 
     prepare-helm-replacements:
       name: Building Helm Values
-      runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       needs: [setup-config, building]
       permissions:
@@ -185,20 +186,27 @@ jobs:
               aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
               aws_region: us-east-1
 
-          - name: Download Helm from S3 - 1 Host
+          - name: Checkout script repository
+            uses: actions/checkout@v4
+            with:
+              repository: 'orbitspot/actions'
+              path: actions
+              ref: 'v20.0'
+
+          - name: Copy Helm from S3 - 1 Host
             if: ${{ vars.HOST_MF_2 == ''}}
             run: |
-              aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/landingpage/one_host_values.yaml values.yaml
+              cp actions/helm-values/landingpage/one_host_values.yaml values.yaml
               sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
               sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
               mkdir -p .github/helm/next
               mv values.yaml .github/helm/next/values.yaml
               cat .github/helm/next/values.yaml
        
-          - name: Download Helm from S3 - 2 Hosts
+          - name: Copy Helm from S3 - 2 Hosts
             if: ${{ vars.HOST_MF_2 != ''}}
             run: |
-              aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/deploy/landingpage/two_hosts_values.yaml values.yaml
+              cp actions/helm-values/landingpage/two_hosts_values.yaml values.yaml 
               sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
               sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
               mkdir -p .github/helm/next
@@ -213,7 +221,7 @@ jobs:
           - name: replace-data
             env:
                 PREFIX: .${{ github.event.repository.name }}
-                PROPERTIES_PATH: /opt/actions-runner/_work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/values.properties
+                PROPERTIES_PATH: values.properties
                 YAML_PATH: .github/helm/next/values.yaml
             run: python code/.github/scripts/replace-properties.py && cat .github/helm/next/values.yaml
 
@@ -226,7 +234,7 @@ jobs:
 
     helm-deploy:
         name: K8s Deploy
-        runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [ setup-config, prepare-helm-replacements ]
         permissions:
@@ -238,7 +246,7 @@ jobs:
           ENV: '${{ needs.setup-config.outputs.ENV }}'
         steps:
             - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v19.0
+              uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.0
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -247,7 +255,7 @@ jobs:
 
             - name: Helm Apply 1 host
               if: ${{ vars.HOST_MF_2 == ''}}
-              uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
+              uses: orbitspot/actions/.github/actions/helm-deploy@v20.0
               with:
                 aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                 aws_region: ${{ env.CLUSTER_REGION }}
@@ -266,7 +274,7 @@ jobs:
                   
             - name: Helm Apply 2 hosts
               if: ${{ vars.HOST_MF_2 != ''}}
-              uses: orbitspot/actions/.github/actions/helm-deploy@v19.0
+              uses: orbitspot/actions/.github/actions/helm-deploy@v20.0
               with:
                 aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                 aws_region: ${{ env.CLUSTER_REGION }}

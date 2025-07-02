@@ -1,0 +1,38 @@
+module: <GRAFANA-TAG>
+ 
+ingress:
+  annotations:
+    order: 1
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
+    
+
+
+csiSecrets:
+  enabled: true
+  serviceAccountName: "application-permission"
+
+service:
+  type: NodePort
+
+containers:
+  - name: frontend
+    ports:
+      - targetPort: 80
+        port: 80
+        protocol: TCP
+    resources:
+        requests:
+            cpu: 10m
+            memory: 8Mi
+        limits:
+            cpu: 25m
+            memory: 16Mi

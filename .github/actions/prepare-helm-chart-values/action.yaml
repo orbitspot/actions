@@ -1,0 +1,80 @@
+name: "Prepare Helm Values"
+description: "Prepara values.yaml com variáveis substituídas"
+inputs:
+  deployment_name:
+    description: "Nome do deployment (ex: api ou consumer)"
+    required: true
+  grafana_tag:
+    description: "Tag do Grafana"
+    required: true
+  BROKER_AMQP:
+    description: "Consumer amqp broker"
+    required: false
+  OLD_INGRESS_HOST:
+    description: "Está no ingress antigo"
+    required: false
+outputs:
+  properties_path:
+    description: "Caminho do arquivo values.properties gerado"
+    value: values.properties
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout script repository
+      uses: actions/checkout@v4
+      with:
+        repository: 'orbitspot/actions'
+        path: actions
+        ref: 'v20.0'
+
+    - name: Determinar chart_type
+      id: set_chart_type
+      run: |
+        if [[ "${{ inputs.deployment_name }}" == *"frontend"* ]]; then
+          echo "chart_type=frontend" >> $GITHUB_ENV
+        elif [[ "${{ inputs.deployment_name }}" == *"scaledjob"* ]]; then
+          echo "chart_type=scaledjob" >> $GITHUB_ENV
+        elif [[ "${{ inputs.deployment_name }}" == *"migration"* ]]; then
+          echo "chart_type=migration" >> $GITHUB_ENV
+        elif [[ "${{ inputs.deployment_name }}" == "api" ]]; then
+          echo "chart_type=node_api" >> $GITHUB_ENV
+        else
+          echo "chart_type=consumer" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Copiar e preparar values.yaml
+      run: |
+        cp actions/helm-values/${{ env.chart_type }}/values.yaml values.yaml
+        sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
+        sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
+        sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
+        mkdir -p .github/helm/${{ inputs.deployment_name }}
+        mv values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
+      shell: bash
+
+    - name: Copiar e preparar values.yaml (old)
+      if: ${{ inputs.OLD_INGRESS_HOST != '' && inputs.deployment_name == 'api' }}
+      run: |
+        cp actions/helm-values/api/old_ingress_values.yaml values.yaml
+        sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
+        sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
+        sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
+        mkdir -p .github/helm/${{ inputs.deployment_name }}
+        echo "build.acm_arn=${{ env.ACM_ARN }}" >> values.properties
+        echo "build.environment=${{ env.ENV }}" >> values.properties
+        mv values.yaml .github/helm/api/values.yaml
+      shell: bash
+  
+    - name: Gerar values.properties
+      run: |
+        echo "${{ env._PROPERTIES }}" | tr '\r' '\n' > values.properties
+        echo "build.istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
+        echo "build.istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
+
+        if [[ -n "${{ inputs.BROKER_AMQP }}" ]]; then
+          RABBITMQ_BASE64=$(echo -n "${{ inputs.BROKER_AMQP }}" | base64 -w0)
+          echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
+        fi
+      shell: bash
