@@ -309,7 +309,7 @@ jobs:
           helm_values: helm-values-api
           release: api
           chart_name: orbitspot/orbitspot-microservices
-          chart_version: 3.0.3
+          chart_version: 3.0.31
           sets: |
             --set environment=${{ env.ENV }} \
             --set region=${{ env.CLUSTER_REGION }} \
@@ -326,7 +326,7 @@ jobs:
           helm_values: helm-values-api
           release: api
           chart_name: orbitspot/orbitspot-microservices
-          chart_version: 3.0.2
+          chart_version: 3.0.31
           sets: |
             --set environment=${{ env.ENV }} \
             --set region=${{ env.CLUSTER_REGION }} \
