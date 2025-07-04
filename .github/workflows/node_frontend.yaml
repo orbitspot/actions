@@ -6,9 +6,6 @@ on:
       module:
         required: true
         type: string
-      grafana_tag:
-        required: true
-        type: string
       version:
         required: true
         type: string
@@ -42,7 +39,7 @@ jobs:
           with:
             repository: 'orbitspot/actions'
             path: code
-            ref: 'v18.10'
+            ref: 'v20.0'
         
         - name: Check required variables
           env:
@@ -250,7 +247,7 @@ jobs:
               uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.0
               with:
                 deployment_name: 'frontend'
-                grafana_tag: ${{ inputs.grafana_tag }}
+                grafana_tag: ${{ inputs.module }}
               env:
                 BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
                 DB_PORT: ${{ vars.DB_PORT }}

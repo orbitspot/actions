@@ -6,9 +6,6 @@ on:
       module:
         required: true
         type: string
-      grafana_tag:
-        required: true
-        type: string
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -34,7 +31,7 @@ jobs:
           with:
             repository: 'orbitspot/actions'
             path: code
-            ref: 'v18.10'
+            ref: 'v20.0'
         
         - name: Check required variables
           env:
@@ -177,10 +174,10 @@ jobs:
             with:
                 repository: 'orbitspot/actions'
                 path: code
-                ref: 'v18.10'
+                ref: 'v20.0'
 
           - name: Authenticate
-            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v18.10
+            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.0
             with:
               aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
               aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -197,7 +194,7 @@ jobs:
             if: ${{ vars.HOST_MF_2 == ''}}
             run: |
               cp actions/helm-values/landingpage/one_host_values.yaml values.yaml
-              sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
+              sed -i 's/<GRAFANA-TAG>/${{ inputs.module }}/g' values.yaml
               sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
               mkdir -p .github/helm/next
               mv values.yaml .github/helm/next/values.yaml
@@ -207,7 +204,7 @@ jobs:
             if: ${{ vars.HOST_MF_2 != ''}}
             run: |
               cp actions/helm-values/landingpage/two_hosts_values.yaml values.yaml 
-              sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
+              sed -i 's/<GRAFANA-TAG>/${{ inputs.module }}/g' values.yaml
               sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
               mkdir -p .github/helm/next
               mv values.yaml .github/helm/next/values.yaml
