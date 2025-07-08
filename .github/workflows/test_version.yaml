@@ -22,46 +22,43 @@ jobs:
           - infra-landingpage-example
 
     steps:
-      - name: Atualizar versão do workflow reusable
+      - name: Update version workflow reusable
         run: |
           repo="${{ matrix.repositorio }}"
           version="${{ github.event.inputs.version }}"
 
-          echo "🔄 Clonando repositório $repo..."
+          echo "Cloning repository $repo..."
           git clone --depth 1 "https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/orbitspot/$repo.git"
           cd "$repo"
 
           file=".github/workflows/push.yaml"
           if [[ -f "$file" ]]; then
-            echo "✏️  Atualizando versão do workflow reusable para @$version"
+            echo "Updating reusable workflow version to @$version"
 
-            # Substitui qualquer valor (ou vazio) após @ no uses: orbitspot/actions/.github/workflows/*.yaml@XYZ
+            # Replace any value (or empty) after @ in uses: orbitspot/actions/.github/workflows/*.yaml@XYZ
             sed -i "s|\(orbitspot/actions/.github/workflows/.*\.yaml\)@\([^'\"]*\)|\1@$version|g" "$file"
 
-            # Configura o autor do commit
+            # Set commit author
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
 
-            # Verifica se houve alteração antes de commitar
+            # Check if there were changes before committing
             if git diff --quiet "$file"; then
-              echo "ℹ️  Nenhuma alteração detectada em $file. Nenhum commit necessário."
+              echo "No changes detected in $file. No commit needed."
             else
               git add "$file"
-              git commit -m "chore: atualiza versão do workflow para @$version"
+              git commit -m "chore: update workflow version to @$version"
               git push origin develop
-              echo "✅ Commit e push realizados com sucesso."
+              echo "Commit and push completed successfully."
             fi
           else
-            echo "⚠️  Arquivo $file não encontrado no repositório $repo"
+            echo "File $file not found in repository $repo"
           fi
 
       - name: Disparar workflow no repositório ${{ matrix.repositorio }}
         run: |
           repo="${{ matrix.repositorio }}"
           branch="develop"  
-
-          echo "🚀 Disparando workflow via API para $repo..."
-
           response=$(curl -s -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
