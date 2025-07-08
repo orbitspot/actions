@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Versão do workflow reusable (ex: v1.0.0)'
+        description: 'Workflow version to update and test (ex: v20.0)'
         required: true
         type: string
 
