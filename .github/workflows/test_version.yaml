@@ -1,14 +1,19 @@
-name: Validar Workflows dos Repositórios
+name: Validate Repository Workflows
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Workflow version to update and test (e.g., v20.0)'
+        required: true
+        type: string
 
 jobs:
-  disparar-e-validar:
+  update-and-trigger:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        repositorio:
+        repository:
           - infra-api-example
           - infra-api-consumer-example
           - infra-scaledjob-example
@@ -17,42 +22,52 @@ jobs:
           - infra-landingpage-example
 
     steps:
-      - name: Disparar workflow no repositório ${{ matrix.repositorio }}
-        id: trigger
+      - name: Update reusable workflow version
         run: |
-          repo="${{ matrix.repositorio }}"
-          branch="develop"
-          
-          # Disparar workflow (push) via GitHub API
-          response=$(curl -s -X POST \
-            -H "Authorization: token ${{ secrets.GIT_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/orbitspot/$repo/actions/workflows/push.yml/dispatches \
-            -d "{\"ref\":\"$branch\"}")
-          
-          echo "Workflow disparado no repositório $repo"
+          repo="${{ matrix.repository }}"
+          version="${{ github.event.inputs.version }}"
+          branch="${{ github.ref_name }}"
 
-      - name: Aguardar conclusão (exemplo básico com delay)
-        run: |
-          echo "Aguardando 600 segundos antes de validar status..."
-          sleep 600
+          echo "Cloning repository $repo on branch $branch..."
+          git clone --depth 1 --branch "$branch" "https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/orbitspot/$repo.git"
+          cd "$repo"
 
-      - name: Validar status do workflow
-        run: |
-          repo="${{ matrix.repositorio }}"
-          run_id=$(curl -s \
-            -H "Authorization: token ${{ secrets.GIT_TOKEN }}" \
-            https://api.github.com/repos/orbitspot/$repo/actions/runs \
-            | jq -r '.workflow_runs[] | select(.head_branch == "develop") | select(.name == "Push") | .id' | head -n 1)
+          file=".github/workflows/push.yaml"
+          if [[ -f "$file" ]]; then
+            echo "Updating reusable workflow version to @$version"
 
-          status=$(curl -s \
-            -H "Authorization: token ${{ secrets.GIT_TOKEN }}" \
-            https://api.github.com/repos/orbitspot/$repo/actions/runs/$run_id \
-            | jq -r '.conclusion')
+            # Replace existing version in 'uses: orbitspot/actions/.github/workflows/*.yaml@<version>'
+            sed -i "s|\(orbitspot/actions/.github/workflows/.*\.yaml\)@\([^'\"]*\)|\1@$version|g" "$file"
 
-          echo "Status do repositório $repo: $status"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [[ "$status" != "success" ]]; then
-            echo "❌ Workflow falhou em $repo"
-            exit 1
+            if git diff --quiet "$file"; then
+              echo "No changes detected in $file. No commit required."
+            else
+              git add "$file"
+              git commit -m "chore: update workflow version to @$version"
+              git push origin "$branch"
+              echo "Changes committed and pushed to branch $branch."
+            fi
+          else
+            echo "File $file not found in repository $repo"
           fi
+
+      - name: Trigger workflow in ${{ matrix.repository }}
+        run: |
+          repo="${{ matrix.repository }}"
+          branch="${{ github.ref_name }}"
+
+          echo "Triggering workflow in $repo on branch $branch..."
+          response=$(curl -s -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GIT_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/orbitspot/$repo/actions/workflows/push.yaml/dispatches \
+            -d "{\"ref\":\"$branch\"}")
+
+          echo "Workflow triggered in repository $repo on branch $branch"
+          echo "API Response:"
+          echo "$response"
