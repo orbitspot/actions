@@ -20,14 +20,14 @@ containers:
 
 keda:
   secrets:
-    name: consumer-<REPOSITORY-NAME>
+    name: consumer-<DEPLOYMENT-NAME>
 
   authentication:
-    name: consumer-<REPOSITORY-NAME>
+    name: consumer-<DEPLOYMENT-NAME>
     spec:
       secretTargetRef:
         - key: rabbitmq_http_host
-          name: consumer-<REPOSITORY-NAME>
+          name: consumer-<DEPLOYMENT-NAME>
           parameter: host
 
   pollingInterval: 30
@@ -39,7 +39,7 @@ keda:
   triggers:
     - type: rabbitmq
       authenticationRef:
-        name: consumer-<REPOSITORY-NAME>
+        name: consumer-<DEPLOYMENT-NAME>
       metadata:
         protocol: amqp
         queueName: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.queue_name}
