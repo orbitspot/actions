@@ -57,6 +57,7 @@ istio:
             hosts:
                 - ${.<REPOSITORY-NAME>.build.istio.ingress.host}
                 - 'api.<REPOSITORY-NAME>.svc.cluster.local'
+                - ${.<REPOSITORY-NAME>.build.istio.ingress.private_host}
             gateways:
                 - 'istio-system/orbit-ingress'
             http:
