@@ -26,7 +26,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: actions
-        ref: 'v20.1'
+        ref: 'beta-private-ingress-v2'
 
     - name: Determinar chart_type
       id: set_chart_type
