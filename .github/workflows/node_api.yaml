@@ -106,7 +106,7 @@ jobs:
         run: bash co_login_commands.txt
 
       - name: Building
-        uses: orbitspot/actions/.github/actions/package_manager_install@v20.1.1
+        uses: orbitspot/actions/.github/actions/package-manager-install@v20.1.1
         with:
           package_manager: '${{ inputs.package_manager }}'
           node_version: '${{ inputs.version }}'

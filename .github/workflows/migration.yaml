@@ -57,7 +57,7 @@ jobs:
           bash co_login_commands.txt
 
       - name: Npm Building
-        uses: orbitspot/actions/.github/actions/npm-ci@v20.1.1
+        uses: orbitspot/actions/.github/actions/package-manager-install@v20.1.1
         with:
           node_version: '20'
 
