@@ -71,7 +71,6 @@ jobs:
 
           # Constrói JSON da matriz em formato compacto
           matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs 'map(select(contains("cronjob")))')
-          echo $matrix
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
         
       - name: Fetch devops variables
@@ -161,7 +160,7 @@ jobs:
     name: Creating Aws Resources
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [generate-docker]
+    needs: [generate-docker, setup-config]
     permissions:
         id-token: write
         contents: read
@@ -223,7 +222,7 @@ jobs:
         with:
             repository: 'orbitspot/actions'
             path: code
-            ref: 'v20.0'
+            ref: 'feat/cronjob'
 
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.0
