@@ -1,0 +1,23 @@
+module: <GRAFANA-TAG>
+
+nodeSelector:
+    nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
+
+csiSecrets:
+    enabled: true
+    serviceAccountName: "application-permission"
+
+scheduler: <SCHEDULER>
+
+service:
+    type: ClusterIP
+
+containers:
+    - name: cronjob-<REPOSITORY-NAME>
+      resources:
+        requests:
+            cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
+            memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
+        limits:
+            cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
+            memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
