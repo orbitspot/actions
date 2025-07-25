@@ -243,7 +243,7 @@ jobs:
 
       - name: Copiar e preparar values.yaml
         run: |
-          cat values.yaml
+          touch values.yaml
           cp actions/helm-values/cronjob/values.yaml values.yaml
           sed -i "s/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g" values.yaml
           sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
