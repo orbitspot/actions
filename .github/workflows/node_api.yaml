@@ -19,6 +19,7 @@ on:
       package_manager:
         description: 'Package manager to use (npm or yarn)'
         required: false
+        type: string
         default: 'npm'
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
