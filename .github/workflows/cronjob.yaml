@@ -70,12 +70,9 @@ jobs:
           scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
 
           # Constrói JSON da matriz em formato compacto
-          matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)
-          echo $matrix
-          matrix=$(echo "$matrix" | jq -c '[.[] | select(. = "cronjob")]')
+          matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -s 'map(select(contains("cronjob")))')
           echo $matrix
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
-          echo $GITHUB_OUTPUT
         
       - name: Fetch devops variables
         id: set-output
