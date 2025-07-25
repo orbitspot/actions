@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   setup-config:
-    name: Generate Matrix of resources 
+    name: Set up pipeline config  
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     outputs:
@@ -58,7 +58,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - id: set-matrix
+      - name: Setup matrix
+        id: set-matrix
         shell: bash
         run: |
           set -e
@@ -70,8 +71,11 @@ jobs:
 
           # Constrói JSON da matriz em formato compacto
           matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)
+          echo $matrix
           matrix=$(echo "$matrix" | jq -c '[.[] | select(. = "cronjob")]')
+          echo $matrix
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
         
       - name: Fetch devops variables
         id: set-output
