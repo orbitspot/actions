@@ -41,7 +41,8 @@ module "default-get" {
 module "default-option" {
   source                      = "../api-gateway-resources"
   depends_on                  = [
-    aws_api_gateway_resource.default
+    aws_api_gateway_resource.default,
+    module.default-get
   ]
   rest_api_id                 = var.api_data.rest_api_id
   http_method                 = "OPTIONS"
