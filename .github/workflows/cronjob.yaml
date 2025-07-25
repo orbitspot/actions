@@ -82,7 +82,8 @@ jobs:
     
   building:
     name: Building
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
+    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     needs: [setup-config]
     permissions:
         id-token: write
@@ -112,7 +113,8 @@ jobs:
 
   generate-docker:
     name: Docker Build
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
+    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [building, setup-config]
     strategy:
@@ -158,7 +160,8 @@ jobs:
 
   create-service-account-role:
     name: Creating Aws Resources
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
+    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [generate-docker, setup-config]
     permissions:
@@ -193,7 +196,8 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
+    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [generate-docker, setup-config]
     strategy:
@@ -243,8 +247,8 @@ jobs:
 
       - name: Copiar e preparar values.yaml
         run: |
-          cat actions/helm-values/cronjob/values.yaml
           cp actions/helm-values/cronjob/values.yaml values.yaml
+          file values.yaml
           sed -i "s/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g" values.yaml
           sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
           sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
@@ -283,7 +287,8 @@ jobs:
 
   helm-cd-consumer:
     name: K8s Deploy ${{ matrix.artifacts }}
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
+    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [prepare-helm-replacements, setup-config]
     strategy:
