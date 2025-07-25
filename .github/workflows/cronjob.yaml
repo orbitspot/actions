@@ -289,7 +289,7 @@ jobs:
     name: K8s Deploy ${{ matrix.artifacts }}
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [prepare-helm-replacements, generate-matrix]
+    needs: [prepare-helm-replacements, setup-config]
     strategy:
       matrix:
         artifacts: ${{fromJson(needs.setup-config.outputs.matrix) }}
