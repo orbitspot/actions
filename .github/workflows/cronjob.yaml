@@ -25,12 +25,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  generate-matrix:
+  setup-config:
     name: Generate Matrix of resources 
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
+      CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
+      ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
+      ENV: '${{ steps.set-output.outputs.ENV }}'
     steps:
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -79,7 +83,7 @@ jobs:
   building:
     name: Building
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-    needs: [generate-matrix]
+    needs: [setup-config]
     permissions:
         id-token: write
         contents: read
@@ -110,10 +114,10 @@ jobs:
     name: Docker Build
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [building, generate-matrix, setup-config]
+    needs: [building, setup-config]
     strategy:
         matrix:
-          artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+          artifacts: ${{ fromJson(needs.setup-config.outputs.matrix) }}
     permissions:
         id-token: write
         contents: read
@@ -191,10 +195,10 @@ jobs:
     name: Building Helm Values
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [generate-docker]
+    needs: [generate-docker, setup-config]
     strategy:
         matrix:
-            artifacts: ${{fromJson(needs.generate-matrix.outputs.matrix) }}
+            artifacts: ${{fromJson(needs.setup-config.outputs.matrix) }}
     permissions:
         id-token: write
         contents: read
@@ -285,10 +289,10 @@ jobs:
     name: K8s Deploy ${{ matrix.artifacts }}
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [prepare-helm-replacements]
+    needs: [prepare-helm-replacements, generate-matrix]
     strategy:
       matrix:
-        artifacts: ${{fromJson(needs.generate-matrix.outputs.matrix) }}
+        artifacts: ${{fromJson(needs.setup-config.outputs.matrix) }}
     permissions:
       id-token: write
       contents: read
