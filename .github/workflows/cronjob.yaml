@@ -243,13 +243,15 @@ jobs:
 
       - name: Copiar e preparar values.yaml
         run: |
-          cp actions/helm-values/cronjob/values.yaml values.yaml
-          sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
+          cd actions/helm-values/cronjob
+          ls -la
+          cp values.yaml values.yaml
+          sed -i "s/<DEPLOYMENT-NAME>/cronjob/g" values.yaml
           sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
           sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
           sed -i "s/<SCHEDULER>/${{ inputs.scheduler }}/g" values.yaml
-          mkdir -p .github/helm/${{ inputs.deployment_name }}
-          mv values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
+          mkdir -p .github/helm/cronjob
+          mv values.yaml .github/helm/cronjob/values.yaml
         shell: bash
   
       - name: Gerar values.properties
@@ -257,11 +259,6 @@ jobs:
           echo "${{ env._PROPERTIES }}" | tr '\r' '\n' > values.properties
           echo "build.istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
           echo "build.istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
-
-          if [[ -n "${{ inputs.BROKER_AMQP }}" ]]; then
-            RABBITMQ_BASE64=$(echo -n "${{ inputs.BROKER_AMQP }}" | base64 -w0)
-            echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
-          fi
         shell: bash
 
       - name: replace-data
