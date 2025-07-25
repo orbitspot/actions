@@ -268,7 +268,7 @@ jobs:
             PREFIX: .${{ github.event.repository.name }}
             PROPERTIES_PATH: ${{github.workspace}}/values.properties
             YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
-        run: python code/.github/scripts/replace-properties.py
+        run: python actions/.github/scripts/replace-properties.py
 
       - name: append-parameters
         run: |
