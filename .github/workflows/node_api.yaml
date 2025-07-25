@@ -62,7 +62,7 @@ jobs:
           PROJECT_ROOT=$(git rev-parse --show-toplevel)
           SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
           scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
-          matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)
+          matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs 'map(select(contains("cronjob") | not))')
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
       - name: Fetch devops variables
