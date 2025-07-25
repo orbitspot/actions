@@ -239,10 +239,11 @@ jobs:
         run: |
           pip install pyyaml
           python actions/.github/scripts/generate-environment-yaml.py
+          cat variables.yaml
 
       - name: Copiar e preparar values.yaml
         run: |
-          cat variables.yaml
+          cat values.yaml
           cp actions/helm-values/cronjob/values.yaml values.yaml
           sed -i "s/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g" values.yaml
           sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
