@@ -39,6 +39,7 @@ runs:
       shell: bash
       run: |
         if [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
+          npm install -g yarn
           echo "Using yarn"
           yarn install --frozen-lockfile
         else
