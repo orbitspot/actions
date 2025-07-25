@@ -110,7 +110,7 @@ jobs:
     name: Docker Build
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [building]
+    needs: [building, generate-matrix, setup-config]
     strategy:
         matrix:
           artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
