@@ -21,53 +21,43 @@ inputs:
     required: false
     default: ''
 
-    
 runs:
   using: composite
   steps:
-  - uses: actions/checkout@v4
-    name: Checkout
-    with:
-      ref: ${{ inputs.git_ref }}
-      fetch-depth: 0
+    - uses: actions/checkout@v4
+      name: Checkout
+      with:
+        ref: ${{ inputs.git_ref }}
+        fetch-depth: 0
 
-  - name: Set up Node.js
-    uses: actions/setup-node@v4
-    with:
-      node-version: ${{ inputs.node_version }}
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
 
-  
-  - name: Install Dependencies
-    shell: bash
-    run: |
-      if [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
-        echo "Using yarn"
-        yarn install --frozen-lockfile
-      else
-        echo "Using npm"
-        if [[ "${{ inputs.install }}" == "true" ]]; then
-          npm install --loglevel verbose
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
+          echo "Using yarn"
+          yarn install --frozen-lockfile
         else
-          npm ci
+          echo "Using npm"
+          if [[ "${{ inputs.install }}" == "true" ]]; then
+            npm install --loglevel verbose
+          else
+            npm ci
+          fi
         fi
-      fi
 
-  - name: Install Yarn (optional)
-    if: ${{ inputs.package_manager == 'yarn' }}
-    shell: bash
-    run: |
-      corepack enable
-      corepack prepare yarn@stable --activate
-      yarn --version
-
-  - name: Build Project
-    shell: bash
-    run: |
-      if [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
-        yarn build
-      else
-        npm run build
-      fi
+    - name: Build Project
+      shell: bash
+      run: |
+        if [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
+          yarn build
+        else
+          npm run build
+        fi
 
     - name: Prune (npm only)
       if: ${{ inputs.package_manager == 'npm' }}
@@ -89,7 +79,8 @@ runs:
       if: ${{ inputs.customized_dockerfile != '' }}
       shell: bash
       run: |
-          mv ${{ inputs.customized_dockerfile }} building/docker
+        mv ${{ inputs.customized_dockerfile }} building/docker
+
     - uses: vimtor/action-zip@v1.2
       with:
         files: deps
@@ -98,6 +89,6 @@ runs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-          name: building
-          path: building
-          retention-days: 1
+        name: building
+        path: building
+        retention-days: 1
