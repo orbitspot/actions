@@ -248,15 +248,10 @@ jobs:
       - name: Copiar e preparar values.yaml
         run: |
           cp actions/helm-values/cronjob/values.yaml values.yaml
-          cat values.yaml
           sed -i "s/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g" values.yaml
-          cat values.yaml
           sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
-          cat values.yaml
           sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
-          cat values.yaml
-          sed -i "s/<SCHEDULER>/${{ inputs.scheduler }}/g" values.yaml
-          cat values.yaml
+          sed -i "s#<SCHEDULER>#${{ inputs.scheduler }}#g" values.yaml
           mkdir -p .github/helm/${{ matrix.artifacts }}
           mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
         shell: bash
