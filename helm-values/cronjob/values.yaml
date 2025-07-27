@@ -7,8 +7,6 @@ csiSecrets:
     enabled: true
     serviceAccountName: "application-permission"
 
-scheduler: <SCHEDULER>
-
 service:
     type: ClusterIP
 
