@@ -46,7 +46,6 @@ jobs:
         with:
           repository: 'orbitspot/actions'
           path: code
-          ref: 'v20.0'
 
       - name: Check required variables
         env:
@@ -82,8 +81,7 @@ jobs:
     
   building:
     name: Building
-    runs-on: ubuntu-latest
-    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     needs: [setup-config]
     permissions:
         id-token: write
@@ -113,8 +111,7 @@ jobs:
 
   generate-docker:
     name: Docker Build
-    runs-on: ubuntu-latest
-    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [building, setup-config]
     strategy:
@@ -160,8 +157,7 @@ jobs:
 
   create-service-account-role:
     name: Creating Aws Resources
-    runs-on: ubuntu-latest
-    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [generate-docker, setup-config]
     permissions:
@@ -196,8 +192,7 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: ubuntu-latest
-    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [generate-docker, setup-config]
     strategy:
@@ -226,7 +221,6 @@ jobs:
         with:
             repository: 'orbitspot/actions'
             path: actions
-            ref: 'feat/cronjob'
 
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.0
@@ -279,8 +273,7 @@ jobs:
 
   helm-cd-consumer:
     name: K8s Deploy ${{ matrix.artifacts }}
-    runs-on: ubuntu-latest
-    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [prepare-helm-replacements, setup-config]
     strategy:
