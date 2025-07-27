@@ -39,6 +39,8 @@ runs:
           echo "chart_type=migration" >> $GITHUB_ENV
         elif [[ "${{ inputs.deployment_name }}" == "api" ]]; then
           echo "chart_type=node_api" >> $GITHUB_ENV
+        elif [[ "${{ inputs.deployment_name }}" == "cronjob" ]]; then
+          echo "chart_type=cronjob" >> $GITHUB_ENV
         else
           echo "chart_type=consumer" >> $GITHUB_ENV
         fi
