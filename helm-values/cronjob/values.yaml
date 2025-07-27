@@ -1,8 +1,7 @@
 module: <GRAFANA-TAG>
 
 nodeSelector:
-    nodegroup-type: tf_ng_commom_app_private_v1_medium
-    # nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
+    nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
 
 csiSecrets:
     enabled: true
@@ -15,14 +14,8 @@ containers:
     - name: cronjob-<REPOSITORY-NAME>
       resources:
         requests:
-            cpu: 100m
-            memory: 128Mi
+            cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
+            memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
         limits:
-            cpu: 200m
-            memory: 256Mi
-        # requests:
-        #     cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
-        #     memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
-        # limits:
-        #     cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
-        #     memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
+            cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
+            memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
