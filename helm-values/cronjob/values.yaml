@@ -1,7 +1,8 @@
 module: <GRAFANA-TAG>
 
 nodeSelector:
-    nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
+    nodegroup-type: tf_ng_commom_app_private_v1_medium
+    # nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
 
 csiSecrets:
     enabled: true
