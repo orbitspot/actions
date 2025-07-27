@@ -26,7 +26,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: actions
-        # ref: ${{ github.ref_name }}
+        ref: feat/cronjob
 
     - name: Determinar chart_type
       id: set_chart_type
