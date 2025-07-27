@@ -245,22 +245,16 @@ jobs:
           python actions/.github/scripts/generate-environment-yaml.py
           cat variables.yaml
 
-      - name: Copiar e preparar values.yaml
-        run: |
-          cp actions/helm-values/cronjob/values.yaml values.yaml
-          sed -i "s/<DEPLOYMENT-NAME>/${{ matrix.artifacts }}/g" values.yaml
-          sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
-          sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
-          mkdir -p .github/helm/${{ matrix.artifacts }}
-          mv values.yaml .github/helm/${{ matrix.artifacts }}/values.yaml
-        shell: bash
-  
-      - name: Gerar values.properties
-        run: |
-          echo "${{ env._PROPERTIES }}" | tr '\r' '\n' > values.properties
-          echo "build.istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
-          echo "build.istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
-        shell: bash
+      - name: Preparar values.yaml
+        id: prepare_helm
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.0
+        with:
+          deployment_name: ${{ matrix.artifacts }}
+          grafana_tag: ${{ inputs.grafana_tag }}
+        env:
+          DB_PORT: ${{ vars.DB_PORT }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          _PROPERTIES: ${{ vars._PROPERTIES }}
 
       - name: replace-data
         env:
