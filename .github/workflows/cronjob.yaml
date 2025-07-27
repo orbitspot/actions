@@ -241,7 +241,7 @@ jobs:
 
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@feat/cronjob
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.2
         with:
           deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
