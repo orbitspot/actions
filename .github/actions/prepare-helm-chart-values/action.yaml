@@ -26,6 +26,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: actions
+        ref: v20.2
 
     - name: Determinar chart_type
       id: set_chart_type
