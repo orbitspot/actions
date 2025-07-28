@@ -14,8 +14,13 @@ containers:
     - name: cronjob-<REPOSITORY-NAME>
       resources:
         requests:
-            cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
-            memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
+            cpu: "100m"
+            memory: "32Mi"
         limits:
-            cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
-            memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
+            cpu: "200m"
+            memory: "128Mi"
+        #     cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
+        #     memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
+        # limits:
+        #     cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
+        #     memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
