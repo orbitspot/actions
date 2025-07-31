@@ -93,9 +93,9 @@ runs:
         PROPERTIES_PATH: values.properties
         YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
       run: |
-        REPLACE_YAML_PATH=""
-        if [[-d "./code/.github/helm/${{ inputs.deployment_name }}/values.yaml" ]]; then
-          REPLACE_YAML_PATH="./code/.github/helm/${{ inputs.deployment_name }}/values.yaml"
+        REPLACE_YAML_PATH="code/.github/helm/${{ inputs.deployment_name }}/values.yaml"
+        if [[ ! -f "$REPLACE_YAML_PATH" ]]; then
+          REPLACE_YAML_PATH=""
         fi
         echo $REPLACE_YAML_PATH
 
