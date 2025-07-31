@@ -22,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: actions
-        ref: 'v20.1.1'
+        ref: 'feat/replace-values'
 
     - name: Determinar chart_type
       id: set_chart_type
