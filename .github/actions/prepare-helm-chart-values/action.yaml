@@ -97,11 +97,9 @@ runs:
         if [[ ! -f "$REPLACE_YAML_PATH" ]]; then
           REPLACE_YAML_PATH=""
         fi
-        echo $REPLACE_YAML_PATH
 
         pip install pyyaml
         python actions/.github/scripts/replace-properties.py
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
-        exit 1
       shell: bash
     
