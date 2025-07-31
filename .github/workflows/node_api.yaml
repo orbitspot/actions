@@ -129,6 +129,8 @@ jobs:
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: us-east-1
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Download Dockerfile from S3
         if: ${{ inputs.dockerfile_path == '' }}
         run: |
