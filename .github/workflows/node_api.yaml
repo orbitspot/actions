@@ -134,6 +134,9 @@ jobs:
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: us-east-1
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Download Dockerfile from S3
         if: ${{ inputs.dockerfile_path == '' }}
         run: |
@@ -142,8 +145,10 @@ jobs:
 
       - name: Copy Dockerfile from original repository
         if: ${{ inputs.dockerfile_path != '' }}
-        run: mv ${{ inputs.dockerfile_path }} Dockerfile
-
+        run: |
+          mv ${{ inputs.dockerfile_path }} Dockerfile
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
+          
       - name: docker-build
         uses: orbitspot/actions/.github/actions/docker@v20.1.1
         with:
