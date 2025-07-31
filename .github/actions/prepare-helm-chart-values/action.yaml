@@ -94,7 +94,7 @@ runs:
         YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
       run: |
         REPLACE_YAML_PATH=""
-        if [-d "./code/.github/helm/${{ inputs.deployment_name }}/values.yaml"]
+        if [-d "./code/.github/helm/${{ inputs.deployment_name }}/values.yaml"]; then
           REPLACE_YAML_PATH="./code/.github/helm/${{ inputs.deployment_name }}/values.yaml"
         fi
         
