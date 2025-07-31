@@ -1,0 +1,95 @@
+name: 'Npm/Yarn CI'
+description: 'Install dependencies and build using npm or yarn'
+
+inputs:
+  node_version:
+    description: 'Node Version'
+    required: true
+  package_manager:
+    description: 'Package manager to use (npm or yarn)'
+    required: false
+    default: 'npm'
+  install:
+    description: 'Use install instead of ci (for npm) or install (for yarn)'
+    required: false
+    default: 'false'
+  customized_dockerfile:
+    description: "Not empty if using the repo's Dockerfile for build"
+    default: ''
+  git_ref:
+    description: 'Git reference (branch, tag or SHA)'
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      name: Checkout
+      with:
+        ref: ${{ inputs.git_ref }}
+        fetch-depth: 0
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
+          npm install -g yarn
+          echo "Using yarn"
+          yarn install --frozen-lockfile
+        else
+          echo "Using npm"
+          if [[ "${{ inputs.install }}" == "true" ]]; then
+            npm install --loglevel verbose
+          else
+            npm ci
+          fi
+        fi
+
+    - name: Build Project
+      shell: bash
+      run: |
+        if [[ "${{ inputs.package_manager }}" == "yarn" ]]; then
+          yarn build
+        else
+          npm run build
+        fi
+
+    - name: Prune (npm only)
+      if: ${{ inputs.package_manager == 'npm' }}
+      shell: bash
+      run: |
+        npm prune --production
+
+    - name: Zip Docker Content
+      shell: bash
+      run: |
+        mkdir -p building
+        mkdir -p deps
+        mv dist building/dist
+        mv package.json building/package.json
+        mv .github/scripts building/scripts
+        mv node_modules deps/node_modules
+
+    - name: Copy Dockerfile
+      if: ${{ inputs.customized_dockerfile != '' }}
+      shell: bash
+      run: |
+        mv ${{ inputs.customized_dockerfile }} building/docker
+
+    - uses: vimtor/action-zip@v1.2
+      with:
+        files: deps
+        dest: building/node_modules.zip
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: building
+        path: building
+        retention-days: 1
