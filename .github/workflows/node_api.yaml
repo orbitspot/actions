@@ -250,7 +250,7 @@ jobs:
 
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.1.1
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@feat/replace-values
         with:
           deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
@@ -260,13 +260,6 @@ jobs:
           DB_HOST: ${{ vars.DB_HOST }}
           _PROPERTIES: ${{ vars._PROPERTIES }}
           OLD_INGRESS_HOST: ${{ vars.OLD_INGRESS_HOST }}
-
-      - name: replace-data
-        env:
-          PREFIX: .${{ github.event.repository.name }}
-          PROPERTIES_PATH: ${{ steps.prepare_helm.outputs.properties_path }}
-          YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
-        run: python code/.github/scripts/replace-properties.py
 
       - name: append-parameters
         run: |
