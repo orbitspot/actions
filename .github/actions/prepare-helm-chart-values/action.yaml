@@ -93,11 +93,17 @@ runs:
         PROPERTIES_PATH: values.properties
         YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
       run: |
+        ls -la
+        cd code/.github
+        ls -la
+        cd ..
+        cd ..
         REPLACE_YAML_PATH=""
         if [-d "./code/.github/helm/${{ inputs.deployment_name }}/values.yaml"]; then
           REPLACE_YAML_PATH="./code/.github/helm/${{ inputs.deployment_name }}/values.yaml"
         fi
-        
+        echo $REPLACE_YAML_PATH
+
         pip install pyyaml
         python actions/.github/scripts/replace-properties.py
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
