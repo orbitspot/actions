@@ -13,10 +13,6 @@ inputs:
   OLD_INGRESS_HOST:
     description: "Está no ingress antigo"
     required: false
-outputs:
-  properties_path:
-    description: "Caminho do arquivo values.properties gerado"
-    value: values.properties
 
 runs:
   using: "composite"
@@ -26,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: actions
-        ref: v20.2.0
+        ref: 'feat/replace-values'
 
     - name: Determinar chart_type
       id: set_chart_type
@@ -80,3 +76,32 @@ runs:
           echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
         fi
       shell: bash
+    
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Checkout script repository
+      uses: actions/checkout@v4
+      with:
+        ref: '${{ inputs.git_ref }}'
+        path: code
+        fetch-depth: 0
+
+    - name: Replace values
+      env:
+        PREFIX: .${{ github.event.repository.name }}
+        PROPERTIES_PATH: values.properties
+        YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
+        REPLACE_YAML_PATH: code/.github/helm/${{ inputs.deployment_name }}/values.yaml
+      run: |
+        if [[ ! -f "$REPLACE_YAML_PATH" ]]; then
+          REPLACE_YAML_PATH=""
+        fi
+
+        pip install pyyaml
+        python actions/.github/scripts/replace-properties.py
+        cat .github/helm/${{ inputs.deployment_name }}/values.yaml
+      shell: bash
+    
