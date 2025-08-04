@@ -250,8 +250,11 @@ jobs:
           DB_HOST: ${{ vars.DB_HOST }}
           _PROPERTIES: ${{ vars._PROPERTIES }}
           OLD_INGRESS_HOST: ${{ vars.OLD_INGRESS_HOST }}
-
-      - name: replace-data
+      - name: list-code-dir
+        run: |
+          echo "Arquivos e pastas dentro de 'code':"
+          ls -R code || echo "A pasta 'code' não existe"
+      - name: replace-datade
         env:
           PREFIX: .${{ github.event.repository.name }}
           PROPERTIES_PATH: ${{ steps.prepare_helm.outputs.properties_path }}
