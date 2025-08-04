@@ -69,12 +69,11 @@ runs:
     - name: Prepare Docker Content
       shell: bash
       run: |
-        mkdir -p building
-        mkdir -p deps
+        mkdir -p building/deps
         mv dist building/dist
         mv package.json building/package.json
         mv .github/scripts building/scripts
-        mv node_modules deps/node_modules
+        mv node_modules building/deps/node_modules
 
     - name: Copy Dockerfile
       if: ${{ inputs.customized_dockerfile != '' }}
