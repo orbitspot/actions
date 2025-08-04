@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Workflow version to update and test (e.g., v20.3.0)'
+        description: 'Workflow version to update and test (e.g., beta-api-scaledjob)'
         required: true
         type: string
 
