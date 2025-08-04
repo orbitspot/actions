@@ -22,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: actions
-        ref: 'chore/split-scripts'
+        ref: 'v20.3.1'
 
     - name: Determinar chart_type
       id: set_chart_type
