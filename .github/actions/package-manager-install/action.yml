@@ -82,10 +82,13 @@ runs:
       run: |
         mv ${{ inputs.customized_dockerfile }} building/docker
 
-    - uses: vimtor/action-zip@v1.2
+    - name: Zip node_modules
+      uses: thedoctor0/zip-release@0.7.1
       with:
-        files: deps
-        dest: building/node_modules.zip
+        type: zip
+        filename: node_modules.zip
+        path: deps
+        directory: building
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
