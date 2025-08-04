@@ -37,7 +37,7 @@ jobs:
             set -e
 
             PROJECT_ROOT=$(git rev-parse --show-toplevel)
-            SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
+            SCRIPT_DIR="$PROJECT_ROOT/.github/scripts/scaledjobs"
 
             scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
 

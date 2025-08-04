@@ -29,34 +29,51 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: configure aws credentials
-    uses: aws-actions/configure-aws-credentials@v4
-    with:
-      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
-      role-session-name: ${{ inputs.aws_role_name }}
-      aws-region: ${{ inputs.aws_region }}
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
+        role-session-name: ${{ inputs.aws_role_name }}
+        aws-region: ${{ inputs.aws_region }}
 
-  - name: Set up Docker Buildx
-    uses: docker/setup-buildx-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-  - name: Login to Amazon ECR
-    id: login-ecr
-    uses: aws-actions/amazon-ecr-login@v2
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
-  - name: Download Building files
-    uses: actions/download-artifact@v4
-    if: ${{ inputs.content != '' }}
-    with:
+    - name: Ensure ECR Repository Exists
+      shell: bash
+      run: |
+        echo "🔹 Verificando se o repositório ECR ${{ inputs.image }} existe..."
+        if ! aws ecr describe-repositories --repository-names "${{ inputs.image }}" >/dev/null 2>&1; then
+          echo "⚠️  Repositório não existe. Criando..."
+          aws ecr create-repository --repository-name "${{ inputs.image }}"
+        else
+          echo "✅ Repositório ECR já existe."
+        fi
+
+    - name: Download Building files
+      uses: actions/download-artifact@v4
+      if: ${{ inputs.content != '' }}
+      with:
         name: ${{ inputs.content }}
 
-  - name: Before Image Building
-    shell: bash
-    if: ${{ inputs.before_building != '' }}
-    run: ${{ inputs.before_building }}
+    - name: Before Image Building
+      shell: bash
+      if: ${{ inputs.before_building != '' }}
+      run: ${{ inputs.before_building }}
 
-  - name: "Building Image ${{ matrix.artifacts }}"
-    shell: bash
-    run: |
-      docker build -t ${{ inputs.image }}:${{ inputs.tag }} ${{ inputs.build_args }} .
-      docker tag ${{ inputs.image }}:${{ inputs.tag }} ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }}:${{ inputs.tag }}
-      docker push ${{ steps.login-ecr.outputs.registry }}/${{ inputs.image }}:${{ inputs.tag }}
+    - name: "Building and Pushing Image"
+      shell: bash
+      run: |
+        IMAGE_NAME=${{ inputs.image }}
+        IMAGE_TAG=${{ inputs.tag }}
+        ECR_URI=${{ steps.login-ecr.outputs.registry }}
+
+        docker build -t $IMAGE_NAME:$IMAGE_TAG ${{ inputs.build_args }} .
+
+        docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_URI/$IMAGE_NAME:$IMAGE_TAG
+
+        docker push $ECR_URI/$IMAGE_NAME:$IMAGE_TAG
