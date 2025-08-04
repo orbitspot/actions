@@ -66,7 +66,7 @@ runs:
       run: |
         npm prune --production
 
-    - name: Zip Docker Content
+    - name: Prepare Docker Content
       shell: bash
       run: |
         mkdir -p building
@@ -81,10 +81,6 @@ runs:
       shell: bash
       run: |
         mv ${{ inputs.customized_dockerfile }} building/docker
-
-    - name: Criar pasta deps e copiar dependências
-      shell: bash
-      run: mkdir -p deps
 
     - name: Zip node_modules
       uses: thedoctor0/zip-release@0.7.1
