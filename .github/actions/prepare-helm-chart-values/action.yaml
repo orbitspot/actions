@@ -13,7 +13,10 @@ inputs:
   OLD_INGRESS_HOST:
     description: "Está no ingress antigo"
     required: false
-
+outputs:
+  properties_path:
+    description: "Caminho do arquivo values.properties gerado"
+    value: values.properties
 runs:
   using: "composite"
   steps:
@@ -104,6 +107,5 @@ runs:
         python actions/.github/scripts/replace-properties.py
         python actions/.github/scripts/replace-values.py
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
-        cat code/.github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
     

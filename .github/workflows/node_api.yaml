@@ -264,15 +264,15 @@ jobs:
       - name: append-parameters
         run: |
           parameters=$(cat variables.yaml)
-          echo "" >> .github/helm/${{ matrix.artifacts }}/values.yaml
+          echo "" >> code/.github/helm/${{ matrix.artifacts }}/values.yaml
           echo "$parameters" >> .github/helm/${{ matrix.artifacts }}/values.yaml
-          cat .github/helm/${{ matrix.artifacts }}/values.yaml
+          cat code/.github/helm/${{ matrix.artifacts }}/values.yaml
 
       - name: upload
         uses: actions/upload-artifact@v4
         with:
           name: helm-values-${{ matrix.artifacts }}
-          path: .github/helm/${{ matrix.artifacts }}/values.yaml
+          path: code/.github/helm/${{ matrix.artifacts }}/values.yaml
           retention-days: 1
 
   helm-cd-api:
