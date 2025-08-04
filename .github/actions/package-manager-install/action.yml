@@ -82,11 +82,15 @@ runs:
       run: |
         mv ${{ inputs.customized_dockerfile }} building/docker
 
+    - name: Criar pasta deps e copiar dependências
+      shell: bash
+      run: mkdir -p deps
+
     - name: Zip node_modules
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: zip
-        filename: node_modules.zip
+        filename: node_modules.zip  
         path: deps
         directory: building
 
