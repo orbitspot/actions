@@ -16,7 +16,11 @@ on:
         required: false
         type: string
         default: ''
-
+      package_manager:
+        description: 'Package manager to use (npm or yarn)'
+        required: false
+        type: string
+        default: 'npm'
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
@@ -102,9 +106,10 @@ jobs:
       - name: Bash Co Login
         run: bash co_login_commands.txt
 
-      - name: Npm Building
+      - name: Building
         uses: orbitspot/actions/.github/actions/package-manager-install@beta-api-scaledjob
         with:
+          package_manager: '${{ inputs.package_manager }}'
           node_version: '${{ inputs.version }}'
           customized_dockerfile: '${{ inputs.dockerfile_path }}'
 
@@ -129,6 +134,9 @@ jobs:
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: us-east-1
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Download Dockerfile from S3
         if: ${{ inputs.dockerfile_path == '' }}
         run: |
@@ -137,8 +145,10 @@ jobs:
 
       - name: Copy Dockerfile from original repository
         if: ${{ inputs.dockerfile_path != '' }}
-        run: mv ${{ inputs.dockerfile_path }} Dockerfile
-
+        run: |
+          mv ${{ inputs.dockerfile_path }} Dockerfile
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
+          
       - name: docker-build
         uses: orbitspot/actions/.github/actions/docker@beta-api-scaledjob
         with:
@@ -251,13 +261,6 @@ jobs:
           _PROPERTIES: ${{ vars._PROPERTIES }}
           OLD_INGRESS_HOST: ${{ vars.OLD_INGRESS_HOST }}
 
-      - name: replace-data
-        env:
-          PREFIX: .${{ github.event.repository.name }}
-          PROPERTIES_PATH: ${{ steps.prepare_helm.outputs.properties_path }}
-          YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
-        run: python code/.github/scripts/replace-properties.py
-
       - name: append-parameters
         run: |
           parameters=$(cat variables.yaml)
@@ -334,14 +337,15 @@ jobs:
             --set 'containers[0].repository.tag=${{ github.sha }}' \
             --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
 
-  helm-cd-scaledjob:
+  helm-cd-consumer:
     name: K8s Deploy ${{ matrix.artifacts }}
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
-    needs: [prepare-helm-replacements]
+    needs: [setup-config, prepare-helm-replacements]
+    if: ${{ needs.setup-config.outputs.consumer-matrix != '[]' }}
     strategy:
       matrix:
-        artifacts: ${{fromJson(needs.generate-matrix.outputs.scaledjob-matrix) }}
+        artifacts: ${{ fromJson(needs.setup-config.outputs.consumer-matrix) }}
     permissions:
       id-token: write
       contents: read
@@ -372,13 +376,10 @@ jobs:
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-${{ matrix.artifacts }}
           release: ${{ matrix.artifacts }}
-          chart_name: orbitspot/orbitspot-job
-          chart_version: 0.1.5
+          chart_name: orbitspot/orbitspot-terraform
+          chart_version: 0.3.5
           sets: |
-                --set environment=${{env.ENV}} \
-                --set region=${{ env.CLUSTER_REGION }} \
-                --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
-                --set 'keda.secrets.data.rabbitmq_http_host=${{ secrets.BROKER_AMQP_SCALED_JOB_BASE64 }}' \
-                --set 'containers[0].repository.tag=${{ github.sha }}' \
-                --set 'containers[0].environments.SERVICE_TYPE=${{ matrix.artifacts }}'
-          
+            --set environment=${{ env.ENV }} \
+            --set region=${{ env.CLUSTER_REGION }} \
+            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.tag=${{ github.sha }}'
