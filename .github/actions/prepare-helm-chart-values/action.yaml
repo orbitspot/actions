@@ -104,5 +104,6 @@ runs:
         python actions/.github/scripts/replace-properties.py
         python actions/.github/scripts/replace-values.py
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
+        cat code/.github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
     
