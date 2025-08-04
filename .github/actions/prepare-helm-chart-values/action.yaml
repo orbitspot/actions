@@ -102,6 +102,7 @@ runs:
 
         pip install pyyaml
         python actions/.github/scripts/replace-properties.py
+        python actions/.github/scripts/replace-values.py
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
     
