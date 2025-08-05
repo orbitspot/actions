@@ -4,6 +4,7 @@ import yaml
 yaml_path = os.getenv('YAML_PATH')
 replace_properties_yaml_path = os.getenv('REPLACE_YAML_PATH')
 
+print("Running replace-values.py")
 print(f"Yaml: {yaml_path}")
 print(f"Yaml Replace: {replace_properties_yaml_path}")
 
