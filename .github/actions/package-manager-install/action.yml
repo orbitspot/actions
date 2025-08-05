@@ -66,30 +66,26 @@ runs:
       run: |
         npm prune --production
 
-    - name: Zip Docker Content
+    - name: Prepare Docker Content
       shell: bash
       run: |
-        mkdir -p building
-        mkdir -p deps
+        mkdir -p building/deps
         mv dist building/dist
         mv package.json building/package.json
         mv .github/scripts building/scripts
-        mv node_modules deps/node_modules
-
+        mv node_modules building/deps/node_modules
     - name: Copy Dockerfile
       if: ${{ inputs.customized_dockerfile != '' }}
       shell: bash
       run: |
         mv ${{ inputs.customized_dockerfile }} building/docker
-
-    - uses: vimtor/action-zip@v1.2
+    - name: Zip node_modules
+      uses: thedoctor0/zip-release@0.7.1
       with:
-        files: deps
-        dest: building/node_modules.zip
+        type: zip
+        filename: node_modules.zip  
+        path: deps
+        directory: building
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
-      with:
-        name: building
-        path: building
-        retention-days: 1
