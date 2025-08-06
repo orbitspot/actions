@@ -150,7 +150,7 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
           
       - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@beta-api-scaledjob
+        uses: orbitspot/actions/.github/actions/docker@v20.0
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}

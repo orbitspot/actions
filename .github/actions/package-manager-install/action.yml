@@ -79,13 +79,14 @@ runs:
       shell: bash
       run: |
         mv ${{ inputs.customized_dockerfile }} building/docker
+
     - name: Zip node_modules
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: zip
-        filename: node_modules.zip       # nome final igual ao primeiro
-        directory: building              # onde o arquivo .zip será gerado
-        path: ./                     # importante: manter o ./ para zipar a pasta inteira
+        filename: node_modules.zip  
+        path: deps
+        directory: building
         
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
