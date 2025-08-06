@@ -80,7 +80,6 @@ runs:
         cd ../building
         rm -r node_modules
         ls -la
-        exit 1 
 
     - name: Copy Dockerfile
       if: ${{ inputs.customized_dockerfile != '' }}
