@@ -76,7 +76,11 @@ runs:
         mv .github/scripts building/scripts
         mv node_modules deps/node_modules
         cd deps
-        zip -r ../building/node_modules.zip . 
+        zip -r ../building/node_modules.zip .
+        cd ../building
+        rm -r node_modules
+        ls -la
+        exit 1 
 
     - name: Copy Dockerfile
       if: ${{ inputs.customized_dockerfile != '' }}
