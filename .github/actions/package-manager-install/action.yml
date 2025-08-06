@@ -85,7 +85,7 @@ runs:
       with:
         type: zip
         filename: node_modules.zip  
-        path: deps
+        path: deps/*
         directory: building
         
     - name: Upload Artifacts
