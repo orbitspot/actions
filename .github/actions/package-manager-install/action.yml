@@ -74,15 +74,19 @@ runs:
         mv dist building/dist
         mv package.json building/package.json
         mv .github/scripts building/scripts
-        mv node_modules deps/node_modules
-        cd deps
-        zip -r ../building/node_modules.zip . 
+        mv node_modules building/node_modules   # <- mover direto para raiz
 
     - name: Copy Dockerfile
       if: ${{ inputs.customized_dockerfile != '' }}
       shell: bash
       run: |
         mv ${{ inputs.customized_dockerfile }} building/docker
+        
+    - name: Zip node_modules
+      shell: bash
+      run: |
+        cd building
+        zip -r node_modules.zip node_modules
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
