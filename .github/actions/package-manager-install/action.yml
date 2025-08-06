@@ -70,7 +70,6 @@ runs:
       shell: bash
       run: |
         mkdir -p building
-        mkdir -p deps
         mv dist building/dist
         mv package.json building/package.json
         mv .github/scripts building/scripts
@@ -92,6 +91,6 @@ runs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: building-${{ github.sha }}
+        name: building
         path: building
         retention-days: 1

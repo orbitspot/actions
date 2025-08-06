@@ -47,7 +47,7 @@ runs:
     uses: actions/download-artifact@v4
     if: ${{ inputs.content != '' }}
     with:
-        name: building-${{ github.sha }}
+        name: ${{ inputs.content }}
   
   - name: Before Image Building
     shell: bash
