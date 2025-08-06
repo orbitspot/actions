@@ -85,7 +85,7 @@ runs:
         type: zip
         filename: node_modules.zip       # nome final igual ao primeiro
         directory: building              # onde o arquivo .zip será gerado
-        path: ./deps                     # importante: manter o ./ para zipar a pasta inteira
+        path: ./                     # importante: manter o ./ para zipar a pasta inteira
         
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
