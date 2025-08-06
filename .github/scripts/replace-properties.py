@@ -2,7 +2,7 @@ import re
 import os
 
 def replace_properties_in_yaml(properties_path, yaml_path, prefix):
-    print("Running replace-properties.py")
+    print("Running replace-values.py")
     # Carregar o arquivo properties em um dicionário
     properties = {}
     with open(properties_path, 'r') as prop_file:
