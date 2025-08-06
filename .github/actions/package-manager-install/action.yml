@@ -66,14 +66,15 @@ runs:
       run: |
         npm prune --production
 
-    - name: Prepare Docker Content
+    - name: Zip Docker Content
       shell: bash
       run: |
         mkdir -p building
+        mkdir -p deps
         mv dist building/dist
         mv package.json building/package.json
         mv .github/scripts building/scripts
-        mv node_modules building/node_modules   # <- diretório correto na raiz
+        mv node_modules deps/node_modules
 
     - name: Copy Dockerfile
       if: ${{ inputs.customized_dockerfile != '' }}
@@ -81,10 +82,10 @@ runs:
       run: |
         mv ${{ inputs.customized_dockerfile }} building/docker
 
-    - name: Zip node_modules
-      shell: bash
-      working-directory: building
-      run: zip -r node_modules.zip node_modules
+    - uses: vimtor/action-zip@v1.2
+      with:
+        files: deps
+        dest: building/node_modules.zip
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
