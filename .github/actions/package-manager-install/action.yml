@@ -74,7 +74,7 @@ runs:
         mv dist building/dist
         mv package.json building/package.json
         mv .github/scripts building/scripts
-        mv node_modules building/node_modules   # <- mover direto para raiz
+        mv node_modules building/node_modules
 
     - name: Copy Dockerfile
       if: ${{ inputs.customized_dockerfile != '' }}
