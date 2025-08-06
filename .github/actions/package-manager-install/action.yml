@@ -69,12 +69,12 @@ runs:
     - name: Prepare Docker Content
       shell: bash
       run: |
-        mkdir -p building/deps
+        mkdir -p building
         mv dist building/dist
         mv package.json building/package.json
         mv .github/scripts building/scripts
-        mv node_modules building/node_modules
-        
+        mv node_modules building/node_modules   # <- diretório correto na raiz
+
     - name: Copy Dockerfile
       if: ${{ inputs.customized_dockerfile != '' }}
       shell: bash
@@ -82,13 +82,10 @@ runs:
         mv ${{ inputs.customized_dockerfile }} building/docker
 
     - name: Zip node_modules
-      uses: thedoctor0/zip-release@0.7.1
-      with:
-        type: zip
-        filename: node_modules.zip  
-        path: deps/*
-        directory: building
-        
+      shell: bash
+      working-directory: building
+      run: zip -r node_modules.zip node_modules
+
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
