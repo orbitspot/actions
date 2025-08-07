@@ -48,7 +48,7 @@ jobs:
         with:
           repository: 'orbitspot/actions'
           path: code
-          ref: 'v20.3.0'
+          ref: 'beta-api-scaledjob'
 
       - name: Check required variables
         env:
@@ -74,7 +74,7 @@ jobs:
 
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.3.0
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@beta-api-scaledjob
         with:
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
           branch: '${{ github.ref_name }}'
@@ -85,14 +85,14 @@ jobs:
 
   building:
     name: Building
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     needs: [setup-config]
     permissions:
       id-token: write
       contents: read
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.3.0
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@beta-api-scaledjob
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -107,7 +107,7 @@ jobs:
         run: bash co_login_commands.txt
 
       - name: Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v20.3.0
+        uses: orbitspot/actions/.github/actions/package-manager-install@beta-api-scaledjob
         with:
           package_manager: '${{ inputs.package_manager }}'
           node_version: '${{ inputs.version }}'
@@ -115,7 +115,7 @@ jobs:
 
   generate-docker:
     name: Docker Build
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     needs: [setup-config, building]
     strategy:
@@ -128,7 +128,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.3.0
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@beta-api-scaledjob
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -150,7 +150,7 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
           
       - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@v20.3.0
+        uses: orbitspot/actions/.github/actions/docker@beta-api-scaledjob
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -165,7 +165,7 @@ jobs:
 
   create-service-account-role:
     name: Creating Aws Resources
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     needs: [setup-config, generate-docker]
     permissions:
@@ -177,7 +177,7 @@ jobs:
       ENV: '${{ needs.setup-config.outputs.ENV }}'
     steps:
       - name: create-role
-        uses: orbitspot/actions/.github/actions/create-role-service-account@v20.3.0
+        uses: orbitspot/actions/.github/actions/create-role-service-account@beta-api-scaledjob
         with:
           role: '${{ github.event.repository.name }}-${{ env.ENV }}'
           namespace: ${{ github.event.repository.name }}
@@ -188,7 +188,7 @@ jobs:
           policy: ${{ vars._POLICY_JSON }}
 
       - name: create-namespace
-        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.3.0
+        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@beta-api-scaledjob
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -200,7 +200,7 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     needs: [setup-config, generate-docker]
     strategy:
@@ -229,10 +229,10 @@ jobs:
         with:
           repository: 'orbitspot/actions'
           path: code
-          ref: 'v20.3.0'
+          ref: 'beta-api-scaledjob'
 
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.3.0
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@beta-api-scaledjob
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -250,7 +250,7 @@ jobs:
 
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.3.0
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@beta-api-scaledjob
         with:
           deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
@@ -277,7 +277,7 @@ jobs:
 
   helm-cd-api:
     name: K8s Deploy api
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     needs: [setup-config, prepare-helm-replacements]
     permissions:
@@ -295,7 +295,7 @@ jobs:
           fetch-depth: 0
 
       - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.3.0
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@beta-api-scaledjob
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -304,7 +304,7 @@ jobs:
 
       - name: helm-apply (sem ingress antigo)
         if: ${{ vars.OLD_INGRESS_HOST == '' }}
-        uses: orbitspot/actions/.github/actions/helm-deploy@v20.3.0
+        uses: orbitspot/actions/.github/actions/helm-deploy@beta-api-scaledjob
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_region: ${{ env.CLUSTER_REGION }}
@@ -321,7 +321,7 @@ jobs:
 
       - name: helm-apply (com OLD_INGRESS_HOST)
         if: ${{ vars.OLD_INGRESS_HOST != '' }}
-        uses: orbitspot/actions/.github/actions/helm-deploy@v20.3.0
+        uses: orbitspot/actions/.github/actions/helm-deploy@beta-api-scaledjob
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_region: ${{ env.CLUSTER_REGION }}
@@ -338,48 +338,50 @@ jobs:
             --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
 
   helm-cd-consumer:
-    name: K8s Deploy ${{ matrix.artifacts }}
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-    environment: ${{ github.ref_name }}
-    needs: [setup-config, prepare-helm-replacements]
-    if: ${{ needs.setup-config.outputs.consumer-matrix != '[]' }}
-    strategy:
-      matrix:
-        artifacts: ${{ fromJson(needs.setup-config.outputs.consumer-matrix) }}
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-      CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
-      ENV: '${{ needs.setup-config.outputs.ENV }}'
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout
-        with:
-          ref: ${{ inputs.git_ref }}
-          fetch-depth: 0
+        name: K8s Deploy ${{ matrix.artifacts }}
+        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        environment: ${{ github.ref_name }}
+        needs: [setup-config, prepare-helm-replacements]
+        strategy:
+          matrix:
+            artifacts: ${{fromJson(needs.setup-config.outputs.consumer-matrix) }}
+        permissions:
+          id-token: write
+          contents: read
+        env:
+          CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+          CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
+          ENV: '${{ needs.setup-config.outputs.ENV }}'
+        steps:
+          - uses: actions/checkout@v4
+            name: Checkout
+            with:
+              ref: ${{ inputs.git_ref }}
+              fetch-depth: 0
 
-      - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.3.0
-        with:
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-          aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-          aws_region: ${{ env.CLUSTER_REGION }}
-          cluster_name: ${{ env.CLUSTER_NAME }}
+          - name: configure
+            uses: orbitspot/actions/.github/actions/kubernetes-auth@beta-api-scaledjob
+            with:
+              aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+              aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+              aws_region: ${{ env.CLUSTER_REGION }}
+              cluster_name: ${{ env.CLUSTER_NAME }}
 
-      - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v20.3.0
-        with:
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-          aws_region: ${{ env.CLUSTER_REGION }}
-          namespace: ${{ github.event.repository.name }}
-          helm_values: helm-values-${{ matrix.artifacts }}
-          release: ${{ matrix.artifacts }}
-          chart_name: orbitspot/orbitspot-terraform
-          chart_version: 0.3.5
-          sets: |
-            --set environment=${{ env.ENV }} \
-            --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
-            --set 'containers[0].repository.tag=${{ github.sha }}'
+          - name: helm-apply
+            uses: orbitspot/actions/.github/actions/helm-deploy@beta-api-scaledjob
+            with:
+              aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+              aws_region: ${{ env.CLUSTER_REGION }}
+              namespace: ${{ github.event.repository.name }}
+              helm_values: helm-values-${{ matrix.artifacts }}
+              release: ${{ matrix.artifacts }}
+              chart_name: orbitspot/orbitspot-job
+              chart_version: 0.1.5
+              sets: |
+                    --set environment=${{env.ENV}} \
+                    --set region=${{ env.CLUSTER_REGION }} \
+                    --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
+                    --set 'keda.secrets.data.rabbitmq_http_host=${{ secrets.BROKER_AMQP_SCALED_JOB_BASE64 }}' \
+                    --set 'containers[0].repository.tag=${{ github.sha }}' \
+                    --set 'containers[0].environments.SERVICE_TYPE=${{ matrix.artifacts }}'
+          
