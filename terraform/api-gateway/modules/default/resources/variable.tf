@@ -1,9 +1,8 @@
 variable "api_data" {
   type = object({
-    parent_id                = string
-    rest_api_id              = string
-    custom_authorizer        = string
-    custom_authorizer_oauth2 = string
+    parent_id         = string
+    rest_api_id       = string
+    custom_authorizer = string
   })
 }
 
