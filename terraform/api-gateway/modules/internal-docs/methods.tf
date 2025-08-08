@@ -1,7 +1,7 @@
 module "get" {
   source = "../api-gateway-resources"
   depends_on = [
-    aws_api_gateway_resource.default
+    aws_api_gateway_resource.internal_docs
   ]
   rest_api_id = var.api_data.rest_api_id
   http_method = "GET"
