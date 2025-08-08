@@ -39,6 +39,6 @@ output "second_api" {
 #   value = module.api-gateway-first
 # }
 
-output "module" {
-  value = module.api-gateway-oauth2-second
-}
+# output "module" {
+#   value = module.api-gateway-oauth2-second
+# }
