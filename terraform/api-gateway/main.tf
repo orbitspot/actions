@@ -29,7 +29,7 @@ locals {
 module "api-gateway-oauth2-second" {
   source = "./modules/default"
   api_data = {
-    parent_id         = "h0ebgzn072"
+    parent_id         = "gqh1ab"
     rest_api_id       = "d4c33alv35"
     custom_authorizer = "dhz1f6"
   }
