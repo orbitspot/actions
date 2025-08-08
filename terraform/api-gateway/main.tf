@@ -1,6 +1,6 @@
 locals {
   api_data = {
-    for index, obj in local.current_api_gateway : index.rest_api_id => obj
+    for index, obj in local.current_api_gateway : obj.rest_api_id => obj
   }
 }
 
