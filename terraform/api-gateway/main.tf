@@ -45,9 +45,9 @@ module "api-gateway" {
   for_each = local.current_api_gateway
   source   = "./modules/default"
   api_data = {
-    parent_id         = each.parent_id
-    rest_api_id       = each.rest_api_id
-    custom_authorizer = each.custom_authorizer
+    parent_id         = each.value["parent_id"]
+    rest_api_id       = each.value["rest_api_id"]
+    custom_authorizer = each.value["custom_authorizer"]
   }
   load_balancer         = local.uri
   path                  = local.api_gateway_resource
