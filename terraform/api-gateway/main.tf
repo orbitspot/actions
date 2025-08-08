@@ -4,28 +4,6 @@ locals {
   }
 }
 
-# module "api-gateway-first" {
-#   source                = "./modules/default"
-#   api_data              = local.current_api_gateway[0]
-#   load_balancer         = local.uri
-#   path                  = local.api_gateway_resource
-#   istio_enabled         = var.istio_enabled
-#   docs                  = var.docs
-#   resource_name         = var.resource_name
-#   apply_response_script = var.apply_response_script
-# }
-
-# module "api-gateway-second" {
-#   source                = "./modules/default"
-#   api_data              = local.current_api_gateway[1]
-#   load_balancer         = local.uri
-#   path                  = local.api_gateway_resource
-#   istio_enabled         = var.istio_enabled
-#   docs                  = var.docs
-#   resource_name         = var.resource_name
-#   apply_response_script = var.apply_response_script
-# }
-
 # module "api-gateway-oauth2-second" {
 #   source = "./modules/default"
 #   api_data = {
@@ -41,7 +19,7 @@ locals {
 #   apply_response_script = var.apply_response_script
 # }
 
-module "api-gateway" {
+module "api_gateway" {
   for_each = local.api_data
   source   = "./modules/default"
   api_data = {
@@ -49,10 +27,25 @@ module "api-gateway" {
     rest_api_id       = each.value["rest_api_id"]
     custom_authorizer = each.value["custom_authorizer"]
   }
+  # api_data              = each.value
   load_balancer         = local.uri
   path                  = local.api_gateway_resource
   istio_enabled         = var.istio_enabled
   docs                  = var.docs
   resource_name         = var.resource_name
   apply_response_script = var.apply_response_script
+}
+
+module "internal_docs" {
+  for_each = local.api_data
+  source   = "./modules/internal-docs"
+  # api_data = {
+  #   parent_id         = each.value["parent_id"]
+  #   rest_api_id       = each.value["rest_api_id"]
+  #   custom_authorizer = each.value["custom_authorizer"]
+  # }
+  api_data      = each.value
+  load_balancer = local.uri
+  path          = local.api_gateway_resource
+  docs          = var.docs
 }
