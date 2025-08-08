@@ -42,9 +42,13 @@ locals {
 # }
 
 module "api-gateway" {
-  for_each              = local.current_api_gateway
-  source                = "./modules/default"
-  api_data              = each
+  for_each = local.current_api_gateway
+  source   = "./modules/default"
+  api_data = {
+    parent_id         = each.parent_id
+    rest_api_id       = each.rest_api_id
+    custom_authorizer = each.custom_authorizer
+  }
   load_balancer         = local.uri
   path                  = local.api_gateway_resource
   istio_enabled         = var.istio_enabled
