@@ -29,7 +29,8 @@ concurrency:
 jobs:
   create-api-gateway:
     name: Create
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
+    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     permissions:
       id-token: write
       contents: read
@@ -45,7 +46,7 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Start
-        uses: orbitspot/actions/.github/actions/api-gateway@v20.4.0
+        uses: orbitspot/actions/.github/actions/api-gateway@feat/oauth
         env:
           TF_VAR_branch: '${{ github.ref_name }}'
           TF_VAR_api_gateway: '${{ vars.API_GATEWAY }}'
@@ -55,4 +56,4 @@ jobs:
           TF_VAR_istio_enabled: '${{ inputs.istio_enabled }}'
           TF_VAR_resource_name: '${{ inputs.resource_name }}'
         with:
-          tag: 'v20.4.0'
+          tag: 'feat/oauth'
