@@ -8,7 +8,7 @@ variable "repository_name" {
 
 variable "hosts" {
   type = object({
-    master = string
+    master  = string
     homolog = string
     develop = string
   })
@@ -17,47 +17,50 @@ variable "hosts" {
 variable "api_gateway" {
   type = object({
     master = list(object({
-      parent_id = string
-      rest_api_id = string
-      custom_authorizer = string
-      region = string
+      parent_id                = string
+      rest_api_id              = string
+      custom_authorizer        = string
+      custom_authorizer_oauth2 = string
+      region                   = string
     }))
     homolog = list(object({
-      parent_id = string
-      rest_api_id = string
-      custom_authorizer = string
-      region = string
+      parent_id                = string
+      rest_api_id              = string
+      custom_authorizer        = string
+      custom_authorizer_oauth2 = string
+      region                   = string
     }))
     develop = list(object({
-      parent_id = string
-      rest_api_id = string
-      custom_authorizer = string
-      region = string
+      parent_id                = string
+      rest_api_id              = string
+      custom_authorizer        = string
+      custom_authorizer_oauth2 = string
+      region                   = string
     }))
   })
 }
 
 variable "ssl" {
-  type = bool
+  type    = bool
   default = true
 }
 
 variable "istio_enabled" {
-  type = bool
+  type    = bool
   default = true
 }
 
 variable "docs" {
-  type = string
+  type    = string
   default = "api-json"
 }
 
 variable "resource_name" {
-  type = string
+  type    = string
   default = null
 }
 
 variable "apply_response_script" {
-  type = bool
+  type    = bool
   default = true
 }
