@@ -1,8 +1,8 @@
-# locals {
-#   api_data = {
-#     for k, v in local.current_api_gateway : k => v
-#   }
-# }
+locals {
+  api_data = {
+    for k, v in local.current_api_gateway : k => v
+  }
+}
 
 # module "api-gateway-first" {
 #   source                = "./modules/default"
@@ -28,11 +28,11 @@
 
 module "api-gateway-oauth2-second" {
   source = "./modules/default"
-  api_data = object({
+  api_data = {
     parent_id         = "h0ebgzn072"
     rest_api_id       = "d4c33alv35"
     custom_authorizer = "dhz1f6"
-  })
+  }
   load_balancer         = local.uri
   path                  = local.api_gateway_resource
   istio_enabled         = var.istio_enabled
