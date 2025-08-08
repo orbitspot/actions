@@ -42,7 +42,7 @@ locals {
 # }
 
 module "api-gateway" {
-  for_each = local.current_api_gateway
+  for_each = local.api_data
   source   = "./modules/default"
   api_data = {
     parent_id         = each.value["parent_id"]
