@@ -22,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: actions
-        ref: 'v20.4.0'
+        ref: 'beta-fix-empty-secret'
 
     - name: Determinar chart_type
       id: set_chart_type
