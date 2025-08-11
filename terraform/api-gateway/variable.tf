@@ -99,11 +99,7 @@ variable "api_gateway_oauth2" {
         region: "us-east-1"
     },
      ],
-     homolog = [ {
-       
-     } ],
-     master = [ {
-       
-     } ]
+     homolog = [ ],
+     master = [ ]
   }
 }
