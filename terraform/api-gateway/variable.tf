@@ -98,6 +98,12 @@ variable "api_gateway_oauth2" {
         custom_authorizer: "rive7o",
         region: "us-east-1"
     },
-     ]
+     ],
+     homolog = [ {
+       
+     } ],
+     master = [ {
+       
+     } ]
   }
 }
