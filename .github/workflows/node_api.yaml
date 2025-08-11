@@ -339,6 +339,7 @@ jobs:
 
   helm-cd-consumer:
         name: K8s Deploy ${{ matrix.artifacts }}
+        if: ${{ needs.setup-config.outputs.consumer-matrix != '[]' }}
         runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, prepare-helm-replacements]
