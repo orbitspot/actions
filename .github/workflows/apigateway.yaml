@@ -29,8 +29,7 @@ concurrency:
 jobs:
   create-api-gateway:
     name: Create
-    runs-on: ubuntu-latest
-    # runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     permissions:
       id-token: write
       contents: read
