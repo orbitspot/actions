@@ -85,7 +85,7 @@ jobs:
 
   building:
     name: Building
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     needs: [setup-config]
     permissions:
       id-token: write
@@ -115,7 +115,7 @@ jobs:
 
   generate-docker:
     name: Docker Build
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [setup-config, building]
     strategy:
@@ -165,7 +165,7 @@ jobs:
 
   create-service-account-role:
     name: Creating Aws Resources
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [setup-config, generate-docker]
     permissions:
@@ -200,7 +200,7 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [setup-config, generate-docker]
     strategy:
@@ -277,7 +277,7 @@ jobs:
 
   helm-cd-api:
     name: K8s Deploy api
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [setup-config, prepare-helm-replacements]
     permissions:
