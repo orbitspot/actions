@@ -68,6 +68,8 @@ locals {
         "integration.request.header.useremail"              = "context.authorizer.userEmail"
         "integration.request.header.username"               = "context.authorizer.userName"
         "integration.request.header.authBranches"           = "context.authorizer.authBranches"
+        "integration.request.header.app-name"               = "context.authorizer.appName"
+        "integration.request.header.app-id"                 = "context.authorizer.appId"
         "integration.request.path.proxy"                    = "method.request.path.proxy"
       }
       request_templates = {

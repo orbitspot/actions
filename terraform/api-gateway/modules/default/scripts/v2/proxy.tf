@@ -1,81 +1,81 @@
 module "proxy-get" {
   source               = "../../../api-gateway-resources"
   rest_api_id          = var.rest_api_id
-  http_method                 = "GET"
-  method = local.proxy.method
-  integration                 = merge(local.proxy.integration, {integration_http_method = "GET"})
-  integration_response        = local.proxy.integration_response
-  method_response             = local.proxy.method_response
+  http_method          = "GET"
+  method               = local.proxy.method
+  integration          = merge(local.proxy.integration, { integration_http_method = "GET" })
+  integration_response = local.proxy.integration_response
+  method_response      = local.proxy.method_response
   resource_id          = var.resource_id
 }
 
 module "proxy-post" {
   source               = "../../../api-gateway-resources"
   rest_api_id          = var.rest_api_id
-  http_method                 = "POST"
-  method = local.proxy.method
-  integration = merge(local.proxy.integration, {integration_http_method = "POST"})
+  http_method          = "POST"
+  method               = local.proxy.method
+  integration          = merge(local.proxy.integration, { integration_http_method = "POST" })
   integration_response = local.proxy.integration_response
-  method_response = local.proxy.method_response
+  method_response      = local.proxy.method_response
   resource_id          = var.resource_id
 }
 
 module "proxy-put" {
   source               = "../../../api-gateway-resources"
   rest_api_id          = var.rest_api_id
-  http_method                 = "PUT"
-  method = local.proxy.method
-  integration = merge(local.proxy.integration, {integration_http_method = "PUT"})
+  http_method          = "PUT"
+  method               = local.proxy.method
+  integration          = merge(local.proxy.integration, { integration_http_method = "PUT" })
   integration_response = local.proxy.integration_response
-  method_response = local.proxy.method_response
+  method_response      = local.proxy.method_response
   resource_id          = var.resource_id
 }
 
 module "proxy-patch" {
   source               = "../../../api-gateway-resources"
   rest_api_id          = var.rest_api_id
-  http_method                 = "PATCH"
-  method = local.proxy.method
-  integration = merge(local.proxy.integration, {integration_http_method = "PATCH"})
+  http_method          = "PATCH"
+  method               = local.proxy.method
+  integration          = merge(local.proxy.integration, { integration_http_method = "PATCH" })
   integration_response = local.proxy.integration_response
-  method_response = local.proxy.method_response
+  method_response      = local.proxy.method_response
   resource_id          = var.resource_id
 }
 
 module "proxy-delete" {
   source               = "../../../api-gateway-resources"
   rest_api_id          = var.rest_api_id
-  http_method                 = "DELETE"
-  method = local.proxy.method
-  integration = merge(local.proxy.integration, {integration_http_method = "DELETE"})
+  http_method          = "DELETE"
+  method               = local.proxy.method
+  integration          = merge(local.proxy.integration, { integration_http_method = "DELETE" })
   integration_response = local.proxy.integration_response
-  method_response = local.proxy.method_response
+  method_response      = local.proxy.method_response
   resource_id          = var.resource_id
 }
 
 module "proxy-option" {
-  source               = "../../../api-gateway-resources"
-  rest_api_id          = var.rest_api_id
-  http_method                 = "OPTIONS"
+  source      = "../../../api-gateway-resources"
+  rest_api_id = var.rest_api_id
+  http_method = "OPTIONS"
   method = {
-    authorization  = "NONE"
-    authorizer_id   = ""
+    authorization                   = "NONE"
+    authorizer_id                   = ""
     request_method_api_key_required = false
-    request_parameters = {}
+    request_parameters              = {}
   }
   integration = {
-    uri = ""
-    type = "MOCK"
+    uri                     = ""
+    type                    = "MOCK"
     integration_http_method = "OPTIONS"
-    request_parameters = {}
+    request_parameters      = {}
     request_templates = {
       "application/json" = "{ statusCode: 200 }"
     }
   }
   integration_response = {
     integration_response_status_code = "200"
-    status_code = {"200" : ""}
-    response_templates = {}
+    status_code                      = { "200" : "" }
+    response_templates               = {}
     response_parameters = {
       "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token,token,X-Requested-With,Cache-Control,accesstoken,clienttenantid'",
       "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
@@ -83,13 +83,13 @@ module "proxy-option" {
     }
   }
   method_response = {
-    status_code = {"200" : ""}
+    status_code     = { "200" : "" }
     response_models = {}
     response_parameters = {
       "method.response.header.Access-Control-Allow-Headers" = true,
       "method.response.header.Access-Control-Allow-Methods" = true,
-      "method.response.header.Access-Control-Allow-Origin" = true
+      "method.response.header.Access-Control-Allow-Origin"  = true
     }
   }
-  resource_id          = var.resource_id
+  resource_id = var.resource_id
 }
