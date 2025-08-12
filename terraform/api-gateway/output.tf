@@ -26,15 +26,3 @@ output "uri" {
 output "path" {
   value = local.api_gateway_resource
 }
-
-output "first_api" {
-  value = local.api_data[0]
-}
-
-output "second_api" {
-  value = local.api_data[1]
-}
-
-output "module" {
-  value = module.api-gateway-first
-}
