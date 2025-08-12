@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.4.0
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.4.1
         with:
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
           branch: '${{ github.ref_name }}'
@@ -41,7 +41,7 @@ jobs:
       contents: read
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.4.0
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.4.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -57,7 +57,7 @@ jobs:
           bash co_login_commands.txt
 
       - name: Npm Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v20.4.0
+        uses: orbitspot/actions/.github/actions/package-manager-install@v20.4.1
         with:
           node_version: '20'
 
@@ -79,7 +79,7 @@ jobs:
           fetch-depth: 0
 
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.4.0
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.4.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -91,7 +91,7 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/migration.sh migration.sh
 
       - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@v20.4.0
+        uses: orbitspot/actions/.github/actions/docker@v20.4.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -131,7 +131,7 @@ jobs:
           path: code
       
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.4.0
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.4.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -149,7 +149,7 @@ jobs:
 
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.4.0
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.4.1
         with:
           deployment_name: 'migration'
           grafana_tag: ${{ inputs.grafana_tag }}
@@ -201,7 +201,7 @@ jobs:
           fetch-depth: 0
 
       - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.4.0
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.4.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -209,7 +209,7 @@ jobs:
           cluster_name: '${{ env.CLUSTER_NAME }}'
 
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v20.4.0
+        uses: orbitspot/actions/.github/actions/helm-deploy@v20.4.1
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_region: '${{ env.CLUSTER_REGION }}'

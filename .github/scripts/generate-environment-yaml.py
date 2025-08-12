@@ -20,10 +20,12 @@ def generate_yaml():
     if len(secrets[key]) > 0 and key not in devops_variables and not key.startswith("_"):
       result_secrets.append({"context": "ssmparameter", "name": f'/{repository_name}/secret/{key}'}) 
 
+  
   with open(f"variables.yaml", "w") as outfile:
     yaml.dump(result_environments, outfile, default_flow_style=False)
 
-  with open(f"variables.yaml", "a") as outfile:
-    yaml.dump(result_secrets, outfile, default_flow_style=False)
+  if result_secrets:
+    with open(f"variables.yaml", "a") as outfile:
+      yaml.dump(result_secrets, outfile, default_flow_style=False)
 
 generate_yaml()
