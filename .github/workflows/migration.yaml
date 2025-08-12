@@ -159,13 +159,6 @@ jobs:
           DB_HOST: ${{ vars.DB_HOST }}
           _PROPERTIES: ${{ vars._PROPERTIES }}
 
-      - name: replace-data
-        env:
-          PREFIX: '.${{ github.event.repository.name }}'
-          PROPERTIES_PATH: ${{ steps.prepare_helm.outputs.properties_path }}
-          YAML_PATH: .github/helm/migration/values.yaml
-        run: python code/.github/scripts/replace-properties.py
-
       - name: append-parameters
         run: |
             parameters=$(cat variables.yaml)
