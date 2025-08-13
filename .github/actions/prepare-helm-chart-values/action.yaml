@@ -22,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: actions
-        ref: 'chore/node-group-front'
+        ref: 'v20.4.1'
 
     - name: Determinar chart_type
       id: set_chart_type

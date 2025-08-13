@@ -149,7 +149,7 @@ jobs:
 
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@chore/node-group-front
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.4.1
         with:
           deployment_name: 'migration'
           grafana_tag: ${{ inputs.grafana_tag }}
