@@ -101,6 +101,7 @@ jobs:
           tag: '${{ github.sha }}'
           build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
           before_building: |
+            sudo apt install unzip
             echo "${{ inputs.run_command }}" >> migration.sh
             cat migration.sh
 
