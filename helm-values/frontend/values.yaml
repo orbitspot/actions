@@ -1,4 +1,7 @@
 module: <GRAFANA-TAG>
+
+nodeSelector:
+  nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
  
 ingress:
   annotations:
