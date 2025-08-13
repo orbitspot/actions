@@ -87,7 +87,7 @@ jobs:
 
       - name: Download Files from S3
         run: |
-          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/test/Dockerfile Dockerfile
+          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/Dockerfile Dockerfile
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/migration.sh migration.sh
 
       - name: docker-build
