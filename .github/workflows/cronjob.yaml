@@ -241,7 +241,7 @@ jobs:
 
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.4.1
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@chore/node-group-front
         with:
           deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
