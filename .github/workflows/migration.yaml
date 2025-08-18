@@ -25,6 +25,11 @@ jobs:
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
     steps:
+      - name: Clean up machine
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h
+
       - name: Fetch devops variables
         id: set-output
         uses: orbitspot/actions/.github/actions/fetch-devops-variables@separando-properties
@@ -34,7 +39,7 @@ jobs:
 
   building:
     name: Building
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     needs: [setup-config]
     permissions:
       id-token: write
@@ -63,7 +68,7 @@ jobs:
 
   generate-docker:
     name: Docker Build Migration
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     needs: [setup-config, building]
     environment: '${{ github.ref_name }}'
     permissions:
@@ -72,6 +77,11 @@ jobs:
     env:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
     steps:
+      - name: Clean up machine
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h
+
       - uses: actions/checkout@v4
         name: Checkout
         with:
@@ -106,7 +116,7 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     environment: '${{ github.ref_name }}'
     needs: [generate-docker]
     permissions:
@@ -183,7 +193,7 @@ jobs:
 
   helm-CD-migration:
     name: K8s Deploy Migration
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     environment: '${{ github.ref_name }}'
     needs: [setup-config, prepare-helm-replacements]
     permissions:

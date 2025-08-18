@@ -36,6 +36,11 @@ jobs:
       ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
     steps:
+      - name: Clean up machine
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -81,7 +86,7 @@ jobs:
     
   building:
     name: Building
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     needs: [setup-config]
     permissions:
         id-token: write
@@ -111,7 +116,7 @@ jobs:
 
   generate-docker:
     name: Docker Build
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [building, setup-config]
     strategy:
@@ -157,7 +162,7 @@ jobs:
 
   create-service-account-role:
     name: Creating Aws Resources
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [generate-docker, setup-config]
     permissions:
@@ -192,7 +197,7 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [generate-docker, setup-config]
     strategy:
@@ -205,6 +210,11 @@ jobs:
       ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
     steps:
+      - name: Clean up machine
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h
+
       - uses: actions/checkout@v4
         name: Checkout
         with:
@@ -273,7 +283,7 @@ jobs:
 
   helm-cd-cronjob:
     name: K8s Deploy ${{ matrix.artifacts }}
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [prepare-helm-replacements, setup-config]
     strategy:

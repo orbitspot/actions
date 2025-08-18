@@ -32,6 +32,11 @@ jobs:
         ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
+        - name: Clean up machine
+          run: |
+            rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+            df -h
+
         - name: Setup Python
           uses: actions/setup-python@v5
           with:
@@ -60,7 +65,7 @@ jobs:
 
     building:
         name: Building
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config]
         permissions:
@@ -146,7 +151,7 @@ jobs:
 
     generate-docker:
         name: Docker Build
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
@@ -184,7 +189,7 @@ jobs:
 
     create-service-account-role:
         name: Creating Aws Resources
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [setup-config, building]
         permissions:
@@ -219,7 +224,7 @@ jobs:
 
     helm-deploy:
         name: K8s Deploy
-        runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+        runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
         needs: [ setup-config, create-service-account-role, generate-docker ]
         permissions:

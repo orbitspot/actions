@@ -29,11 +29,16 @@ concurrency:
 jobs:
   create-api-gateway:
     name: Create
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     permissions:
       id-token: write
       contents: read
     steps:
+      - name: Clean up machine
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
