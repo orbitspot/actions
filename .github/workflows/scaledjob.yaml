@@ -25,6 +25,7 @@ jobs:
     generate-matrix:
       name: Generate Matrix of resources 
       runs-on: ubuntu-latest
+      environment: ${{ github.ref_name }}
       outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
       steps:
