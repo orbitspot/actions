@@ -1,7 +1,7 @@
 module: <GRAFANA-TAG>
 
 nodeSelector:
-    nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
+    nodegroup-type: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.node_selector}
 
 csiSecrets:
     enabled: true
@@ -11,8 +11,8 @@ keda:
     scale:
         spec:
             cooldownPeriod: 300
-            maxReplicaCount: ${.<REPOSITORY-NAME>.build.service.keda.maxReplicaCount}
-            minReplicaCount: ${.<REPOSITORY-NAME>.build.service.keda.minReplicaCount}
+            maxReplicaCount: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
+            minReplicaCount: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.minReplicaCount}
             scaleTargetRef:
                 name: api
             triggers:
@@ -26,36 +26,36 @@ istio:
     egress:
         serviceEntries:
             - ports:
-                  - number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
+                  - number: ${.<REPOSITORY-NAME>.istio.egress.databases.default.port}
                     name: tcp
                     protocol: TCP
               hosts:
-                  - ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.host}
+                  - ${.<REPOSITORY-NAME>.istio.egress.databases.default.host}
         virtualService:
             hosts:
-                - ${.<REPOSITORY-NAME>.build.istio.ingress.host}
+                - ${.<REPOSITORY-NAME>.istio.ingress.host}
             gateways:
                 - 'istio-system/orbit-egress'
             tcp:
                 - match:
                       - gateways:
                         - 'istio-system/orbit-egress'
-                        port: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
+                        port: ${.<REPOSITORY-NAME>.istio.egress.databases.default.port}
                   route:
                       - destination:
                             host: istio-egressgateway.istio-system.svc.cluster.local
                             subset: postgres
                             port:
-                                number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
+                                number: ${.<REPOSITORY-NAME>.istio.egress.databases.default.port}
                       - destination:
-                            host: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.host}
+                            host: ${.<REPOSITORY-NAME>.istio.egress.databases.default.host}
                             port:
-                                number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
+                                number: ${.<REPOSITORY-NAME>.istio.egress.databases.default.port}
                         weight: 100
     ingress:
         virtualService:
             hosts:
-                - ${.<REPOSITORY-NAME>.build.istio.ingress.host}
+                - ${.<REPOSITORY-NAME>.istio.ingress.host}
                 - 'api.<REPOSITORY-NAME>.svc.cluster.local'
             gateways:
                 - 'istio-system/orbit-ingress'
@@ -85,11 +85,11 @@ containers:
             protocol: TCP
       resources:
           requests:
-              cpu: ${.<REPOSITORY-NAME>.build.api.resources.requests.cpu}
-              memory: ${.<REPOSITORY-NAME>.build.api.resources.requests.memory}
+              cpu: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.requests.cpu}
+              memory: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.requests.memory}
           limits:
-              cpu: ${.<REPOSITORY-NAME>.build.api.resources.limits.cpu}
-              memory: ${.<REPOSITORY-NAME>.build.api.resources.limits.memory}
+              cpu: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.cpu}
+              memory: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.memory}
       livenessProbe:
           httpGet:
               path: /health

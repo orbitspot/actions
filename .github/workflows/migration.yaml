@@ -157,7 +157,7 @@ jobs:
           BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
           DB_PORT: ${{ vars.DB_PORT }}
           DB_HOST: ${{ vars.DB_HOST }}
-          _PROPERTIES: ${{ vars._PROPERTIES }}
+          PROPERTIES: ${{ vars._PROPERTIES_MIGRATION }}
 
       - name: replace-data
         env:

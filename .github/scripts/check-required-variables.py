@@ -14,7 +14,7 @@ except json.JSONDecodeError:
 required=[]
 match setup:
     case 'api':
-        required=['_PROPERTIES','_POLICY_JSON']
+        required=['_PROPERTIES_API','_POLICY_JSON']
     case 'frontend':
         required=['HOST_MF']
     case 'landingpage':

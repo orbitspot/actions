@@ -238,7 +238,7 @@ jobs:
                 BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
                 DB_PORT: ${{ vars.DB_PORT }}
                 DB_HOST: ${{ vars.DB_HOST }}
-                _PROPERTIES: ${{ vars._PROPERTIES }}
+                PROPERTIES: ${{ vars._PROPERTIES_SCALEDJOB }}
 
             - name: replace-data
               env:
@@ -261,7 +261,7 @@ jobs:
                   path: .github/helm/${{ matrix.artifacts }}/values.yaml
                   retention-days: 1
 
-    helm-cd-consumer:
+    helm-cd-scaledjob:
       name: K8s Deploy ${{ matrix.artifacts }}
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
