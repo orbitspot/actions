@@ -232,16 +232,6 @@ jobs:
                 aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
                 aws_region: us-east-1
 
-            - name: Generate Yaml from Parameters 
-              env:
-                environments: ${{ toJson(vars) }}
-                secrets: ${{ toJson(secrets) }}
-                repository_name: ${{ github.event.repository.name }}
-              run: |
-                pip install pyyaml
-                python code/.github/scripts/generate-environment-yaml.py
-                cat variables.yaml
-
             - name: Preparar values.yaml
               id: prepare_helm
               uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@separando-properties
@@ -259,7 +249,17 @@ jobs:
                   PREFIX: .${{ github.event.repository.name }}
                   PROPERTIES_PATH: ${{github.workspace}}/values.properties
                   YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
-              run: ls && cd code && ls && python code/.github/scripts/replace-properties.py
+              run: cd code && ls && python code/.github/scripts/replace-properties.py
+            
+            - name: Generate Yaml from Parameters 
+              env:
+                environments: ${{ toJson(vars) }}
+                secrets: ${{ toJson(secrets) }}
+                repository_name: ${{ github.event.repository.name }}
+              run: |
+                pip install pyyaml
+                python code/.github/scripts/generate-environment-yaml.py
+                cat variables.yaml
 
             - name: append-parameters
               run: |
