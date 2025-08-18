@@ -47,7 +47,10 @@ jobs:
             setup: 'scaledjob'
           run: |
             python code/.github/scripts/check-required-variables.py
-
+        
+        - name: Checkout repository
+          uses: actions/checkout@v4
+          
         - id: set-matrix
           shell: bash
           run: |
