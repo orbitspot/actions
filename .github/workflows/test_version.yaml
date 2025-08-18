@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Workflow version to update and test (e.g., v20.4.1)'
+        description: 'Workflow version to update and test (e.g., separando-properties)'
         required: true
         type: string
 
