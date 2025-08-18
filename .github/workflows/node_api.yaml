@@ -89,12 +89,15 @@ jobs:
         id: properties
         run: |
             united="${{ vars._PROPERTIES_API }}
-            ${{ vars._PROPERTIES_SCALEDJOB }}
-            ${{ vars._PROPERTIES_scaledjob }}"
+            ${{ vars._PROPERTIES_SCALEDJOB }}"
 
             echo "===== MERGED ====="
             echo "$united"
-            echo "properties=$united" >> $GITHUB_OUTPUT
+            {
+              echo "properties<<EOF"
+              echo "$united"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
 
   building:
     name: Building
