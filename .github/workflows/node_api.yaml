@@ -85,7 +85,7 @@ jobs:
         run: |
             united="${{ vars._PROPERTIES_API }}
             ${{ vars._PROPERTIES_SCALEDJOB }}
-            ${{ vars._PROPERTIES_scaledjob }}
+            ${{ vars._PROPERTIES_scaledjob }}"
 
             echo "===== MERGED ====="
             echo "$united"
