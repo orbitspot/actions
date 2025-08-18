@@ -219,17 +219,17 @@ jobs:
                   ref: '${{ inputs.git_ref }}'
                   fetch-depth: 0
 
-            - name: Configurar Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: '3.x'
-
             - name: Checkout script repository
               uses: actions/checkout@v4
               with:
                   repository: 'orbitspot/actions'
                   path: code
                   ref: 'separando-properties'
+
+            - name: Configurar Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.x'
 
             - name: Authenticate
               uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
@@ -265,7 +265,7 @@ jobs:
                   PREFIX: .${{ github.event.repository.name }}
                   PROPERTIES_PATH: ${{github.workspace}}/values.properties
                   YAML_PATH: .github/helm/${{ matrix.artifacts }}/values.yaml
-              run: python code/.github/scripts/replace-properties.py
+              run: ls && cd code && ls && python code/.github/scripts/replace-properties.py
 
             - name: append-parameters
               run: |
