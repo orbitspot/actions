@@ -28,7 +28,7 @@ concurrency:
 jobs:
   setup-config:
     name: Set Up Config
-    runs-on: ubuntu-latest
+    runs-on: ['${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     outputs:
       PROPERTIES: '${{ steps.properties.outputs.properties }}'
@@ -39,6 +39,11 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       scaledjob-matrix: ${{ steps.set-matrix.outputs.scaledjob_matrix }}
     steps:
+      - name: Clean up machine
+        run: |
+          rm -rf /opt/actions-runner/_work/*
+          df -h
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
