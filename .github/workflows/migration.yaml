@@ -116,8 +116,8 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
-    environment: '${{ github.ref_name }}'
+    runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
+    environment: ${{ github.ref_name }}
     needs: [generate-docker]
     permissions:
       id-token: write
@@ -132,14 +132,15 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: '3.x'
 
       - name: Checkout script repository
         uses: actions/checkout@v4
         with:
-          repository: orbitspot/actions
+          repository: 'orbitspot/actions'
           path: code
-      
+          ref: 'separando-properties'
+
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
         with:
@@ -147,7 +148,7 @@ jobs:
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: us-east-1
 
-      - name: Generate Yaml from Parameters 
+      - name: Generate Yaml from Parameters
         env:
           environments: ${{ toJson(vars) }}
           secrets: ${{ toJson(secrets) }}
@@ -169,19 +170,12 @@ jobs:
           DB_HOST: ${{ vars.DB_HOST }}
           PROPERTIES: ${{ vars._PROPERTIES_MIGRATION }}
 
-      - name: replace-data
-        env:
-          PREFIX: '.${{ github.event.repository.name }}'
-          PROPERTIES_PATH: ${{ steps.prepare_helm.outputs.properties_path }}
-          YAML_PATH: .github/helm/migration/values.yaml
-        run: python code/.github/scripts/replace-properties.py
-
       - name: append-parameters
         run: |
-            parameters=$(cat variables.yaml)
-            echo "" >> .github/helm/migration/values.yaml
-            echo "$parameters" >> .github/helm/migration/values.yaml
-            cat .github/helm/migration/values.yaml
+          parameters=$(cat variables.yaml)
+          echo "" >> .github/helm/migration/values.yaml
+          echo "$parameters" >> .github/helm/migration/values.yaml
+          cat .github/helm/migration/values.yaml
 
       - name: upload
         uses: actions/upload-artifact@v4
@@ -189,7 +183,6 @@ jobs:
           name: helm-values-migration
           path: .github/helm/migration/values.yaml
           retention-days: 1
-
 
   helm-CD-migration:
     name: K8s Deploy Migration
