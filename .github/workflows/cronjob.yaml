@@ -51,6 +51,7 @@ jobs:
         with:
           repository: 'orbitspot/actions'
           path: code
+          ref: 'separando-properties'
 
       - name: Check required variables
         env:

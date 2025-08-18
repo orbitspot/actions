@@ -28,8 +28,24 @@ jobs:
       outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
       steps:
-        - name: Checkout
+        - name: Checkout script repository
           uses: actions/checkout@v4
+          with:
+            repository: 'orbitspot/actions'
+            path: code
+            ref: 'separando-properties'
+        
+        - name: Setup Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.x'
+
+        - name: Check required variables
+          env:
+            variables_json: ${{ toJson(vars) }}
+            setup: 'scaledjob'
+          run: |
+            python code/.github/scripts/check-required-variables.py
 
         - id: set-matrix
           shell: bash
@@ -56,18 +72,6 @@ jobs:
         ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
-        - name: Setup Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: '3.x'
-
-        - name: Check required variables
-          env:
-            variables_json: ${{ toJson(vars) }}
-            setup: 'scaledjob'
-          run: |
-            python code/.github/scripts/check-required-variables.py
-
         - name: Fetch devops variables
           id: set-output
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@separando-properties
