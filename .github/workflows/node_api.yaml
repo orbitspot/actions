@@ -41,7 +41,7 @@ jobs:
     steps:
       - name: Clean up machine
         run: |
-          rm -rf /opt/actions-runner/_work/*
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
           df -h
 
       - name: Setup Python
