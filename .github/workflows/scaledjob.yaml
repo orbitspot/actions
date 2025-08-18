@@ -56,6 +56,11 @@ jobs:
         ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
         ENV: '${{ steps.set-output.outputs.ENV }}'
       steps:
+        - name: Setup Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.x'
+
         - name: Check required variables
           env:
             variables_json: ${{ toJson(vars) }}
