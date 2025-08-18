@@ -54,5 +54,6 @@ jobs:
           TF_VAR_docs: '${{ inputs.docs }}'
           TF_VAR_istio_enabled: '${{ inputs.istio_enabled }}'
           TF_VAR_resource_name: '${{ inputs.resource_name }}'
+          TF_VAR_api_gateway_oauth2: '${{ vars.API_GATEWAY }}'
         with:
           tag: 'v20.5.0'
