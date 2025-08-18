@@ -9,8 +9,8 @@ locals {
 }
 
 module "default_routes" {
-  source   = "./modules/default"
-  for_each = local.api_data
+  source                = "./modules/default"
+  for_each              = local.api_data
   api_data              = each.value
   load_balancer         = local.uri
   path                  = local.api_gateway_resource
@@ -19,8 +19,8 @@ module "default_routes" {
 }
 
 module "oauth_routes" {
-  source   = "./modules/default"
-  for_each = local.api_oauth_data
+  source                = "./modules/default"
+  for_each              = local.api_oauth_data
   api_data              = each.value
   load_balancer         = local.uri
   path                  = local.api_gateway_resource
@@ -29,8 +29,8 @@ module "oauth_routes" {
 }
 
 module "internal_docs" {
-  source   = "./modules/internal-docs"
-  for_each = local.api_data
+  source        = "./modules/internal-docs"
+  for_each      = local.api_data
   api_data      = each.value
   load_balancer = local.uri
   path          = local.api_gateway_resource
