@@ -22,11 +22,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-    generate-matrix:
-      name: Generate Matrix of resources 
-      runs-on: ubuntu-latest
+    setup-config:
+      name: Set Up Config
+      runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       outputs:
+        CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
+        CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
+        ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
+        ENV: '${{ steps.set-output.outputs.ENV }}'
         matrix: ${{ steps.set-matrix.outputs.matrix }}
       steps:
         - name: Checkout script repository
@@ -65,17 +69,6 @@ jobs:
             matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs .)
             echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
-    setup-config:
-      name: Set Up Config
-      runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
-      needs: [generate-matrix]
-      environment: ${{ github.ref_name }}
-      outputs:
-        CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
-        CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
-        ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
-        ENV: '${{ steps.set-output.outputs.ENV }}'
-      steps:
         - name: Fetch devops variables
           id: set-output
           uses: orbitspot/actions/.github/actions/fetch-devops-variables@separando-properties
@@ -83,7 +76,7 @@ jobs:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
             branch: '${{ github.ref_name }}'
     
-    building:
+    building: #virar uma action
         name: Building
         runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
         needs: [setup-config]
@@ -117,10 +110,10 @@ jobs:
         name: Docker Build
         runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [setup-config, building, generate-matrix]
+        needs: [setup-config, building]
         strategy:
             matrix:
-              artifacts: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+              artifacts: ${{ fromJson(needs.setup-config.outputs.matrix) }}
         permissions:
             id-token: write
             contents: read
@@ -202,16 +195,17 @@ jobs:
         name: Building Helm Values
         runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
         environment: ${{ github.ref_name }}
-        needs: [setup-config, generate-docker, generate-matrix]
+        needs: [setup-config, generate-docker]
         strategy:
             matrix:
-                artifacts: ${{fromJson(needs.generate-matrix.outputs.matrix) }}
+                artifacts: ${{fromJson(needs.setup-config.outputs.matrix) }}
         permissions:
             id-token: write
             contents: read
         env:
           ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
           ENV: '${{ needs.setup-config.outputs.ENV }}'
+          PROPERTIES: '${{ needs.setup-config.outputs.PROPERTIES }}'
         steps:
             - uses: actions/checkout@v4
               name: Checkout
@@ -285,10 +279,10 @@ jobs:
       name: K8s Deploy ${{ matrix.artifacts }}
       runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
-      needs: [setup-config, prepare-helm-replacements, generate-matrix]
+      needs: [setup-config, prepare-helm-replacements]
       strategy:
         matrix:
-          artifacts: ${{fromJson(needs.generate-matrix.outputs.matrix) }}
+          artifacts: ${{fromJson(needs.setup-config.outputs.matrix) }}
       permissions:
         id-token: write
         contents: read
