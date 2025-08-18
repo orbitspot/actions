@@ -13,6 +13,10 @@ except json.JSONDecodeError:
 
 required=[]
 match setup:
+    case 'scaledjob':
+        required=['_PROPERTIES_SCALEDJOB','_POLICY_JSON']
+    case 'cronjob':
+        required=['_PROPERTIES_CRONJOB','_POLICY_JSON']
     case 'api':
         required=['_PROPERTIES_API','_POLICY_JSON']
     case 'frontend':

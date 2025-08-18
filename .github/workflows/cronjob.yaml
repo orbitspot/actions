@@ -55,7 +55,7 @@ jobs:
       - name: Check required variables
         env:
           variables_json: ${{ toJson(vars) }}
-          setup: 'api'
+          setup: 'cronjob'
         run: |
           python code/.github/scripts/check-required-variables.py
 
