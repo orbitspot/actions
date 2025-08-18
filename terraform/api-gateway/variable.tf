@@ -78,33 +78,4 @@ variable "api_gateway" {
       region      = string
     }))
   })
-  default = {
-    develop = [
-      {
-        default : {
-          parent_id : "h0ebgzn072",
-          custom_authorizer : "wj7i3i",
-        },
-        oauth2 : {
-          parent_id : "gqh1ab",
-          custom_authorizer : "dhz1f6",
-        },
-        rest_api_id : "d4c33alv35",
-        region : "us-east-1"
-      },
-      {
-        default : {
-          parent_id : "hx5807dj99",
-          custom_authorizer : "5mq3cv",
-        },
-        oauth2 : {
-          parent_id : "dc8sdh",
-          custom_authorizer : "rive7o",
-        },
-        rest_api_id : "vvu27u8aga",
-        region : "us-east-1"
-    }],
-    homolog = [],
-    master  = []
-  }
 }
