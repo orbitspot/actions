@@ -35,6 +35,17 @@ runs:
       with:
         node-version: ${{ inputs.node_version }}
 
+    - name: Authenticate
+      uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
+      with:
+        aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+        aws_role_name: ${{ vars.AWS_ROLE_NAME }}
+        aws_region: 'us-east-1'
+
+    - name: Bash Co Login
+      shell: bash
+      run: bash co_login_commands.txt
+
     - name: Install Dependencies
       shell: bash
       run: |

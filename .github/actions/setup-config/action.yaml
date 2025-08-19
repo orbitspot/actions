@@ -1,0 +1,43 @@
+name: 'Generate Docker Image on Ecr'
+description: 'Create and publish docker image'
+inputs:
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+  aws_role_name:
+    description: 'Aws role with polices to deploy'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Clean up machine
+      run: |
+        rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+        df -h
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    
+    - name: Checkout script repository
+      uses: actions/checkout@v4
+      with:
+        repository: 'orbitspot/actions'
+        path: code
+        ref: 'separando-properties'
+    
+    - name: Check required variables
+      env:
+        variables_json: ${{ toJson(vars) }}
+        setup: 'landingpage'
+      run: |
+        python code/.github/scripts/check-required-variables.py
+
+    - name: Fetch devops variables
+      id: set-output
+      uses: orbitspot/actions/.github/actions/fetch-devops-variables@separando-properties
+      with:
+        devops_config: '${{ vars._DEVOPS_CONFIG }}'
+        branch: '${{ github.ref_name }}'

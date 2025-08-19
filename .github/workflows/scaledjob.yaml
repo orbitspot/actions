@@ -76,7 +76,7 @@ jobs:
             devops_config: '${{ vars._DEVOPS_CONFIG }}'
             branch: '${{ github.ref_name }}'
     
-    building: #virar uma action
+    building:
         name: Building
         runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
         needs: [setup-config]
@@ -84,27 +84,11 @@ jobs:
             id-token: write
             contents: read
         steps:
-            - name: Authenticate
-              uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
-              with:
-                  aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-                  aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-                  aws_region: 'us-east-1'
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: '${{ inputs.version }}'
-
-            - name: Bash Co Login
-              run: |
-                  bash co_login_commands.txt
-
-            - name: Npm Building
-              uses: orbitspot/actions/.github/actions/package-manager-install@separando-properties
-              with:
-                  node_version: '${{ inputs.version }}'
-                  customized_dockerfile: '${{ inputs.dockerfile_path  }}'
+          - name: Building
+            uses: orbitspot/actions/.github/actions/package-manager-install@separando-properties
+            with:
+                node_version: '${{ inputs.version }}'
+                customized_dockerfile: '${{ inputs.dockerfile_path  }}'
 
     generate-docker:
         name: Docker Build
