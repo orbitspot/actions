@@ -1,0 +1,56 @@
+name: 'Kubernetes authenticate'
+description: 'Generate kube config file'
+inputs:
+  aws_account_number:
+    description: 'Aws Account number'
+    required: true
+  aws_role_name:
+    description: 'Aws Role'
+    required: true
+  cluster_region:
+    description: 'Aws Region'
+    required: true
+  dockerfile_path:
+    description: 'Dockerfile Path'
+    required: true
+  build_args:
+    description: 'build_args'
+    required: true
+  before_building:
+    description: 'before_building'
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Authenticate
+      uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
+      with:
+        aws_account_number: '${{ inputs.aws_account_number }}'
+        aws_role_name: '${{ inputs.aws_role_name }}'
+        aws_region: '${{ inputs.cluster_region }}'
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Download Dockerfile from S3
+      shell: bash
+      if: ${{ inputs.dockerfile_path == '' }}
+      run: |
+        aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/node/${{ inputs.version }}/Dockerfile Dockerfile
+        aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
+
+    - name: Copy Dockerfile from original repository
+      shell: bash
+      if: ${{ inputs.dockerfile_path != '' }}
+      run: |
+        mv ${{ inputs.dockerfile_path }} Dockerfile
+        aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
+        
+    - name: docker-build
+      uses: orbitspot/actions/.github/actions/docker@separando-properties
+      with:
+        content: 'building'
+        image: '${{ matrix.artifacts }}-${{ github.event.repository.name }}'
+        tag: ${{ github.sha }}
+        build_args: ${{ inputs.build_args }}
+        before_building: ${{ inputs.before_building }}
