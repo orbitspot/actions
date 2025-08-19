@@ -3,7 +3,7 @@ description: 'Generate kube config file'
 inputs:
   dockerfile_path:
     description: 'Dockerfile Path'
-    required: true
+    required: false
   build_args:
     description: 'build_args'
     required: true
