@@ -1,14 +1,6 @@
 name: 'Npm/Yarn CI'
 description: 'Install dependencies and build using npm or yarn'
 inputs:
-  aws_account_number:
-    description: 'Account Number'
-    required: true
-    default: '931670397156'
-  aws_role_name:
-    description: 'Aws role with polices to deploy'
-    required: true
-    default: 'github-actions'
   node_version:
     description: 'Node Version'
     required: true
@@ -45,8 +37,8 @@ runs:
     - name: Authenticate
       uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
       with:
-        aws_account_number: '${{ inputs.AWS_ACCOUNT_NUMBER }}'
-        aws_role_name: '${{ inputs.AWS_ROLE_NAME }}'
+        aws_account_number: '${{ env.AWS_ACCOUNT_NUMBER }}'
+        aws_role_name: '${{ env.AWS_ROLE_NAME }}'
         aws_region: 'us-east-1'
 
     - name: Bash Co Login

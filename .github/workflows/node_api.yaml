@@ -25,6 +25,11 @@ concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
 
+env: # global env
+  AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+  AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
+  AWS_REGION: ${{ vars._AWS_REGION }}
+
 jobs:
   setup-config:
     name: Set Up Config
@@ -87,8 +92,6 @@ jobs:
       - name: Building
         uses: orbitspot/actions/.github/actions/package-manager-install@separando-properties
         with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           node_version: '${{ inputs.version }}'
           customized_dockerfile: '${{ inputs.dockerfile_path  }}'
 
