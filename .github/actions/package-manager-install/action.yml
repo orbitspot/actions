@@ -1,6 +1,5 @@
 name: 'Npm/Yarn CI'
 description: 'Install dependencies and build using npm or yarn'
-
 inputs:
   node_version:
     description: 'Node Version'
