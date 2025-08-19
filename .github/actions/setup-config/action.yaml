@@ -1,11 +1,8 @@
-name: 'Generate Docker Image on Ecr'
-description: 'Create and publish docker image'
+name: 'Setup'
+description: 'Basic config for pipeline run'
 inputs:
-  aws_account_number:
-    description: 'Account Number'
-    required: true
-  aws_role_name:
-    description: 'Aws role with polices to deploy'
+  setup:
+    description: 'api/landingpage/scaledjob/consumer/etc'
     required: true
 
 runs:
@@ -31,7 +28,7 @@ runs:
     - name: Check required variables
       env:
         variables_json: ${{ toJson(vars) }}
-        setup: 'landingpage'
+        setup: '${{ inputs.setup }}'
       run: |
         python code/.github/scripts/check-required-variables.py
 
