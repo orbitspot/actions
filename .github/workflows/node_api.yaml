@@ -107,7 +107,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/generate-docker/action.yaml@separando-properties
+        uses: orbitspot/actions/.github/actions//generate-docker@separando-properties
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -186,13 +186,6 @@ jobs:
           repository: 'orbitspot/actions'
           path: code
           ref: 'separando-properties'
-
-      - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
-        with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-          aws_region: us-east-1
 
       - name: Generate Yaml from Parameters
         env:
