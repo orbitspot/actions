@@ -152,13 +152,6 @@ jobs:
           with:
               python-version: '3.x'
 
-        - name: Checkout script repository
-          uses: actions/checkout@v4
-          with:
-              repository: 'orbitspot/actions'
-              path: orbitspot-actions
-              ref: 'separando-properties'
-
         - name: Authenticate
           uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
 
