@@ -174,8 +174,6 @@ jobs:
       - name: helm-apply
         uses: orbitspot/actions/.github/actions/helm-deploy@separando-properties
         with:
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-          aws_region: ${{ env.CLUSTER_REGION }}
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-${{ matrix.artifacts }}
           release: ${{ matrix.artifacts }}

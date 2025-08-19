@@ -156,9 +156,6 @@ jobs:
         - name: docker-build
           uses: orbitspot/actions/.github/actions/docker@separando-properties
           with:
-              aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
-              aws_role_name: ${{ vars.AWS_ROLE_NAME }}
-              aws_region: ${{ env.CLUSTER_REGION }}
               content: "building"
               image: ${{ github.event.repository.name }}
               tag: ${{ github.sha }}
