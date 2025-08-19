@@ -194,6 +194,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
+      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: helm-apply (sem ingress antigo)
         if: ${{ vars.OLD_INGRESS_HOST == '' }}
@@ -242,6 +243,7 @@ jobs:
           CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
           CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
           ENV: '${{ needs.setup-config.outputs.ENV }}'
+          AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
         steps:
           - name: helm-apply
             uses: orbitspot/actions/.github/actions/helm-deploy@separando-properties
