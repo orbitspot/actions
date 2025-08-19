@@ -56,7 +56,7 @@ runs:
 
     - name: Copiar e preparar values.yaml
       run: |
-        cp actions/helm-values/${{ env.chart_type }}/values.yaml values.yaml
+        cp orbitspot-actions/helm-values/${{ env.chart_type }}/values.yaml values.yaml
         sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
         sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
@@ -67,7 +67,7 @@ runs:
     - name: Copiar e preparar values.yaml (old)
       if: ${{ inputs.OLD_INGRESS_HOST != '' && inputs.deployment_name == 'api' }}
       run: |
-        cp actions/helm-values/api/old_ingress_values.yaml values.yaml
+        cp orbitspot-actions/helm-values/api/old_ingress_values.yaml values.yaml
         sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
         sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
