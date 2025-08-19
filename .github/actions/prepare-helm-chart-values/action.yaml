@@ -7,6 +7,12 @@ inputs:
   grafana_tag:
     description: "Tag do Grafana"
     required: true
+  vars:
+    description: "environment vars"
+    required: true
+  secrets:
+    description: "environment secrets"
+    required: true
   BROKER_AMQP:
     description: "Consumer amqp broker"
     required: false
@@ -106,3 +112,25 @@ runs:
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
     
+    - name: Generate Yaml from Parameters
+      shell: bash
+      if: ${{ ${{ contains('scaledjob,api,cronjob', inputs.deployment_name) }}}}
+      env:
+        environments: ${{ inputs.vars }}
+        secrets: ${{ inputs.secrets }}
+        repository_name: ${{ github.event.repository.name }}
+      run: |
+        pip install pyyaml
+        python code/.github/scripts/generate-environment-yaml.py
+        cat variables.yaml
+        parameters=$(cat variables.yaml)
+        echo "" >> .github/helm/${{ matrix.artifacts }}/values.yaml
+        echo "$parameters" >> .github/helm/${{ matrix.artifacts }}/values.yaml
+        cat .github/helm/${{ matrix.artifacts }}/values.yaml
+
+    - name: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: helm-values-${{ matrix.artifacts }}
+        path: .github/helm/${{ matrix.artifacts }}/values.yaml
+        retention-days: 1
