@@ -13,6 +13,8 @@ except json.JSONDecodeError:
 
 required=[]
 match setup:
+    case 'migration':
+        required=['_PROPERTIES_MIGRATION']
     case 'scaledjob':
         required=['_PROPERTIES_SCALEDJOB','_POLICY_JSON']
     case 'cronjob':
