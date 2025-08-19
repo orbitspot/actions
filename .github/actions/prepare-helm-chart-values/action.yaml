@@ -124,13 +124,13 @@ runs:
         python code/.github/scripts/generate-environment-yaml.py
         cat variables.yaml
         parameters=$(cat variables.yaml)
-        echo "" >> .github/helm/${{ matrix.artifacts }}/values.yaml
-        echo "$parameters" >> .github/helm/${{ matrix.artifacts }}/values.yaml
-        cat .github/helm/${{ matrix.artifacts }}/values.yaml
+        echo "" >> .github/helm/${{ inputs.deployment_name }}/values.yaml
+        echo "$parameters" >> .github/helm/${{ inputs.deployment_name }}/values.yaml
+        cat .github/helm/${{ inputs.deployment_name }}/values.yaml
 
     - name: upload
       uses: actions/upload-artifact@v4
       with:
-        name: helm-values-${{ matrix.artifacts }}
-        path: .github/helm/${{ matrix.artifacts }}/values.yaml
+        name: helm-values-${{ inputs.deployment_name }}
+        path: .github/helm/${{ inputs.deployment_name }}/values.yaml
         retention-days: 1
