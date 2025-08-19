@@ -48,7 +48,7 @@ jobs:
         with:
           repository: 'orbitspot/actions'
           path: code
-          ref: 'v20.4.2'
+          ref: 'v20.5.0'
 
       - name: Check required variables
         env:
@@ -74,7 +74,7 @@ jobs:
 
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.4.2
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.5.0
         with:
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
           branch: '${{ github.ref_name }}'
@@ -92,7 +92,7 @@ jobs:
       contents: read
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.4.2
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.5.0
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -107,7 +107,7 @@ jobs:
         run: bash co_login_commands.txt
 
       - name: Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v20.4.2
+        uses: orbitspot/actions/.github/actions/package-manager-install@v20.5.0
         with:
           package_manager: '${{ inputs.package_manager }}'
           node_version: '${{ inputs.version }}'
@@ -128,7 +128,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.4.2
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.5.0
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -150,7 +150,7 @@ jobs:
           aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
           
       - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@v20.4.2
+        uses: orbitspot/actions/.github/actions/docker@v20.5.0
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -177,7 +177,7 @@ jobs:
       ENV: '${{ needs.setup-config.outputs.ENV }}'
     steps:
       - name: create-role
-        uses: orbitspot/actions/.github/actions/create-role-service-account@v20.4.2
+        uses: orbitspot/actions/.github/actions/create-role-service-account@v20.5.0
         with:
           role: '${{ github.event.repository.name }}-${{ env.ENV }}'
           namespace: ${{ github.event.repository.name }}
@@ -188,7 +188,7 @@ jobs:
           policy: ${{ vars._POLICY_JSON }}
 
       - name: create-namespace
-        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.4.2
+        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.5.0
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -229,10 +229,10 @@ jobs:
         with:
           repository: 'orbitspot/actions'
           path: code
-          ref: 'v20.4.2'
+          ref: 'v20.5.0'
 
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.4.2
+        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.5.0
         with:
           aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
@@ -250,7 +250,7 @@ jobs:
 
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.4.2
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.5.0
         with:
           deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
@@ -295,7 +295,7 @@ jobs:
           fetch-depth: 0
 
       - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.4.2
+        uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.5.0
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -304,7 +304,7 @@ jobs:
 
       - name: helm-apply (sem ingress antigo)
         if: ${{ vars.OLD_INGRESS_HOST == '' }}
-        uses: orbitspot/actions/.github/actions/helm-deploy@v20.4.2
+        uses: orbitspot/actions/.github/actions/helm-deploy@v20.5.0
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_region: ${{ env.CLUSTER_REGION }}
@@ -321,7 +321,7 @@ jobs:
 
       - name: helm-apply (com OLD_INGRESS_HOST)
         if: ${{ vars.OLD_INGRESS_HOST != '' }}
-        uses: orbitspot/actions/.github/actions/helm-deploy@v20.4.2
+        uses: orbitspot/actions/.github/actions/helm-deploy@v20.5.0
         with:
           aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
           aws_region: ${{ env.CLUSTER_REGION }}
@@ -361,7 +361,7 @@ jobs:
               fetch-depth: 0
 
           - name: configure
-            uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.4.2
+            uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.5.0
             with:
               aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
               aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -369,7 +369,7 @@ jobs:
               cluster_name: ${{ env.CLUSTER_NAME }}
 
           - name: helm-apply
-            uses: orbitspot/actions/.github/actions/helm-deploy@v20.4.2
+            uses: orbitspot/actions/.github/actions/helm-deploy@v20.5.0
             with:
               aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
               aws_region: ${{ env.CLUSTER_REGION }}
