@@ -116,8 +116,8 @@ runs:
       shell: bash
       if: ${{ contains('scaledjob,api,cronjob', inputs.deployment_name) }}
       env:
-        vars: ${{ inputs.vars }}
-        secrets: ${{ inputs.secrets }}
+        vars: ${{ env.vars }}
+        secrets: ${{ env.secrets }}
         repository_name: ${{ github.event.repository.name }}
       run: |
         pip install pyyaml
