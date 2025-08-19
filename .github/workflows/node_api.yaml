@@ -6,7 +6,7 @@ on:
       module:
         required: true
         type: string
-      grafana_tag:
+      grafana_tag: # vai desaparecer
         required: true
         type: string
       version:

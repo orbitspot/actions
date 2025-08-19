@@ -22,7 +22,7 @@ runs:
       echo "Cluster: ${{ env.CLUSTER_NAME }}"
 
   - name: configure
-    uses: orbitspot/actions/.github/actions/kubernetes-auth@master
+    uses: orbitspot/actions/.github/actions/kubernetes-auth@separando-properties
     with:
       cluster_name: ${{ env.CLUSTER_NAME }}
 
