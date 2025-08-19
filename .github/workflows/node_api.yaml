@@ -54,7 +54,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        # add ref: 
+        with:
+          ref: ${{ github.ref_name }}
 
       - id: set-matrix
         shell: bash

@@ -1,5 +1,5 @@
-name: 'Kubernetes authenticate'
-description: 'Generate kube config file'
+name: 'Helm deploy'
+description: 'Deploy Helm'
 inputs:
   namespace:
     description: 'Helm namespace'
@@ -22,12 +22,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-      name: Checkout
-      with:
-        ref: ${{ inputs.git_ref }}
-        fetch-depth: 0
-
     - name: configure
       uses: orbitspot/actions/.github/actions/kubernetes-auth@separando-properties
 

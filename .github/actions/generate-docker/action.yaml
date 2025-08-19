@@ -1,5 +1,5 @@
-name: 'Kubernetes authenticate'
-description: 'Generate kube config file'
+name: 'Generate docker'
+description: 'Copy Dockerfile and Build it'
 inputs:
   dockerfile_path:
     description: 'Dockerfile Path'
@@ -19,8 +19,10 @@ runs:
     - name: Authenticate
       uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
 
-    - name: Checkout repository
+    - name: Checkout
       uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.git_ref }}
       
     - name: Download Dockerfile from S3
       shell: bash

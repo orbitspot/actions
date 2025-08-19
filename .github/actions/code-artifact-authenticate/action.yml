@@ -6,7 +6,6 @@ inputs:
     required: false
     default: 'co_login_commands.txt'
 
-
 runs:
   using: composite
   steps:
