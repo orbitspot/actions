@@ -87,6 +87,8 @@ jobs:
       - name: Building
         uses: orbitspot/actions/.github/actions/package-manager-install@separando-properties
         with:
+            aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+            aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
             node_version: '${{ inputs.version }}'
             customized_dockerfile: '${{ inputs.dockerfile_path  }}'
 

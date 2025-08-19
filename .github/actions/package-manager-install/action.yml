@@ -1,6 +1,14 @@
 name: 'Npm/Yarn CI'
 description: 'Install dependencies and build using npm or yarn'
 inputs:
+  aws_account_number:
+    description: 'Account Number'
+    required: true
+    default: '931670397156'
+  aws_role_name:
+    description: 'Aws role with polices to deploy'
+    required: true
+    default: 'github-actions'
   node_version:
     description: 'Node Version'
     required: true
