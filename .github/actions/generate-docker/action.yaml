@@ -19,6 +19,9 @@ inputs:
   before_building:
     description: 'before_building'
     required: true
+  version:
+    description: 'node version'
+    required: true
 runs:
   using: composite
   steps:

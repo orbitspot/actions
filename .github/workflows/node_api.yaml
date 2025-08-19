@@ -113,6 +113,7 @@ jobs:
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           cluster_region: '${{ env.CLUSTER_REGION }}'
           dockerfile_path: ${{ inputs.dockerfile_path }}
+          version: ${{ inputs.version }}
           build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=${{ matrix.artifacts }}'
           before_building: |
             cat base_script.sh scripts/${{ matrix.artifacts }}.sh > ${{ matrix.artifacts }}.sh
