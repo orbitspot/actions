@@ -1,12 +1,6 @@
 name: 'Kubernetes authenticate'
 description: 'Generate kube config file'
 inputs:
-  aws_account_number:
-    description: 'Aws Account number'
-    required: true
-  aws_role_name:
-    description: 'Aws Role'
-    required: true
   cluster_region:
     description: 'Aws Region'
     required: true
@@ -28,8 +22,8 @@ runs:
     - name: Authenticate
       uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
       with:
-        aws_account_number: '${{ inputs.aws_account_number }}'
-        aws_role_name: '${{ inputs.aws_role_name }}'
+        aws_account_number: '${{ env.AWS_ACCOUNT_NUMBER }}'
+        aws_role_name: '${{ env.AWS_ROLE_NAME }}'
         aws_region: '${{ inputs.cluster_region }}'
 
     - name: Checkout repository
