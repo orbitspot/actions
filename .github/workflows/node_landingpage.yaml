@@ -125,7 +125,6 @@ jobs:
             uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@separando-properties
             with:
                 namespace: ${{ github.event.repository.name }}
-                role_arn: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ github.event.repository.name }}-${{ env.ENV }}"
                 service_account_name: "application-permission"
 
   prepare-helm-replacements:
