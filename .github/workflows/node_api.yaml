@@ -21,6 +21,7 @@ on:
         required: false
         type: string
         default: 'npm'
+
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
@@ -142,16 +143,12 @@ jobs:
           role: '${{ github.event.repository.name }}-${{ env.ENV }}'
           namespace: ${{ github.event.repository.name }}
           service_account_name: 'application-permission'
-          aws_region: ${{ vars._AWS_REGION }}
           policy: ${{ vars._POLICY_JSON }}
 
       - name: create-namespace
         uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@separando-properties
         with:
-          aws_region: ${{ env.CLUSTER_REGION }}
-          cluster_name: ${{ env.CLUSTER_NAME }}
           namespace: ${{ github.event.repository.name }}
-          role_arn: 'arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ github.event.repository.name }}-${{ env.ENV }}'
           service_account_name: 'application-permission'
 
   prepare-helm-replacements:

@@ -10,15 +10,6 @@ inputs:
   service_account_name:
     description: 'Service Account name'
     required: true
-  aws_account_number:
-    description: 'Account Number'
-    required: true
-  aws_role_name:
-    description: 'Aws role with polices to deploy'
-    required: true
-  aws_region:
-    description: 'Aws region'
-    required: true
   policy:
     description: 'Policy'
     required: false
@@ -30,7 +21,6 @@ inputs:
 runs:
   using: composite
   steps:
-
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:

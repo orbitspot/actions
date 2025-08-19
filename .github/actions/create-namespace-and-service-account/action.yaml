@@ -1,9 +1,6 @@
 name: 'Create Namespace And Service Account'
 description: 'creating k8s resources'
 inputs:
-  role_arn:
-    description: 'Aws role arn'
-    required: true
   namespace:
     description: 'Application name'
     required: true
@@ -22,12 +19,12 @@ runs:
       echo "AccountNumber: ${{ env.AWS_ACCOUNT_NUMBER }}"
       echo "Region: ${{ env.AWS_REGION }}"
       echo "Role: ${{ env.AWS_ROLE_NAME }}"
-      echo "Cluster: ${{ inputs.cluster_name }}"
+      echo "Cluster: ${{ env.CLUSTER_NAME }}"
 
   - name: configure
     uses: orbitspot/actions/.github/actions/kubernetes-auth@master
     with:
-        cluster_name: ${{ inputs.cluster_name }}
+      cluster_name: ${{ env.CLUSTER_NAME }}
 
   - name: create-namespace
     shell: bash
@@ -37,6 +34,7 @@ runs:
         else
             echo "Namespace ${{ inputs.namespace }} already exists."
         fi
+
   - name: create service account yaml
     shell: bash
     run: |
@@ -45,7 +43,7 @@ runs:
       kind: ServiceAccount
       metadata:
         annotations:
-          eks.amazonaws.com/role-arn: ${{ inputs.role_arn }}
+          eks.amazonaws.com/role-arn: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ github.event.repository.name }}-${{ env.ENV }}
         name: ${{ inputs.service_account_name }}
         namespace: ${{ inputs.namespace }}
       EOT
