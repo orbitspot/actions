@@ -7,9 +7,6 @@ inputs:
   service_account_name:
     description: 'Service Account name'
     required: true
-  cluster_name:
-    description: 'Cluster Name'
-    required: true
 runs:
   using: composite
   steps:
@@ -23,8 +20,6 @@ runs:
 
   - name: configure
     uses: orbitspot/actions/.github/actions/kubernetes-auth@separando-properties
-    with:
-      cluster_name: ${{ env.CLUSTER_NAME }}
 
   - name: create-namespace
     shell: bash

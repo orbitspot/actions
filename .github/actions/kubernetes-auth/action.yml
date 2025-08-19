@@ -65,9 +65,6 @@ runs:
 
   - name: update-k8s-config
     shell: bash
-    env:
-      AWS_REGION: ${{ env.AWS_REGION }}
-      CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
     run: |
       echo "ClusterName: $CLUSTER_NAME"
       echo "Region: $AWS_REGION"
