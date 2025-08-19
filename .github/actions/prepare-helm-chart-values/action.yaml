@@ -92,7 +92,7 @@ runs:
       uses: actions/checkout@v4
       with:
         ref: '${{ inputs.git_ref }}'
-        path: code
+        path: actions
         fetch-depth: 0
 
     - name: Replace values
@@ -100,7 +100,7 @@ runs:
         PREFIX: .${{ github.event.repository.name }}
         PROPERTIES_PATH: values.properties
         YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
-        REPLACE_YAML_PATH: code/.github/helm/${{ inputs.deployment_name }}/values.yaml
+        REPLACE_YAML_PATH: actions/.github/helm/${{ inputs.deployment_name }}/values.yaml
       run: |
         if [[ ! -f "$REPLACE_YAML_PATH" ]]; then
           REPLACE_YAML_PATH=""
@@ -121,7 +121,7 @@ runs:
         repository_name: ${{ github.event.repository.name }}
       run: |
         pip install pyyaml
-        python code/.github/scripts/generate-environment-yaml.py
+        python actions/.github/scripts/generate-environment-yaml.py
         cat variables.yaml
         parameters=$(cat variables.yaml)
         echo "" >> .github/helm/${{ inputs.deployment_name }}/values.yaml
