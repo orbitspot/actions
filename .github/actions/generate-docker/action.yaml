@@ -1,9 +1,6 @@
 name: 'Kubernetes authenticate'
 description: 'Generate kube config file'
 inputs:
-  cluster_region:
-    description: 'Aws Region'
-    required: true
   dockerfile_path:
     description: 'Dockerfile Path'
     required: true
@@ -24,7 +21,7 @@ runs:
       with:
         aws_account_number: '${{ env.AWS_ACCOUNT_NUMBER }}'
         aws_role_name: '${{ env.AWS_ROLE_NAME }}'
-        aws_region: '${{ inputs.cluster_region }}'
+        aws_region: '${{ env.CLUSTER_rEGION }}'
 
     - name: Checkout repository
       uses: actions/checkout@v4

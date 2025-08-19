@@ -13,12 +13,6 @@ inputs:
   chart_version:
     description: 'Chart Version'
     required: true
-  aws_region:
-    description: 'Aws Region'
-    required: true
-  aws_account_number:
-    description: 'Aws Account number'
-    required: true
   sets:
     description: 'Set values'
     required: true
@@ -28,23 +22,31 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: actions/checkout@v4
+      name: Checkout
+      with:
+        ref: ${{ inputs.git_ref }}
+        fetch-depth: 0
 
-  - name: Download Building files
-    uses: actions/download-artifact@v4
-    with:
-        name: ${{ inputs.helm_values }}
+    - name: configure
+      uses: orbitspot/actions/.github/actions/kubernetes-auth@separando-properties
 
-  - name: Check Files
-    shell: bash
-    run: |
-      ls -ltra
+    - name: Download Building files
+      uses: actions/download-artifact@v4
+      with:
+          name: ${{ inputs.helm_values }}
 
-  - name: CheckValues
-    shell: bash
-    run: |
-      cat values.yaml
+    - name: Check Files
+      shell: bash
+      run: |
+        ls -ltra
 
-  - name: Helm Install
-    shell: bash
-    run: |
-      helm upgrade ${{ inputs.release}}  --install --create-namespace --namespace ${{ inputs.namespace}} ${{ inputs.chart_name }} --version ${{ inputs.chart_version }} --set region=${{ inputs.aws_region }} -f values.yaml ${{ inputs.sets }}
+    - name: CheckValues
+      shell: bash
+      run: |
+        cat values.yaml
+
+    - name: Helm Install
+      shell: bash
+      run: |
+        helm upgrade ${{ inputs.release}}  --install --create-namespace --namespace ${{ inputs.namespace}} ${{ inputs.chart_name }} --version ${{ inputs.chart_version }} --set region=${{ env.CLUSTER_REGION }} -f values.yaml ${{ inputs.sets }}

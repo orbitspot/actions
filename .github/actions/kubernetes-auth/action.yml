@@ -5,9 +5,6 @@ inputs:
     description: 'S3 template location'
     required: false
     default: 's3://devops.orbitspot.com/charts/'
-  cluster_name: 
-    description: 'Cluster Name'
-    required: true
 runs:
   using: composite
   steps:
@@ -70,7 +67,7 @@ runs:
     shell: bash
     env:
       AWS_REGION: ${{ env.AWS_REGION }}
-      CLUSTER_NAME: ${{ inputs.cluster_name }}
+      CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
     run: |
       echo "ClusterName: $CLUSTER_NAME"
       echo "Region: $AWS_REGION"
