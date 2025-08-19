@@ -62,7 +62,7 @@ jobs:
     needs: [setup-config, building]
     strategy:
       matrix:
-        artifacts: ${{ fromJson(needs.setup-config.outputs.matrix) }}
+        artifacts: ${{ needs.setup-config.outputs.matrix }}
     permissions:
       id-token: write
       contents: read
@@ -87,7 +87,7 @@ jobs:
     needs: [setup-config, generate-docker]
     strategy:
       matrix:
-        artifacts: ${{ fromJson(needs.setup-config.outputs.matrix) }}
+        artifacts: ${{ needs.setup-config.outputs.matrix }}
     permissions:
       id-token: write
       contents: read
