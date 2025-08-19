@@ -74,7 +74,7 @@ jobs:
         uses: orbitspot/actions/.github/actions/generate-docker@separando-properties
         with:
           dockerfile_path: ${{ inputs.dockerfile_path }}
-          version: ${{ inputs.version }}
+          version: '20'
           build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=${{ matrix.artifacts }}'
           before_building: |
             echo "${{ inputs.run_command }}" >> migration.sh
