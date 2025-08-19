@@ -29,7 +29,6 @@ jobs:
       CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
-      matrix: 'migration'
     steps:
       - name: Set up
         id: set-output
@@ -60,9 +59,6 @@ jobs:
     runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [setup-config, building]
-    strategy:
-      matrix:
-        artifacts: ${{ needs.setup-config.outputs.matrix }}
     permissions:
       id-token: write
       contents: read
@@ -75,7 +71,7 @@ jobs:
         with:
           dockerfile_path: ${{ inputs.dockerfile_path }}
           version: '20'
-          build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=${{ matrix.artifacts }}'
+          build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
           before_building: |
             echo "${{ inputs.run_command }}" >> migration.sh
             cat migration.sh
@@ -85,9 +81,6 @@ jobs:
     runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [setup-config, generate-docker]
-    strategy:
-      matrix:
-        artifacts: ${{ needs.setup-config.outputs.matrix }}
     permissions:
       id-token: write
       contents: read
@@ -100,7 +93,7 @@ jobs:
         id: prepare_helm
         uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@separando-properties
         with:
-          deployment_name: ${{ matrix.artifacts }}
+          deployment_name: migration
           grafana_tag: ${{ inputs.grafana_tag }}
         env:
           BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
@@ -114,9 +107,6 @@ jobs:
     runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     environment: '${{ github.ref_name }}'
     needs: [setup-config, prepare-helm-replacements]
-    strategy:
-      matrix:
-        artifacts: ${{fromJson(needs.setup-config.outputs.scaledjob-matrix) }}
     permissions:
       id-token: write
       contents: read
@@ -129,8 +119,8 @@ jobs:
         uses: orbitspot/actions/.github/actions/helm-deploy@separando-properties
         with:
           namespace: '${{ github.event.repository.name }}'
-          helm_values: helm-values-${{ matrix.artifacts }}
-          release: ${{ matrix.artifacts }}
+          helm_values: helm-values-migration
+          release: migration
           chart_name: orbitspot/orbitspot-terraform
           chart_version: 0.3.5
           sets: |
