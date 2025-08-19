@@ -23,6 +23,12 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v4
+      name: Checkout
+      with:
+        ref: ${{ inputs.git_ref }}
+        fetch-depth: 0
+
     - name: Checkout script repository
       uses: actions/checkout@v4
       with:
@@ -88,12 +94,6 @@ runs:
       with:
         python-version: '3.x'
 
-    - name: Checkout script repository
-      uses: actions/checkout@v4
-      with:
-        ref: '${{ inputs.git_ref }}'
-        path: actions
-        fetch-depth: 0
 
     - name: Replace values
       env:
