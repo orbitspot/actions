@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Fetch devops variables
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.5.0
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.5.1
         with:
           devops_config: ${{ vars._DEVOPS_CONFIG }}
           branch: ${{ github.ref_name }}
@@ -36,7 +36,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-vars
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v20.5.0
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v20.5.1
           with:
             environment_json: ${{ toJson(vars) }}
             file_name: variables
@@ -52,7 +52,7 @@ jobs:
       steps:
         - name: Generate Envs
           id: generate-environments-secrets
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v20.5.0
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v20.5.1
           with:
             environment_json: ${{ toJson(secrets) }}
             file_name: secrets
@@ -79,10 +79,10 @@ jobs:
           terraform_version: "1.5.0"
               
       - name: Start terraform
-        uses: orbitspot/actions/.github/actions/parameter-store@v20.5.0
+        uses: orbitspot/actions/.github/actions/parameter-store@v20.5.1
         with:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
           aws_region: "${{ env.CLUSTER_REGION }}"
-          tag: 'v20.5.0'
+          tag: 'v20.5.1'
 
