@@ -3,7 +3,7 @@ import json
 import os
 
 def generate_yaml():
-  environments = json.loads(os.getenv('environments'))
+  environments = json.loads(os.getenv('vars'))
   secrets = json.loads(os.getenv('secrets'))
   repository_name = os.getenv('repository_name')
 
