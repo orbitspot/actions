@@ -4,6 +4,9 @@ inputs:
   dockerfile_path:
     description: 'Dockerfile Path'
     required: false
+  deployment_name:
+    description: 'Deployment Name'
+    required: true
   build_args:
     description: 'build_args'
     required: true
@@ -42,7 +45,7 @@ runs:
       uses: orbitspot/actions/.github/actions/docker@separando-properties
       with:
         content: 'building'
-        image: '${{ matrix.artifacts }}-${{ github.event.repository.name }}'
+        image: '${{ inputs.deployment_name }}-${{ github.event.repository.name }}'
         tag: ${{ github.sha }}
         build_args: ${{ inputs.build_args }}
         before_building: ${{ inputs.before_building }}

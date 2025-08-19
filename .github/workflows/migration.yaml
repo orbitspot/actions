@@ -69,6 +69,7 @@ jobs:
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/generate-docker@separando-properties
         with:
+          deployment_name: ${{ matrix.artifacts }}
           dockerfile_path: ${{ inputs.dockerfile_path }}
           version: '20'
           build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
