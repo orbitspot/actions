@@ -18,10 +18,6 @@ runs:
   steps:
     - name: Authenticate
       uses: orbitspot/actions/.github/actions/code-artifact-authenticate@separando-properties
-      with:
-        aws_account_number: '${{ env.AWS_ACCOUNT_NUMBER }}'
-        aws_role_name: '${{ env.AWS_ROLE_NAME }}'
-        aws_region: '${{ env.CLUSTER_rEGION }}'
 
     - name: Checkout repository
       uses: actions/checkout@v4
