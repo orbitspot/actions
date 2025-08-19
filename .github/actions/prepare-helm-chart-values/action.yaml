@@ -33,7 +33,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: 'orbitspot/actions'
-        path: actions
+        path: orbitspot-actions
         ref: 'separando-properties'
 
     - name: Determinar chart_type
@@ -94,21 +94,20 @@ runs:
       with:
         python-version: '3.x'
 
-
     - name: Replace values
       env:
         PREFIX: .${{ github.event.repository.name }}
         PROPERTIES_PATH: values.properties
         YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
-        REPLACE_YAML_PATH: actions/.github/helm/${{ inputs.deployment_name }}/values.yaml
+        REPLACE_YAML_PATH: orbitspot-actions/.github/helm/${{ inputs.deployment_name }}/values.yaml
       run: |
         if [[ ! -f "$REPLACE_YAML_PATH" ]]; then
           REPLACE_YAML_PATH=""
         fi
 
         pip install pyyaml
-        python actions/.github/scripts/replace-properties.py
-        python actions/.github/scripts/replace-values.py
+        python orbitspot-actions/.github/scripts/replace-properties.py
+        python orbitspot-actions/.github/scripts/replace-values.py
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
     
@@ -121,7 +120,7 @@ runs:
         repository_name: ${{ github.event.repository.name }}
       run: |
         pip install pyyaml
-        python actions/.github/scripts/generate-environment-yaml.py
+        python orbitspot-actions/.github/scripts/generate-environment-yaml.py
         cat variables.yaml
         parameters=$(cat variables.yaml)
         echo "" >> .github/helm/${{ inputs.deployment_name }}/values.yaml

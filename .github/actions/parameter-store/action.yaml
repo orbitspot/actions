@@ -41,20 +41,20 @@ runs:
     uses: actions/checkout@v4
     with:
         repository: 'orbitspot/actions'
-        path: code
+        path: orbitspot-actions
         ref: '${{ inputs.tag }}'
 
   - name: Download Artifact Variables
     uses: actions/download-artifact@v4
     with:
         name: variables
-        path: code/terraform/parameter-store
+        path: orbitspot-actions/terraform/parameter-store
 
   - name: Download Artifact
     uses: actions/download-artifact@v4
     with:
         name: secrets
-        path: code/terraform/parameter-store
+        path: orbitspot-actions/terraform/parameter-store
   
   - name: Install Terraform
     shell: bash
@@ -72,7 +72,7 @@ runs:
     shell: bash
     run: |
       ls
-      cd code/terraform/parameter-store && ls
+      cd orbitspot-actions/terraform/parameter-store && ls
       terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=parameter-store/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
       
   - name: Terraform Plan
@@ -82,7 +82,7 @@ runs:
       TF_VAR_modulo: ${{ inputs.modulo }}
       TF_VAR_repository: ${{ inputs.repository }}
     run: |
-      cd code/terraform/parameter-store
+      cd orbitspot-actions/terraform/parameter-store
       terraform plan -no-color
 
   - name: Terraform Apply
@@ -92,6 +92,6 @@ runs:
       TF_VAR_modulo: ${{ inputs.modulo }}
       TF_VAR_repository: ${{ inputs.repository }}
     run: |
-      cd code/terraform/parameter-store
+      cd orbitspot-actions/terraform/parameter-store
       terraform apply -auto-approve -no-color
 

@@ -89,7 +89,7 @@ jobs:
             with:
                 repository: 'orbitspot/actions'
                 ref: separando-properties
-                path: code
+                path: orbitspot-actions
 
           - name: Fetch fronted variables
             env:
@@ -98,7 +98,7 @@ jobs:
                 variables_json: ${{ toJson(vars) }}
                 secrets_json: ${{ toJson(secrets) }}
             run: |
-                python code/.github/scripts/generate-environment-frontend.py
+                python orbitspot-actions/.github/scripts/generate-environment-frontend.py
                 cat .env
           
           - name: Install Yarn

@@ -41,7 +41,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: 'orbitspot/actions'
-        path: code
+        path: orbitspot-actions
         ref: 'separando-properties'
     
     - name: Check required variables
@@ -50,7 +50,7 @@ runs:
         variables_json: ${{ inputs.repo_vars }}
         setup: '${{ inputs.setup }}'
       run: |
-        python code/.github/scripts/check-required-variables.py
+        python orbitspot-actions/.github/scripts/check-required-variables.py
 
     - name: Fetch devops variables
       id: set-output
