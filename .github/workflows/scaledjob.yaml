@@ -21,6 +21,10 @@ concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
 
+env: # global env
+  AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
+  AWS_REGION: ${{ vars._AWS_REGION }}
+
 jobs:
   setup-config:
     name: Set Up Config
