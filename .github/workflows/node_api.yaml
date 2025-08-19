@@ -181,7 +181,6 @@ jobs:
           vars: ${{ toJson(vars) }}
           secrets: ${{ toJson(secrets) }}
 
-
   helm-cd-api:
     name: K8s Deploy api
     runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
