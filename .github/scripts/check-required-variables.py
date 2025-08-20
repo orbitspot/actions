@@ -16,7 +16,7 @@ match setup:
     case 'migration':
         required=['_PROPERTIES_MIGRATION']
     case 'scaledjob':
-        required=['_PROPERTIES_SCALEDJOB','_POLICY_JSON', 'BROKER_AMQP_SCALEDJOB_BASE64']
+        required=['_PROPERTIES_SCALEDJOB','_POLICY_JSON']
     case 'cronjob':
         required=['_PROPERTIES_CRONJOB']
     case 'api':

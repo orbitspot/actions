@@ -9,3 +9,7 @@
 - ENV fica disponível para todos os steps/workflow, enquanto o with apenas para a action que aceita o seu input.
 - ENVs de devops e outras que mais de um step precisar, setar à nível de job.
 
+## TODO
+- [ ] helm personalizável
+- [ ] repo_vars => env
+- [ ] verificar secrets tbm no setup-config
