@@ -19,7 +19,7 @@ runs:
       echo "Cluster: ${{ env.CLUSTER_NAME }}"
 
   - name: configure
-    uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.6.1
+    uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.6.0
 
   - name: create-namespace
     shell: bash

@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@v20.6.1
+        uses:  orbitspot/actions/.github/actions/setup-config@v20.6.0
         with:
           setup: 'landingpage'
           repo_vars: '${{ toJson(vars) }}'
@@ -38,7 +38,7 @@ jobs:
 
   building:
       name: Building
-      runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       needs: [setup-config]
       permissions:
@@ -70,7 +70,7 @@ jobs:
             name: Checkout
             with:
                 repository: 'orbitspot/actions'
-                ref: v20.6.1
+                ref: v20.6.0
                 path: orbitspot-actions
 
           - name: Fetch landingpage variables
@@ -84,7 +84,7 @@ jobs:
               cat .env
 
           - name: Generate Build Args
-            uses: orbitspot/actions/.github/actions/generate-build-args@v20.6.1
+            uses: orbitspot/actions/.github/actions/generate-build-args@v20.6.0
             with:
               landingpage_config: '${{ vars._LANDINGPAGE_CONFIG }}'
               branch: '${{ github.ref_name }}'
@@ -94,7 +94,7 @@ jobs:
               aws s3 sync s3://devops.orbitspot.com/build-github-actions/v1/deploy/landingpage .
           
           - name: docker-build
-            uses: orbitspot/actions/.github/actions/docker@v20.6.1
+            uses: orbitspot/actions/.github/actions/docker@v20.6.0
             with:
                 image: ${{ github.event.repository.name }}
                 tag: ${{ github.sha }}
@@ -102,7 +102,7 @@ jobs:
 
   create-service-account-role:
       name: Creating Aws Resources
-      runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       needs: [setup-config, building]
       permissions:
@@ -115,21 +115,21 @@ jobs:
         AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
       steps:
           - name: create-role
-            uses: orbitspot/actions/.github/actions/create-role-service-account@v20.6.1
+            uses: orbitspot/actions/.github/actions/create-role-service-account@v20.6.0
             with:
                 role: "${{ github.event.repository.name }}-${{ env.ENV }}"
                 namespace: ${{ github.event.repository.name }}
                 service_account_name: "application-permission"
 
           - name: create-namespace
-            uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.6.1
+            uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.6.0
             with:
                 namespace: ${{ github.event.repository.name }}
                 service_account_name: "application-permission"
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     needs: [setup-config, building]
     permissions:
@@ -151,14 +151,14 @@ jobs:
               python-version: '3.x'
 
         - name: Authenticate
-          uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.6.1
+          uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.6.0
 
         - name: Checkout script repository
           uses: actions/checkout@v4
           with:
             repository: 'orbitspot/actions'
             path: orbitspot-actions
-            ref: 'v20.6.1'
+            ref: 'v20.6.0'
 
         - name: Copy Helm from S3 - 1 Host
           if: ${{ vars.HOST_MF_2 == ''}}
@@ -201,7 +201,7 @@ jobs:
 
   helm-deploy:
       name: K8s Deploy
-      runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
       needs: [ setup-config, prepare-helm-replacements ]
       permissions:
@@ -215,7 +215,7 @@ jobs:
       steps:
           - name: Helm Apply 1 host
             if: ${{ vars.HOST_MF_2 == ''}}
-            uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.1
+            uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.0
             with:
               namespace: ${{ github.event.repository.name }}
               helm_values: helm-values
@@ -232,7 +232,7 @@ jobs:
                 
           - name: Helm Apply 2 hosts
             if: ${{ vars.HOST_MF_2 != ''}}
-            uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.1
+            uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.0
             with:
               namespace: ${{ github.event.repository.name }}
               helm_values: helm-values
