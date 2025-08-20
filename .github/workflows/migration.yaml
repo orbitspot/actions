@@ -88,7 +88,7 @@ jobs:
     env:
       ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
-      PROPERTIES: '${{ vars.PROPERTIES_MIGRATION }}'
+      PROPERTIES: '${{ vars._PROPERTIES_MIGRATION }}'
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
