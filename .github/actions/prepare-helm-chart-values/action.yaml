@@ -102,7 +102,7 @@ runs:
     
     - name: Generate Yaml from Parameters
       shell: bash
-      if: ${{ contains('scaledjob,api,cronjob', inputs.deployment_name) }}
+      if: ${{ contains('scaledjob,api,cronjob,migration', inputs.deployment_name) }}
       env:
         VARS: ${{ env.VARS }}
         SECRETS: ${{ env.SECRETS }}
