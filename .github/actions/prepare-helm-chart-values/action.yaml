@@ -7,18 +7,6 @@ inputs:
   grafana_tag:
     description: "Tag do Grafana"
     required: true
-  vars:
-    description: "environment vars"
-    required: true
-  secrets:
-    description: "environment secrets"
-    required: true
-  BROKER_AMQP:
-    description: "Consumer amqp broker"
-    required: false
-  OLD_INGRESS_HOST:
-    description: "Está no ingress antigo"
-    required: false
 
 runs:
   using: "composite"
@@ -57,15 +45,15 @@ runs:
     - name: Copiar e preparar values.yaml
       run: |
         cp orbitspot-actions/helm-values/${{ env.chart_type }}/values.yaml values.yaml
-        sed -i "s/<DEPLOYMENT-NAME>/${{ env.chart_type }}/g" values.yaml
+        sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
         sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
-        mkdir -p .github/helm/${{ env.chart_type }}
-        mv values.yaml .github/helm/${{ env.chart_type }}/values.yaml
+        mkdir -p .github/helm/${{ inputs.deployment_name }}
+        mv values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
 
     - name: Copiar e preparar values.yaml (old)
-      if: ${{ inputs.OLD_INGRESS_HOST != '' && env.chart_type == 'api' }}
+      if: ${{ env.OLD_INGRESS_HOST != '' && env.chart_type == 'api' }}
       run: |
         cp orbitspot-actions/helm-values/api/old_ingress_values.yaml values.yaml
         sed -i "s/<DEPLOYMENT-NAME>/api/g" values.yaml
@@ -83,8 +71,8 @@ runs:
         echo "istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
         echo "istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
 
-        if [[ -n "${{ inputs.BROKER_AMQP }}" ]]; then
-          RABBITMQ_BASE64=$(echo -n "${{ inputs.BROKER_AMQP }}" | base64 -w0)
+        if [[ -n "${{ env.BROKER_AMQP }}" ]]; then
+          RABBITMQ_BASE64=$(echo -n "${{ env.BROKER_AMQP }}" | base64 -w0)
           echo "secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
         fi
       shell: bash
@@ -115,9 +103,9 @@ runs:
       shell: bash
       if: ${{ contains('scaledjob,api,cronjob', inputs.deployment_name) }}
       env:
-        vars: ${{ env.vars }}
-        secrets: ${{ env.secrets }}
-        repository_name: ${{ github.event.repository.name }}
+        VARS: ${{ env.VARS }}
+        SECRETS: ${{ env.SECRETS }}
+        REPOSITORY_NAME: ${{ github.event.repository.name }}
       run: |
         pip install pyyaml
         python orbitspot-actions/.github/scripts/generate-environment-yaml.py

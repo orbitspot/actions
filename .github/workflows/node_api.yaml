@@ -180,8 +180,8 @@ jobs:
           DB_PORT: ${{ vars.DB_PORT }}
           DB_HOST: ${{ vars.DB_HOST }}
           OLD_INGRESS_HOST: ${{ vars.OLD_INGRESS_HOST }}
-          vars: ${{ toJson(vars) }}
-          secrets: ${{ toJson(secrets) }}
+          VARS: ${{ toJson(vars) }}
+          SECRETS: ${{ toJson(secrets) }}
 
   helm-cd-api:
     name: K8s Deploy api

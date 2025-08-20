@@ -100,8 +100,8 @@ jobs:
           BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
           DB_PORT: ${{ vars.DB_PORT }}
           DB_HOST: ${{ vars.DB_HOST }}
-          vars: ${{ toJson(vars) }}
-          secrets: ${{ toJson(secrets) }}
+          VARS: ${{ toJson(vars) }}
+          SECRETS: ${{ toJson(secrets) }}
 
   helm-CD-migration:
     name: K8s Deploy Migration
