@@ -60,8 +60,7 @@ runs:
         sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
         mkdir -p .github/helm/api
-        echo "acm_arn=${{ env.ACM_ARN }}" >> values.properties
-        echo "environment=${{ env.ENV }}" >> values.properties
+        echo "" >> .github/helm/api/values.yaml
         cat values.yaml >> .github/helm/api/values.yaml
       shell: bash
   
@@ -70,6 +69,8 @@ runs:
         echo "${{ env.PROPERTIES }}" | tr '\r' '\n' > values.properties
         echo "istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
         echo "istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
+        echo "acm_arn=${{ env.ACM_ARN }}" >> values.properties
+        echo "environment=${{ env.ENV }}" >> values.properties
 
         if [[ -n "${{ env.BROKER_AMQP }}" ]]; then
           RABBITMQ_BASE64=$(echo -n "${{ env.BROKER_AMQP }}" | base64 -w0)
