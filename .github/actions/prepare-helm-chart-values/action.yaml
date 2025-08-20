@@ -55,14 +55,14 @@ runs:
     - name: Copiar e preparar values.yaml (old)
       if: ${{ env.OLD_INGRESS_HOST != '' && inputs.deployment_name == 'api' }}
       run: |
-        cp orbitspot-actions/helm-values/api/old_ingress_values.yaml values.yaml
-        sed -i "s/<DEPLOYMENT-NAME>/api/g" values.yaml
+        cp orbitspot-actions/helm-values/${{ env.chart_type }}/old_ingress_values.yaml values.yaml
+        sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
         sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
-        mkdir -p .github/helm/api
+        mkdir -p .github/helm/${{ inputs.deployment_name }}
         echo "acm_arn=${{ env.ACM_ARN }}" >> values.properties
         echo "environment=${{ env.ENV }}" >> values.properties
-        mv values.yaml .github/helm/api/values.yaml
+        mv values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
   
     - name: Gerar values.properties
