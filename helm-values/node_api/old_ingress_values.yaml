@@ -6,9 +6,9 @@ ingress:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/ssl-redirect: "443"
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/certificate-arn: ${.<REPOSITORY-NAME>.build.acm_arn}
-    alb.ingress.kubernetes.io/group.name: ${.<REPOSITORY-NAME>.build.environment}-ingress
-    alb.ingress.kubernetes.io/load-balancer-name: ${.<REPOSITORY-NAME>.build.environment}-applications
+    alb.ingress.kubernetes.io/certificate-arn: ${.<REPOSITORY-NAME>.acm_arn}
+    alb.ingress.kubernetes.io/group.name: ${.<REPOSITORY-NAME>.environment}-ingress
+    alb.ingress.kubernetes.io/load-balancer-name: ${.<REPOSITORY-NAME>.environment}-applications
   rules:
     - http:
         paths:

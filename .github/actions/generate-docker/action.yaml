@@ -1,0 +1,51 @@
+name: 'Generate docker'
+description: 'Copy Dockerfile and Build it'
+inputs:
+  dockerfile_path:
+    description: 'Dockerfile Path'
+    required: false
+  deployment_name:
+    description: 'Deployment Name'
+    required: true
+  build_args:
+    description: 'build_args'
+    required: true
+  before_building:
+    description: 'before_building'
+    required: true
+  version:
+    description: 'node version'
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Authenticate
+      uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.6.1
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.git_ref }}
+      
+    - name: Download Dockerfile from S3
+      shell: bash
+      if: ${{ inputs.dockerfile_path == '' }}
+      run: |
+        aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/node/${{ inputs.version }}/Dockerfile Dockerfile
+        aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
+
+    - name: Copy Dockerfile from original repository
+      shell: bash
+      if: ${{ inputs.dockerfile_path != '' }}
+      run: |
+        mv ${{ inputs.dockerfile_path }} Dockerfile
+        aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/scripts/base_script.sh base_script.sh
+        
+    - name: docker-build
+      uses: orbitspot/actions/.github/actions/docker@v20.6.1
+      with:
+        content: 'building'
+        image: '${{ inputs.deployment_name }}-${{ github.event.repository.name }}'
+        tag: ${{ github.sha }}
+        build_args: ${{ inputs.build_args }}
+        before_building: ${{ inputs.before_building }}

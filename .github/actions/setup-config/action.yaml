@@ -1,0 +1,60 @@
+name: 'Setup'
+description: 'Basic config for pipeline run'
+inputs:
+  setup:
+    description: 'api/landingpage/scaledjob/migration/etc'
+    required: true
+  repo_vars: # action não tem acesso às vars
+    description: 'repository variables'
+    required: true
+  devops_config: # action não tem acesso às vars
+    description: 'devops config'
+    required: true
+outputs:
+  CLUSTER_REGION:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.CLUSTER_REGION }}
+  CLUSTER_NAME:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.CLUSTER_NAME }}
+  ACM_ARN:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.ACM_ARN }}
+  ENV:
+    description: 'cluster region'
+    value: ${{ steps.set-output.outputs.ENV }}
+runs:
+  using: composite
+  steps:
+    - name: Clean up machine
+      shell: bash
+      run: |
+        rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+        df -h
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    
+    - name: Checkout script repository
+      uses: actions/checkout@v4
+      with:
+        repository: 'orbitspot/actions'
+        path: orbitspot-actions
+        ref: 'v20.6.1'
+    
+    - name: Check required variables
+      shell: bash
+      env:
+        variables_json: ${{ inputs.repo_vars }}
+        setup: '${{ inputs.setup }}'
+      run: |
+        python orbitspot-actions/.github/scripts/check-required-variables.py
+
+    - name: Fetch devops variables
+      id: set-output
+      uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.6.1
+      with:
+        devops_config: '${{ inputs.devops_config }}'
+        branch: '${{ github.ref_name }}'

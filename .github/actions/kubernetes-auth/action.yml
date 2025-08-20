@@ -5,28 +5,15 @@ inputs:
     description: 'S3 template location'
     required: false
     default: 's3://devops.orbitspot.com/charts/'
-  aws_account_number:
-    description: 'Account Number'
-    required: true
-  aws_role_name:
-    description: 'Aws role with polices to deploy'
-    required: true
-  aws_region: 
-    description: 'Aws region'
-    required: true
-  cluster_name: 
-    description: 'Cluster Name'
-    required: true
 runs:
   using: composite
   steps:
-
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
-      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
-      role-session-name: ${{ inputs.aws_role_name }}
-      aws-region: ${{ inputs.aws_region }}
+      role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ env.AWS_ROLE_NAME }}
+      role-session-name: ${{ env.AWS_ROLE_NAME }}
+      aws-region: ${{ env.AWS_REGION }}
 
   - name: Install kubectl
     shell: bash
@@ -78,9 +65,6 @@ runs:
 
   - name: update-k8s-config
     shell: bash
-    env:
-      AWS_REGION: ${{ inputs.aws_region }}
-      CLUSTER_NAME: ${{ inputs.cluster_name }}
     run: |
       echo "ClusterName: $CLUSTER_NAME"
       echo "Region: $AWS_REGION"

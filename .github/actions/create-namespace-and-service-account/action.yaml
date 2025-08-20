@@ -1,47 +1,25 @@
 name: 'Create Namespace And Service Account'
 description: 'creating k8s resources'
 inputs:
-  role_arn:
-    description: 'Aws role arn'
-    required: true
   namespace:
     description: 'Application name'
     required: true
   service_account_name:
     description: 'Service Account name'
     required: true
-
-  aws_account_number:
-    description: 'Account Number'
-    required: true
-  aws_role_name:
-    description: 'Aws role with polices to deploy'
-    required: true
-  aws_region:
-    description: 'Aws region'
-    required: true
-  cluster_name:
-    description: 'Cluster Name'
-    required: true
 runs:
   using: composite
   steps:
-
   - name: check-values
     shell: bash
     run: |
-      echo "AccountNumber: ${{ inputs.aws_account_number }}"
-      echo "Region: ${{ inputs.aws_region }}"
-      echo "Role: ${{ inputs.aws_role_name }}"
-      echo "Cluster: ${{ inputs.cluster_name }}"
+      echo "AccountNumber: ${{ env.AWS_ACCOUNT_NUMBER }}"
+      echo "Region: ${{ env.AWS_REGION }}"
+      echo "Role: ${{ env.AWS_ROLE_NAME }}"
+      echo "Cluster: ${{ env.CLUSTER_NAME }}"
 
   - name: configure
-    uses: orbitspot/actions/.github/actions/kubernetes-auth@master
-    with:
-        aws_account_number: ${{ inputs.aws_account_number }}
-        aws_role_name: ${{ inputs.aws_role_name }}
-        aws_region: ${{ inputs.aws_region }}
-        cluster_name: ${{ inputs.cluster_name }}
+    uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.6.1
 
   - name: create-namespace
     shell: bash
@@ -51,6 +29,7 @@ runs:
         else
             echo "Namespace ${{ inputs.namespace }} already exists."
         fi
+
   - name: create service account yaml
     shell: bash
     run: |
@@ -59,7 +38,7 @@ runs:
       kind: ServiceAccount
       metadata:
         annotations:
-          eks.amazonaws.com/role-arn: ${{ inputs.role_arn }}
+          eks.amazonaws.com/role-arn: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ github.event.repository.name }}-${{ env.ENV }}
         name: ${{ inputs.service_account_name }}
         namespace: ${{ inputs.namespace }}
       EOT

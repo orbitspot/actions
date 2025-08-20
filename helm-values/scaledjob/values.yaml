@@ -1,50 +1,50 @@
 module: <GRAFANA-TAG>
 
 nodeSelector:
-  nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
+  nodegroup-type: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.node_selector}
 
 csiSecrets:
   enabled: true
   serviceAccountName: "application-permission"
 
 containers:
-  - name: consumer
+  - name: scaledjob
     resources:
       requests:
-        cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
-        memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
+        cpu: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.requests.cpu}
+        memory: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.requests.memory}
       limits:
-        cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
-        memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
+        cpu: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.cpu}
+        memory: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.memory}
 
 
 keda:
   secrets:
-    name: consumer-<DEPLOYMENT-NAME>
+    name: scaledjob-<DEPLOYMENT-NAME>
 
   authentication:
-    name: consumer-<DEPLOYMENT-NAME>
+    name: scaledjob-<DEPLOYMENT-NAME>
     spec:
       secretTargetRef:
         - key: rabbitmq_http_host
-          name: consumer-<DEPLOYMENT-NAME>
+          name: scaledjob-<DEPLOYMENT-NAME>
           parameter: host
 
   pollingInterval: 30
-  maxReplicaCount: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
-  failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
-  successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
-  activeDeadlineSeconds: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.keda.activeDeadlineSeconds}
+  maxReplicaCount: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
+  failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
+  successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
+  activeDeadlineSeconds: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.activeDeadlineSeconds}
   
   triggers:
     - type: rabbitmq
       authenticationRef:
-        name: consumer-<DEPLOYMENT-NAME>
+        name: scaledjob-<DEPLOYMENT-NAME>
       metadata:
         protocol: amqp
-        queueName: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.queue_name}
+        queueName: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.queue_name}
         mode: QueueLength
-        value: "${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.queue_min_messages}"
+        value: "${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.queue_min_messages}"
 
 service:
   type: ClusterIP

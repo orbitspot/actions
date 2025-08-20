@@ -1,20 +1,10 @@
 name: 'Code Artifact'
 description: 'code artifact login'
 inputs:
-  aws_account_number:
-    description: 'Account Number'
-    required: true
-  aws_role_name:
-    description: 'Aws role with polices to deploy'
-    required: true
-  aws_region: 
-    description: 'Aws region'
-    required: true
   co_login_file_name:
     description: 'co login file name'
     required: false
     default: 'co_login_commands.txt'
-
 
 runs:
   using: composite
@@ -22,9 +12,9 @@ runs:
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
-      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
-      role-session-name: ${{ inputs.aws_role_name }}
-      aws-region: ${{ inputs.aws_region }}
+      role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ env.AWS_ROLE_NAME }}
+      role-session-name: ${{ env.AWS_ROLE_NAME }}
+      aws-region: ${{ env.AWS_REGION }}
 
   - name: Verify AWS Identity
     shell: bash

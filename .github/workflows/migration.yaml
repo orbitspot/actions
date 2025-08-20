@@ -16,89 +16,62 @@ concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
 
+env: # global env
+  AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
+  AWS_REGION: ${{ vars._AWS_REGION }}
+
 jobs:
   setup-config:
     name: Set Up Config
-    runs-on: ubuntu-latest
+    runs-on: ['${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
+    environment: ${{ github.ref_name }}
     outputs:
       CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
     steps:
-      - name: Fetch devops variables
+      - name: Set up
         id: set-output
-        uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.5.1
+        uses:  orbitspot/actions/.github/actions/setup-config@v20.6.1
         with:
+          setup: 'migration'
+          repo_vars: '${{ toJson(vars) }}'
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
-          branch: '${{ github.ref_name }}'
 
   building:
     name: Building
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
     needs: [setup-config]
     permissions:
       id-token: write
       contents: read
+    env:
+      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
-      - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.5.1
-        with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-          aws_region: us-east-1
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Bash Co Login
-        run: |
-          bash co_login_commands.txt
-
-      - name: Npm Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v20.5.1
+      - name: Building
+        uses: orbitspot/actions/.github/actions/package-manager-install@v20.6.1
         with:
           node_version: '20'
+          customized_dockerfile: '${{ inputs.dockerfile_path  }}'
 
   generate-docker:
-    name: Docker Build Migration
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    name: Docker Build
+    runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
+    environment: ${{ github.ref_name }}
     needs: [setup-config, building]
-    environment: '${{ github.ref_name }}'
     permissions:
       id-token: write
       contents: read
     env:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
-      - uses: actions/checkout@v4
-        name: Checkout
-        with:
-          ref: '${{ inputs.git_ref }}'
-          fetch-depth: 0
-
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.5.1
+        uses: orbitspot/actions/.github/actions/generate-docker@v20.6.1
         with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-          aws_region: us-east-1
-
-      - name: Download Files from S3
-        run: |
-          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/Dockerfile Dockerfile
-          aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/migration/migration.sh migration.sh
-
-      - name: docker-build
-        uses: orbitspot/actions/.github/actions/docker@v20.5.1
-        with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-          aws_region: '${{ env.CLUSTER_REGION }}'
-          image: 'migration-${{ github.event.repository.name }}'
-          content: 'building'
-          tag: '${{ github.sha }}'
+          deployment_name: migration
+          dockerfile_path: ${{ inputs.dockerfile_path }}
+          version: '20'
           build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
           before_building: |
             echo "${{ inputs.run_command }}" >> migration.sh
@@ -106,77 +79,33 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-    environment: '${{ github.ref_name }}'
-    needs: [generate-docker]
+    runs-on: [ '${{ github.ref_name }}', 4unity, linux, self-hosted, x64]
+    environment: ${{ github.ref_name }}
+    needs: [setup-config, generate-docker]
     permissions:
       id-token: write
       contents: read
+    env:
+      ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
+      ENV: '${{ needs.setup-config.outputs.ENV }}'
+      PROPERTIES: '${{ vars._PROPERTIES_MIGRATION }}'
     steps:
-      - uses: actions/checkout@v4
-        name: Checkout
-        with:
-          ref: '${{ inputs.git_ref }}'
-          fetch-depth: 0
-
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.x
-
-      - name: Checkout script repository
-        uses: actions/checkout@v4
-        with:
-          repository: orbitspot/actions
-          path: code
-      
-      - name: Authenticate
-        uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.5.1
-        with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-          aws_region: us-east-1
-
-      - name: Generate Yaml from Parameters 
-        env:
-          environments: ${{ toJson(vars) }}
-          secrets: ${{ toJson(secrets) }}
-          repository_name: ${{ github.event.repository.name }}
-        run: |
-          pip install pyyaml
-          python code/.github/scripts/generate-environment-yaml.py
-          cat variables.yaml
-
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.5.1
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.6.1
         with:
-          deployment_name: 'migration'
+          deployment_name: migration
           grafana_tag: ${{ inputs.grafana_tag }}
         env:
           BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
           DB_PORT: ${{ vars.DB_PORT }}
           DB_HOST: ${{ vars.DB_HOST }}
-          _PROPERTIES: ${{ vars._PROPERTIES }}
-
-      - name: append-parameters
-        run: |
-            parameters=$(cat variables.yaml)
-            echo "" >> .github/helm/migration/values.yaml
-            echo "$parameters" >> .github/helm/migration/values.yaml
-            cat .github/helm/migration/values.yaml
-
-      - name: upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: helm-values-migration
-          path: .github/helm/migration/values.yaml
-          retention-days: 1
-
+          VARS: ${{ toJson(vars) }}
+          SECRETS: ${{ toJson(secrets) }}
 
   helm-CD-migration:
     name: K8s Deploy Migration
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: [ '${{ github.ref_name }}', '4unity', linux, self-hosted, x64]
     environment: '${{ github.ref_name }}'
     needs: [setup-config, prepare-helm-replacements]
     permissions:
@@ -186,26 +115,11 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
+      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
-      - uses: actions/checkout@v4
-        name: Checkout
-        with:
-          ref: '${{ inputs.git_ref }}'
-          fetch-depth: 0
-
-      - name: configure
-        uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.5.1
-        with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
-          aws_region: '${{ env.CLUSTER_REGION }}'
-          cluster_name: '${{ env.CLUSTER_NAME }}'
-
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v20.5.1
+        uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.1
         with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
-          aws_region: '${{ env.CLUSTER_REGION }}'
           namespace: '${{ github.event.repository.name }}'
           helm_values: helm-values-migration
           release: migration
@@ -214,5 +128,5 @@ jobs:
           sets: |
             --set environment=${{ env.ENV}} \
             --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER}}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/migration-${{github.event.repository.name }}' \
+            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER}}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/migration-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}'

@@ -1,7 +1,7 @@
 module: <GRAFANA-TAG>
 
 nodeSelector:
-    nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
+    nodegroup-type: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.node_selector}
 
 csiSecrets:
     enabled: true
@@ -14,8 +14,8 @@ containers:
     - name: cronjob-<REPOSITORY-NAME>
       resources:
         requests:
-            cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.cpu}
-            memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.requests.memory}
+            cpu: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.requests.cpu}
+            memory: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.requests.memory}
         limits:
-            cpu: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.cpu}
-            memory: ${.<REPOSITORY-NAME>.build.<DEPLOYMENT-NAME>.resources.limits.memory}
+            cpu: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.cpu}
+            memory: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.memory}

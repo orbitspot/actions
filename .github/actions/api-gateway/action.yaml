@@ -1,18 +1,6 @@
 name: 'Terraform Init'
 description: 'terraform init commands'
 inputs:
-  aws_account_number:
-    description: 'Account Number'
-    required: true
-    default: '931670397156'
-  aws_role_name:
-    description: 'Aws role with polices to deploy'
-    required: true
-    default: 'github-actions'
-  aws_region:
-    description: 'Aws region'
-    required: true
-    default: 'us-east-1'
   terraform_bucket_name:
     description: 'Bucket'
     required: true
@@ -23,36 +11,35 @@ inputs:
   apply_response_script:
     description: 'Apply new scripts on integration'
     required: false
-    default: true
+    default: 'true'
 
 runs:
   using: composite
   steps:
-
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
-      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
-      role-session-name: ${{ inputs.aws_role_name }}
-      aws-region: ${{ inputs.aws_region }}
+      role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ env.AWS_ROLE_NAME }}
+      role-session-name: ${{ env.AWS_ROLE_NAME }}
+      aws-region: ${{ env.AWS_REGION }}
 
   - name: Checkout code
     uses: actions/checkout@v4
     with:
         repository: 'orbitspot/actions'
-        path: code
+        path: orbitspot-actions
         ref: '${{ inputs.tag }}'
 
   - name: Terraform Init
     shell: bash
     run: |
-      cd code/terraform/api-gateway
+      cd orbitspot-actions/terraform/api-gateway
       terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
 
   - name: Delete resource if it exists
     shell: bash
     run: |
-      cd code/terraform/api-gateway
+      cd orbitspot-actions/terraform/api-gateway
       terraform destroy -auto-approve
       
   - name: Terraform Plan
@@ -60,7 +47,7 @@ runs:
     env:
       TF_VAR_apply_response_script: ${{ inputs.apply_response_script }}
     run: |
-      cd code/terraform/api-gateway
+      cd orbitspot-actions/terraform/api-gateway
       terraform plan -no-color
 
   - name: Terraform Apply
@@ -68,6 +55,6 @@ runs:
     env:
       TF_VAR_apply_response_script: ${{ inputs.apply_response_script }}
     run: |
-      cd code/terraform/api-gateway
+      cd orbitspot-actions/terraform/api-gateway
       terraform apply -auto-approve -no-color
 
