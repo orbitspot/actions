@@ -18,11 +18,6 @@ jobs:
     outputs:
       CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
     steps:
-      - name: Clean up machine
-        run: |
-          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
-          df -h
-
       - name: Fetch devops variables
         id: set-output
         uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.6.0
@@ -94,3 +89,8 @@ jobs:
           AWS_REGION: ${{ vars._AWS_REGION }}
           AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
 
+      - name: Clean up machine
+        shell: bash
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h

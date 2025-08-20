@@ -71,3 +71,9 @@ jobs:
           echo "Workflow triggered in repository $repo on branch $branch"
           echo "API Response:"
           echo "$response"
+
+      - name: Clean up machine
+        shell: bash
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h

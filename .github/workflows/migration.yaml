@@ -130,3 +130,9 @@ jobs:
             --set region=${{ env.CLUSTER_REGION }} \
             --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER}}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/migration-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}'
+      
+      - name: Clean up machine
+        shell: bash
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h

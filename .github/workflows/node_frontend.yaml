@@ -218,22 +218,28 @@ jobs:
           - name: upload
             uses: actions/upload-artifact@v4
             with:
-                name: helm-values
-                path: .github/helm/frontend/values.yaml
-                retention-days: 1
+              name: helm-values
+              path: .github/helm/frontend/values.yaml
+              retention-days: 1
 
           - name: helm-apply
             uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.0
             with:
-                namespace: ${{ github.event.repository.name }}
-                helm_values: helm-values
-                release: nginx
-                chart_name: orbitspot/orbitspot-front-nginx
-                chart_version: 1.1.1
-                sets: |
-                    --set environment=${{ env.ENV }} \
-                    --set region=${{ env.CLUSTER_REGION }} \
-                    --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
-                    --set 'containers[0].repository.tag=${{ github.sha }}' \
-                    --set ingress.annotations.acm=${{ env.ACM_ARN }} \
-                    --set ingress.rules[0].host=${{ vars.HOST_MF }}
+              namespace: ${{ github.event.repository.name }}
+              helm_values: helm-values
+              release: nginx
+              chart_name: orbitspot/orbitspot-front-nginx
+              chart_version: 1.1.1
+              sets: |
+                  --set environment=${{ env.ENV }} \
+                  --set region=${{ env.CLUSTER_REGION }} \
+                  --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
+                  --set 'containers[0].repository.tag=${{ github.sha }}' \
+                  --set ingress.annotations.acm=${{ env.ACM_ARN }} \
+                  --set ingress.rules[0].host=${{ vars.HOST_MF }}
+          
+          - name: Clean up machine
+            shell: bash
+            run: |
+              rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+              df -h

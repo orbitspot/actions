@@ -247,3 +247,9 @@ jobs:
                 --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
                 --set ingress.rules[0].host=${{ vars.HOST_MF }} \
                 --set ingress.rules[1].host=${{ vars.HOST_MF_2 }}
+          
+          - name: Clean up machine
+            shell: bash
+            run: |
+              rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+              df -h

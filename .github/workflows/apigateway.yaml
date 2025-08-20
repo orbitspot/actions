@@ -34,11 +34,6 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Clean up machine
-        run: |
-          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
-          df -h
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -64,3 +59,9 @@ jobs:
           TF_VAR_api_gateway: '${{ vars._API_GATEWAY }}'
         with:
           tag: 'v20.6.0'
+      
+      - name: Clean up machine
+        shell: bash
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h
