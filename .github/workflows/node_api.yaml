@@ -46,7 +46,7 @@ jobs:
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@separando-properties
+        uses:  orbitspot/actions/.github/actions/setup-config@v20.6.1
         with:
           setup: 'api'
           repo_vars: '${{ toJson(vars) }}'
@@ -94,7 +94,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@separando-properties
+        uses: orbitspot/actions/.github/actions/package-manager-install@v20.6.1
         with:
           node_version: '${{ inputs.version }}'
           customized_dockerfile: '${{ inputs.dockerfile_path  }}'
@@ -115,7 +115,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/generate-docker@separando-properties
+        uses: orbitspot/actions/.github/actions/generate-docker@v20.6.1
         with:
           deployment_name: ${{ matrix.artifacts }}
           dockerfile_path: ${{ inputs.dockerfile_path }}
@@ -140,7 +140,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: create-role
-        uses: orbitspot/actions/.github/actions/create-role-service-account@separando-properties
+        uses: orbitspot/actions/.github/actions/create-role-service-account@v20.6.1
         with:
           role: '${{ github.event.repository.name }}-${{ env.ENV }}'
           namespace: ${{ github.event.repository.name }}
@@ -148,7 +148,7 @@ jobs:
           policy: ${{ vars._POLICY_JSON }}
 
       - name: create-namespace
-        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@separando-properties
+        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.6.1
         with:
           namespace: ${{ github.event.repository.name }}
           service_account_name: 'application-permission'
@@ -171,7 +171,7 @@ jobs:
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@separando-properties
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.6.1
         with:
           deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
@@ -199,7 +199,7 @@ jobs:
     steps:
       - name: helm-apply (sem ingress antigo)
         if: ${{ vars.OLD_INGRESS_HOST == '' }}
-        uses: orbitspot/actions/.github/actions/helm-deploy@separando-properties
+        uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.1
         with:
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-api
@@ -214,7 +214,7 @@ jobs:
 
       - name: helm-apply (com OLD_INGRESS_HOST)
         if: ${{ vars.OLD_INGRESS_HOST != '' }}
-        uses: orbitspot/actions/.github/actions/helm-deploy@separando-properties
+        uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.1
         with:
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-api
@@ -247,7 +247,7 @@ jobs:
           AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
         steps:
           - name: helm-apply
-            uses: orbitspot/actions/.github/actions/helm-deploy@separando-properties
+            uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.1
             with:
               namespace: ${{ github.event.repository.name }}
               helm_values: helm-values-${{ matrix.artifacts }}
