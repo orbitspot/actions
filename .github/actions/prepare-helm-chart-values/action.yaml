@@ -62,7 +62,7 @@ runs:
         mkdir -p .github/helm/api
         echo "acm_arn=${{ env.ACM_ARN }}" >> values.properties
         echo "environment=${{ env.ENV }}" >> values.properties
-        values.yaml >> .github/helm/api/values.yaml
+        cat values.yaml >> .github/helm/api/values.yaml
       shell: bash
   
     - name: Gerar values.properties
