@@ -57,21 +57,21 @@ runs:
     - name: Copiar e preparar values.yaml
       run: |
         cp orbitspot-actions/helm-values/${{ env.chart_type }}/values.yaml values.yaml
-        sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
+        sed -i "s/<DEPLOYMENT-NAME>/${{ env.chart_type }}/g" values.yaml
         sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
-        mkdir -p .github/helm/${{ inputs.deployment_name }}
-        mv values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
+        mkdir -p .github/helm/${{ env.chart_type }}
+        mv values.yaml .github/helm/${{ env.chart_type }}/values.yaml
       shell: bash
 
     - name: Copiar e preparar values.yaml (old)
-      if: ${{ inputs.OLD_INGRESS_HOST != '' && inputs.deployment_name == 'api' }}
+      if: ${{ inputs.OLD_INGRESS_HOST != '' && env.chart_type == 'api' }}
       run: |
         cp orbitspot-actions/helm-values/api/old_ingress_values.yaml values.yaml
-        sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
+        sed -i "s/<DEPLOYMENT-NAME>/${{ env.chart_type }}/g" values.yaml
         sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
-        mkdir -p .github/helm/${{ inputs.deployment_name }}
+        mkdir -p .github/helm/${{ env.chart_type }}
         echo "acm_arn=${{ env.ACM_ARN }}" >> values.properties
         echo "environment=${{ env.ENV }}" >> values.properties
         mv values.yaml .github/helm/api/values.yaml
