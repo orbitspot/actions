@@ -88,7 +88,6 @@ jobs:
         with:
           modulo: '4unity'
           repository: "${{ github.event.repository.name }}"
-          aws_region: "${{ env.CLUSTER_REGION }}"
           tag: 'separando-properties'
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
