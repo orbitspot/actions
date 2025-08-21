@@ -116,8 +116,8 @@ jobs:
     environment: ${{ github.ref_name }}
     needs: [generate-docker, setup-config]
     permissions:
-        id-token: write
-        contents: read
+      id-token: write
+      contents: read
     env:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
