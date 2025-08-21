@@ -88,10 +88,11 @@ runs:
         PREFIX: .${{ github.event.repository.name }}
         PROPERTIES_PATH: values.properties
         YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
-        REPLACE_YAML_PATH: orbitspot-actions/.github/helm/${{ inputs.deployment_name }}/values.yaml
+        REPLACE_YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
       run: |
         if [[ ! -f "$REPLACE_YAML_PATH" ]]; then
-          REPLACE_YAML_PATH=""
+          echo "replaceeeeeeeeeeeeeeeeee"
+          REPLACE_YAML_PATH="orbitspot-actions/.github/helm/${{ inputs.deployment_name }}/values.yaml"
         fi
 
         pip install pyyaml
