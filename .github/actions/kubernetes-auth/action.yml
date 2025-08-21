@@ -13,7 +13,7 @@ runs:
     with:
       role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ env.AWS_ROLE_NAME }}
       role-session-name: ${{ env.AWS_ROLE_NAME }}
-      aws-region: ${{ env.AWS_REGION }}
+      aws-region: ${{ env.CLUSTER_REGION }}
 
   - name: Install kubectl
     shell: bash
@@ -67,5 +67,5 @@ runs:
     shell: bash
     run: |
       echo "ClusterName: $CLUSTER_NAME"
-      echo "Region: $AWS_REGION"
-       aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+      echo "Region: $CLUSTER_REGION"
+       aws eks update-kubeconfig --region $CLUSTER_REGION --name $CLUSTER_NAME

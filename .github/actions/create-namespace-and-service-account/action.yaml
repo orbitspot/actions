@@ -14,7 +14,7 @@ runs:
     shell: bash
     run: |
       echo "AccountNumber: ${{ env.AWS_ACCOUNT_NUMBER }}"
-      echo "Region: ${{ env.AWS_REGION }}"
+      echo "Region: ${{ env.CLUSTER_REGION }}"
       echo "Role: ${{ env.AWS_ROLE_NAME }}"
       echo "Cluster: ${{ env.CLUSTER_NAME }}"
 
