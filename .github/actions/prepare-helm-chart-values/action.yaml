@@ -44,12 +44,15 @@ runs:
 
     - name: Copiar e preparar values.yaml
       run: |
-        cp orbitspot-actions/helm-values/${{ env.chart_type }}/values.yaml values.yaml
+        if [[ ! -f ".github/helm/${{ inputs.deployment_name }}/values.yaml" ]]; then
+          echo "replaceeeeeeeeeeeeeeeeee"
+          mkdir -p .github/helm/${{ inputs.deployment_name }}
+          cp orbitspot-actions/helm-values/${{ env.chart_type }}/values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
+        fi
+        cd .github/helm/${{ inputs.deployment_name }}
         sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
         sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
-        mkdir -p .github/helm/${{ inputs.deployment_name }}
-        mv values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
 
     - name: Copiar e preparar values.yaml (old)
@@ -88,11 +91,10 @@ runs:
         PREFIX: .${{ github.event.repository.name }}
         PROPERTIES_PATH: values.properties
         YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
-        REPLACE_YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
+        REPLACE_YAML_PATH: orbitspot-actions/.github/helm/${{ inputs.deployment_name }}/values.yaml
       run: |
         if [[ ! -f "$REPLACE_YAML_PATH" ]]; then
-          echo "replaceeeeeeeeeeeeeeeeee"
-          REPLACE_YAML_PATH="orbitspot-actions/.github/helm/${{ inputs.deployment_name }}/values.yaml"
+          REPLACE_YAML_PATH=""
         fi
 
         pip install pyyaml
