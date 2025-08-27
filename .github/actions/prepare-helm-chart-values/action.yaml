@@ -45,7 +45,7 @@ runs:
     - name: Copiar e preparar values.yaml
       run: |
         if [[ ! -f ".github/helm/${{ inputs.deployment_name }}/values.yaml" ]]; then
-          echo "replaceeeeeeeeeeeeeeeeee"
+          echo "helm replace by local values.yaml"
           mkdir -p .github/helm/${{ inputs.deployment_name }}
           cp orbitspot-actions/helm-values/${{ env.chart_type }}/values.yaml .github/helm/${{ inputs.deployment_name }}/values.yaml
         fi
@@ -105,7 +105,7 @@ runs:
     
     - name: Generate Yaml from Parameters
       shell: bash
-      if: ${{ contains('scaledjob,api,cronjob,migration', env.chart_type) }}
+      if: ${{ contains(fromJSON('["scaledjob", "node_api", "cronjob", "migration"]'), github.event_name) }}
       env:
         VARS: ${{ env.VARS }}
         SECRETS: ${{ env.SECRETS }}
