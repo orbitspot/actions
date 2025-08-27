@@ -105,7 +105,7 @@ runs:
     
     - name: Generate Yaml from Parameters
       shell: bash
-      if: ${{ contains(fromJSON('["scaledjob", "node_api", "cronjob", "migration"]'), chart_type) }}
+      if: ${{ contains(fromJSON('["scaledjob", "node_api", "cronjob", "migration"]'), env.chart_type) }}
       env:
         VARS: ${{ env.VARS }}
         SECRETS: ${{ env.SECRETS }}
