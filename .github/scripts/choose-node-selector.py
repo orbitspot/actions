@@ -36,7 +36,7 @@ private_machine = bool(props_dict.get(key_to_lookup))
 # Escolhe node selector com base no arquivo data/node_selectors.json
 if not node_selector:
   print('aaaaaa')
-  with open("./orbitspot-actions/data/node_selectors.json", "r") as f:
+  with open("./.github/data/node_selectors.json", "r") as f:
     data = json.load(f)
 
   key = f'{repo}-{deployment}'
@@ -53,7 +53,7 @@ result = placeholder_template.format(repo=repo, deployment=deployment)
 print('bbbbb')
 # Substituir node selector pelo escolhido
 # yaml_path = f"../data/{chart_type}.yaml"
-yaml_path = f"./orbitspot-actions/helm-values/{chart_type}/values.yaml"
+yaml_path = f"./.github/helm-values/{chart_type}/values.yaml"
 with open(yaml_path, 'r') as yaml_file:
   yaml_content = yaml_file.read()
   yaml_content = yaml_content.replace(result, node_selector)
