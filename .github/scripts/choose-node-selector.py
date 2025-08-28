@@ -3,6 +3,7 @@ import yaml
 import os
 from dotenv import load_dotenv
 dir_path = os.path.dirname(os.path.realpath(__file__))
+print("aaaaaaaaaa")
 print(dir_path)
 
 load_dotenv('.env')
