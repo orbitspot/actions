@@ -66,7 +66,12 @@ runs:
         echo "" >> .github/helm/api/values.yaml
         cat values.yaml >> .github/helm/api/values.yaml
       shell: bash
-  
+
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
     - name: Node selection
       run: |
         pip install pyyaml python-dotenv
@@ -89,11 +94,6 @@ runs:
           echo "secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
         fi
       shell: bash
-    
-    - name: Configurar Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
 
     - name: Replace values
       env:
