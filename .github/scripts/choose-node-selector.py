@@ -14,6 +14,7 @@ environment = os.getenv("ENV") # OK
 deployment = os.getenv("DEPLOYMENT_NAME", None) # OK
 chart_type = os.getenv("chart_type", None) # OK
 properties = os.getenv("PROPERTIES")
+yaml_path = os.getenv("YAML_PATH")
 
 # Processa properties
 props_dict = {}
@@ -53,7 +54,7 @@ result = placeholder_template.format(repo=repo, deployment=deployment)
 print('bbbbb')
 # Substituir node selector pelo escolhido
 # yaml_path = f"../data/{chart_type}.yaml"
-yaml_path = f"./.github/helm-values/{chart_type}/values.yaml"
+# yaml_path = f"./.github/helm-values/{chart_type}/values.yaml"
 with open(yaml_path, 'r') as yaml_file:
   yaml_content = yaml_file.read()
   yaml_content = yaml_content.replace(result, node_selector)

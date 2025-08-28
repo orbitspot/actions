@@ -72,14 +72,12 @@ runs:
       with:
         python-version: '3.x'
 
-    - name: Node selection
-      run: |
-        pip install pyyaml python-dotenv
-        python orbitspot-actions/.github/scripts/choose-node-selector.py
-      env:
-        REPOSITORY: ${{ github.event.repository.name }}
-        DEPLOYMENT_NAME: ${{ inputs.deployment_name }}
-      shell: bash
+    # - name: Node selection
+    #   run: |
+        
+    #   env:
+        
+    #   shell: bash
     
     - name: Gerar values.properties
       run: |
@@ -101,12 +99,15 @@ runs:
         PROPERTIES_PATH: values.properties
         YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
         REPLACE_YAML_PATH: orbitspot-actions/.github/helm/${{ inputs.deployment_name }}/values.yaml
+        REPOSITORY: ${{ github.event.repository.name }}
+        DEPLOYMENT_NAME: ${{ inputs.deployment_name }}
       run: |
         if [[ ! -f "$REPLACE_YAML_PATH" ]]; then
           REPLACE_YAML_PATH=""
         fi
 
-        pip install pyyaml
+        pip install pyyaml python-dotenv
+        python orbitspot-actions/.github/scripts/choose-node-selector.py
         python orbitspot-actions/.github/scripts/replace-properties.py
         python orbitspot-actions/.github/scripts/replace-values.py
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
