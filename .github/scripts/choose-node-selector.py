@@ -37,7 +37,7 @@ private_machine = bool(props_dict.get(key_to_lookup))
 # Escolhe node selector com base no arquivo data/node_selectors.json
 if not node_selector:
   print('aaaaaa')
-  with open("./.github/data/node_selectors.json", "r") as f:
+  with open("./orbitspot-actions/.github/data/node_selectors.json", "r") as f:
     data = json.load(f)
 
   key = f'{repo}-{deployment}'
