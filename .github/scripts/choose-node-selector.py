@@ -2,9 +2,6 @@ import json
 import yaml
 import os
 from dotenv import load_dotenv
-dir_path = os.path.dirname(os.path.realpath(__file__))
-print("aaaaaaaaaa")
-print(dir_path)
 
 load_dotenv('.env')
 
@@ -36,7 +33,6 @@ private_machine = bool(props_dict.get(key_to_lookup))
 
 # Escolhe node selector com base no arquivo data/node_selectors.json
 if not node_selector:
-  print('aaaaaa')
   with open("./orbitspot-actions/data/node_selectors.json", "r") as f:
     data = json.load(f)
 
@@ -51,10 +47,6 @@ if not node_selector:
 placeholder_template = "${{.{repo}.{deployment}.node_selector}}"
 result = placeholder_template.format(repo=repo, deployment=deployment)
 
-print('bbbbb')
-# Substituir node selector pelo escolhido
-# yaml_path = f"../data/{chart_type}.yaml"
-# yaml_path = f"./.github/helm-values/{chart_type}/values.yaml"
 with open(yaml_path, 'r') as yaml_file:
   yaml_content = yaml_file.read()
   yaml_content = yaml_content.replace(result, node_selector)

@@ -72,13 +72,6 @@ runs:
       with:
         python-version: '3.x'
 
-    # - name: Node selection
-    #   run: |
-        
-    #   env:
-        
-    #   shell: bash
-    
     - name: Gerar values.properties
       run: |
         echo "${{ env.PROPERTIES }}" | tr '\r' '\n' > values.properties
