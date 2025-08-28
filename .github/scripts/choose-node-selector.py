@@ -2,6 +2,8 @@ import json
 import yaml
 import os
 from dotenv import load_dotenv
+dir_path = os.path.dirname(os.path.realpath(__file__))
+print(dir_path)
 
 load_dotenv('.env')
 
@@ -48,7 +50,7 @@ result = placeholder_template.format(repo=repo, deployment=deployment)
 
 # Substituir node selector pelo escolhido
 # yaml_path = f"../data/{chart_type}.yaml"
-yaml_path = f"../../helm-values/{chart_type}.yaml"
+yaml_path = f"./helm-values/{chart_type}.yaml"
 with open(yaml_path, 'r') as yaml_file:
   yaml_content = yaml_file.read()
   yaml_content = yaml_content.replace(result, node_selector)
