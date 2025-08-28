@@ -67,6 +67,15 @@ runs:
         cat values.yaml >> .github/helm/api/values.yaml
       shell: bash
   
+    - name: Node selection
+      run: |
+        pip install pyyaml python-dotenv
+        python orbitspot-actions/.github/scripts/choose-node-selector.py
+      env:
+        REPOSITORY: ${{ github.event.repository.name }}
+        DEPLOYMENT_NAME: ${{ inputs.deployment_name }}
+      shell: bash
+    
     - name: Gerar values.properties
       run: |
         echo "${{ env.PROPERTIES }}" | tr '\r' '\n' > values.properties

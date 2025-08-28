@@ -1,0 +1,117 @@
+{
+  "development": {
+    "fiscal": {
+      "public": "tf_ng_fiscal_brasil_app_v1_xlarge",
+      "private": "tf_ng_fiscal_brasil_app_private_v1_medium"
+    },
+    "4unity": {
+      "public": "tf_ng_4_unity_app_v1_large",
+      "private": "tf_ng_4_unity_app_private_v1_medium"
+    },
+    "inbound": {
+      "public": "tf_ng_inbound_v1_medium",
+      "private": "tf_ng_inbound_private_v1_large"
+    },
+    "common": {
+      "public": "tf_ng_commom_app_backend_v1_xlarge",
+      "private": "tf_ng_commom_app_private_v1_medium"
+    },
+    "outbound": {
+      "public": "tf_ng_outbound_app_v2_large",
+      "private": ""
+    },
+    "timeflow": {
+      "public": "",
+      "private": "tf_ng_timeflow_app_private_v1_large"
+    },
+    "seidor-analytics": {
+      "public": "",
+      "private": ""
+    },
+    "bank": {
+      "public": "tf_ng_bank_app_v1_xlarge",
+      "private": ""
+    },
+    "4pay": {
+      "public": "tf_ng_bank_app_v1_xlarge",
+      "private": ""
+    }
+  },
+  "homolog": {
+    "fiscal": {
+      "public": "tf_ng_fiscal_brasil_app_v1_xlarge",
+      "private": "tf_ng_fiscal_brasil_app_private_v1_medium"
+    },
+    "4unity": {
+      "public": "ng_4unity_us-east-2a_public",
+      "private": "ng_4unity_us-east-2a_private"
+    },
+    "inbound": {
+      "public": "tf_ng_inbound_v1_medium",
+      "private": "tf_ng_inbound_private_v1_large",
+      "mail-attachment-service-consumer": "ng_inbound_us-east-2b_public_mail-attachment-service"
+    },
+    "common": {
+      "public": "tf_ng_commom_app_backend_v1_xlarge",
+      "private": "tf_ng_commom_app_private_v1_medium"
+    },
+    "outbound": {
+      "public": "tf_ng_outbound_app_v1_xlarge",
+      "private": ""
+    },
+    "timeflow": {
+      "public": "",
+      "private": "ng_timeflow_us-east-2a_private"
+    },
+    "seidor-analytics": {
+      "public": "",
+      "private": ""
+    },
+    "bank": {
+      "public": "tf_ng_bank_app_v1_xlarge",
+      "private": ""
+    },
+    "4pay": {
+      "public": "tf_ng_bank_app_v1_xlarge",
+      "private": ""
+    }
+  },
+  "production": {
+    "fiscal": {
+      "public": "ng_fiscal_sa-east-1c_public",
+      "private": "tf_ng_fiscal_brasil_app_private_v1_medium"
+    },
+    "4unity": {
+      "public": "tf_ng_4_unity_app_v1_large",
+      "private": "tf_ng_4_unity_app_private_v1_large"
+    },
+    "inbound": {
+      "public": "ng_inbound_sa-east-1c_public",
+      "private": "ng_inbound_sa-east-1c_private"
+    },
+    "common": {
+      "public": "ng_common_sa-east-1a_public",
+      "private": "ng_common_sa-east-1b_private"
+    },
+    "outbound": {
+      "public": "tf_ng_outbound_app_v2_large",
+      "private": ""
+    },
+    "timeflow": {
+      "public": "",
+      "private": "tf_ng_timeflow_app_private_v1_large"
+    },
+    "seidor-analytics": {
+      "public": "ng_seidor-analytics_sa-east-1b_public",
+      "private": ""
+    },
+    "bank": {
+      "public": "tf_ng_bank_app_v1_xlarge",
+      "private": ""
+    },
+    "4pay": {
+      "public": "tf_ng_bank_app_v1_xlarge",
+      "private": ""
+    }
+  }
+}
