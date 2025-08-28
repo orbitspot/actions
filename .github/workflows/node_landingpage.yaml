@@ -187,10 +187,17 @@ jobs:
 
         - name: replace-data
           env:
-              PREFIX: .${{ github.event.repository.name }}
-              PROPERTIES_PATH: values.properties
-              YAML_PATH: .github/helm/next/values.yaml
-          run: python orbitspot-actions/.github/scripts/replace-properties.py && cat .github/helm/next/values.yaml
+            PREFIX: .${{ github.event.repository.name }}
+            PROPERTIES_PATH: values.properties
+            YAML_PATH: .github/helm/next/values.yaml
+            MODULE: ${{ inputs.module }}
+            PROPERTIES: ${{ vars._PROPERTIES }}
+            REPOSITORY: ${{ github.event.repository.name }}
+            DEPLOYMENT_NAME: "landingpage"
+          run: |
+            python orbitspot-actions/.github/scripts/replace-properties.py 
+            
+            cat .github/helm/next/values.yaml
 
         - name: upload
           uses: actions/upload-artifact@v4

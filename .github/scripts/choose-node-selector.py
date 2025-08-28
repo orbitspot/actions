@@ -1,15 +1,11 @@
 import json
 import yaml
 import os
-from dotenv import load_dotenv
 
-load_dotenv('.env')
-
-module = os.getenv("MODULE", "common")
-repo = os.getenv("REPOSITORY") # ok
+module = os.getenv("MODULE", "common") #OK
+repo = os.getenv("REPOSITORY") # OK
 environment = os.getenv("ENV") # OK
 deployment = os.getenv("DEPLOYMENT_NAME", None) # OK
-chart_type = os.getenv("chart_type", None) # OK
 properties = os.getenv("PROPERTIES")
 yaml_path = os.getenv("YAML_PATH")
 
