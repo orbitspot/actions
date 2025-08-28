@@ -196,7 +196,7 @@ jobs:
             DEPLOYMENT_NAME: "landingpage"
           run: |
             python orbitspot-actions/.github/scripts/replace-properties.py 
-            
+            python orbitspot-actions/.github/scripts/choose-node-selector.py 
             cat .github/helm/next/values.yaml
 
         - name: upload
