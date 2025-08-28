@@ -16,6 +16,10 @@
       "public": "tf_ng_commom_app_backend_v1_xlarge",
       "private": "tf_ng_commom_app_private_v1_medium"
     },
+    "commom": {
+      "public": "tf_ng_commom_app_backend_v1_xlarge",
+      "private": "tf_ng_commom_app_private_v1_medium"
+    },
     "outbound": {
       "public": "tf_ng_outbound_app_v2_large",
       "private": ""
@@ -55,6 +59,10 @@
       "public": "tf_ng_commom_app_backend_v1_xlarge",
       "private": "tf_ng_commom_app_private_v1_medium"
     },
+    "commom": {
+      "public": "tf_ng_commom_app_backend_v1_xlarge",
+      "private": "tf_ng_commom_app_private_v1_medium"
+    },
     "outbound": {
       "public": "tf_ng_outbound_app_v1_xlarge",
       "private": ""
@@ -90,6 +98,10 @@
       "private": "ng_inbound_sa-east-1c_private"
     },
     "common": {
+      "public": "ng_common_sa-east-1a_public",
+      "private": "ng_common_sa-east-1b_private"
+    },
+    "commom": {
       "public": "ng_common_sa-east-1a_public",
       "private": "ng_common_sa-east-1b_private"
     },
