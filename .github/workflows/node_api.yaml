@@ -176,6 +176,7 @@ jobs:
           deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
         env:
+          MODULE: ${{ inputs.module }}
           BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
           DB_PORT: ${{ vars.DB_PORT }}
           DB_HOST: ${{ vars.DB_HOST }}
