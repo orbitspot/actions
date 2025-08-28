@@ -23,7 +23,7 @@ runs:
   using: composite
   steps:
     - name: configure
-      uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.6.0
+      uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.6.1
 
     - name: Download Building files
       uses: actions/download-artifact@v4
