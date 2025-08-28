@@ -195,6 +195,7 @@ jobs:
             REPOSITORY: ${{ github.event.repository.name }}
             DEPLOYMENT_NAME: "landingpage"
           run: |
+            pip install pyyaml
             python orbitspot-actions/.github/scripts/choose-node-selector.py 
             python orbitspot-actions/.github/scripts/replace-properties.py 
             cat .github/helm/next/values.yaml

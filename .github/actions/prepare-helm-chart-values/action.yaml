@@ -99,7 +99,7 @@ runs:
           REPLACE_YAML_PATH=""
         fi
 
-        pip install pyyaml python-dotenv
+        pip install pyyaml
         python orbitspot-actions/.github/scripts/choose-node-selector.py
         python orbitspot-actions/.github/scripts/replace-properties.py
         python orbitspot-actions/.github/scripts/replace-values.py
