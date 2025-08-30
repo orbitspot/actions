@@ -53,6 +53,7 @@ istio:
                                 number: ${.<REPOSITORY-NAME>.build.istio.egress.databases.default.port}
                         weight: 100
     ingress:
+        version: 3
         virtualService:
             hosts:
                 - ${.<REPOSITORY-NAME>.build.istio.ingress.host}
