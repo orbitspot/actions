@@ -32,8 +32,8 @@ containers:
         protocol: TCP
     resources:
       requests:
-        cpu: ${.<NOME-REPOSITORIO>.landingpage.resources.requests.cpu}
-        memory: ${.<NOME-REPOSITORIO>.landingpage.resources.requests.memory}
+        cpu: 10m
+        memory: 8Mi
       limits:
-        cpu: ${.<NOME-REPOSITORIO>.landingpage.resources.limits.cpu}
-        memory: ${.<NOME-REPOSITORIO>.landingpage.resources.limits.memory}
+        cpu: 25m
+        memory: 16Mi
