@@ -9,7 +9,7 @@
       "private": "tf_ng_4_unity_app_private_v1_medium"
     },
     "inbound": {
-      "public": "tf_ng_inbound_v1_medium",
+      "public": "ng_inbound_us-east-1a_private",
       "private": "tf_ng_inbound_private_v1_large"
     },
     "common": {
