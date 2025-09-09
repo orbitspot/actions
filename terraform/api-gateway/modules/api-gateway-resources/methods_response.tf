@@ -7,5 +7,6 @@ resource "aws_api_gateway_method_response" "default" {
     status_code               = each.key
     response_models           = var.method_response.response_models
     response_parameters       = var.method_response.response_parameters
+    region                    = "us-east-1"
 }
 
