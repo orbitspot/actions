@@ -45,7 +45,7 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Start
-        uses: orbitspot/actions/.github/actions/api-gateway@v20.6.0
+        uses: orbitspot/actions/.github/actions/api-gateway@v20.6.2
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
           AWS_REGION: ${{ vars._AWS_REGION }}
@@ -58,7 +58,7 @@ jobs:
           TF_VAR_resource_name: '${{ inputs.resource_name }}'
           TF_VAR_api_gateway: '${{ vars._API_GATEWAY }}'
         with:
-          tag: 'v20.6.0'
+          tag: 'v20.6.2'
       
       - name: Clean up machine
         shell: bash
