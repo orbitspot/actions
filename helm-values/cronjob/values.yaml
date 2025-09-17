@@ -3,6 +3,10 @@ module: <GRAFANA-TAG>
 nodeSelector:
     nodegroup-type: ${.<REPOSITORY-NAME>.build.service.node_selector}
 
+jobTemplate:
+    activeDeadlineSeconds: 900
+    backoffLimit: 3
+
 csiSecrets:
     enabled: true
     serviceAccountName: "application-permission"
