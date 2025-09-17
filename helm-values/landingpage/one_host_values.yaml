@@ -1,7 +1,7 @@
 module: <GRAFANA-TAG>
 
 nodeSelector:
-    nodegroup-type: ${.<NOME-REPOSITORIO>.build.landingpage.node_selector}
+    nodegroup-type: ${.<NOME-REPOSITORIO>.landingpage.node_selector}
 
 ingress:
   annotations:
@@ -32,8 +32,8 @@ containers:
         protocol: TCP
     resources:
       requests:
-        cpu: ${.<NOME-REPOSITORIO>.build.landingpage.resources.requests.cpu}
-        memory: ${.<NOME-REPOSITORIO>.build.landingpage.resources.requests.memory}
+        cpu: 50m
+        memory: 110Mi
       limits:
-        cpu: ${.<NOME-REPOSITORIO>.build.landingpage.resources.limits.cpu}
-        memory: ${.<NOME-REPOSITORIO>.build.landingpage.resources.limits.memory}
+        cpu: 25m
+        memory: 16Mi

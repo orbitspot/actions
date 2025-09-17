@@ -1,5 +1,5 @@
 name: 'Parameter Store'
-description: 'Parameter store'
+description: 'Generate Parameter Store Enviroments for Backend Applications'
 inputs:
   environment_json:
     description: 'environment values'

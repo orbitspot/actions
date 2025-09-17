@@ -1,18 +1,6 @@
 name: 'Parameter Store'
 description: 'Parameter store'
 inputs:
-  aws_account_number:
-    description: 'Account Number'
-    required: true
-    default: '931670397156'
-  aws_role_name:
-    description: 'Aws role with polices to deploy'
-    required: true
-    default: 'github-actions'
-  aws_region:
-    description: 'Aws region'
-    required: true
-    default: 'us-east-1'
   terraform_bucket_name:
     description: 'Bucket'
     required: true
@@ -33,28 +21,28 @@ runs:
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
-      role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
-      role-session-name: ${{ inputs.aws_role_name }}
-      aws-region: ${{ inputs.aws_region }}
+      role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ env.AWS_ROLE_NAME }}
+      role-session-name: ${{ env.AWS_ROLE_NAME }}
+      aws-region: ${{ env.CLUSTER_REGION }}
 
   - name: Checkout code
     uses: actions/checkout@v4
     with:
         repository: 'orbitspot/actions'
-        path: code
+        path: orbitspot-actions
         ref: '${{ inputs.tag }}'
 
   - name: Download Artifact Variables
     uses: actions/download-artifact@v4
     with:
         name: variables
-        path: code/terraform/parameter-store
+        path: orbitspot-actions/terraform/parameter-store
 
   - name: Download Artifact
     uses: actions/download-artifact@v4
     with:
         name: secrets
-        path: code/terraform/parameter-store
+        path: orbitspot-actions/terraform/parameter-store
   
   - name: Install Terraform
     shell: bash
@@ -72,26 +60,26 @@ runs:
     shell: bash
     run: |
       ls
-      cd code/terraform/parameter-store && ls
+      cd orbitspot-actions/terraform/parameter-store && ls
       terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=parameter-store/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
       
   - name: Terraform Plan
     shell: bash
     env:
-      TF_VAR_region: ${{ inputs.aws_region }}
+      TF_VAR_region: ${{ env.CLUSTER_REGION }}
       TF_VAR_modulo: ${{ inputs.modulo }}
       TF_VAR_repository: ${{ inputs.repository }}
     run: |
-      cd code/terraform/parameter-store
+      cd orbitspot-actions/terraform/parameter-store
       terraform plan -no-color
 
   - name: Terraform Apply
     shell: bash
     env:
-      TF_VAR_region: ${{ inputs.aws_region }}
+      TF_VAR_region: ${{ env.CLUSTER_REGION }}
       TF_VAR_modulo: ${{ inputs.modulo }}
       TF_VAR_repository: ${{ inputs.repository }}
     run: |
-      cd code/terraform/parameter-store
+      cd orbitspot-actions/terraform/parameter-store
       terraform apply -auto-approve -no-color
 

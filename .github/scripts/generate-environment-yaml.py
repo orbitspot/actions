@@ -3,9 +3,9 @@ import json
 import os
 
 def generate_yaml():
-  environments = json.loads(os.getenv('environments'))
-  secrets = json.loads(os.getenv('secrets'))
-  repository_name = os.getenv('repository_name')
+  environments = json.loads(os.getenv('VARS'))
+  secrets = json.loads(os.getenv('SECRETS'))
+  repository_name = os.getenv('REPOSITORY_NAME')
 
   devops_variables = ['CLUSTER_REGION', 'ENV', 'CLUSTER_NAME', 'ACCESS_KEY_CODE_ARTIFACT', 'GIT_TOKEN', 'PARAMETERS_ENCRYPT_HASH', 'SECRET_ACCESS_KEY_CODE_ARTIFACT',
                               'API_GATEWAY', 'DEVOPS_CONFIG', 'github_token', 'AWS_ACCOUNT_NUMBER', 'AWS_ROLE_NAME', 'ISTIO_HOST', 'TERRAFORM_BUCKET', 'API_HOST']

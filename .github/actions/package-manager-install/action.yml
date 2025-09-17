@@ -1,6 +1,5 @@
 name: 'Npm/Yarn CI'
 description: 'Install dependencies and build using npm or yarn'
-
 inputs:
   node_version:
     description: 'Node Version'
@@ -34,6 +33,13 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
+
+    - name: Authenticate
+      uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.6.2
+
+    - name: Bash Co Login
+      shell: bash
+      run: bash co_login_commands.txt
 
     - name: Install Dependencies
       shell: bash
