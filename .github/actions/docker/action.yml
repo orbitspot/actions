@@ -45,7 +45,7 @@ runs:
         echo "📜 Aplicando lifecycle policy..."
         aws ecr put-lifecycle-policy \
           --repository-name "$repo_name" \
-          --lifecycle-policy-text file://.github/actions/ecr-policy.json \
+          --lifecycle-policy-text file://.github/actions/docker/ecr-policy.json \
           --region "$AWS_REGION"
         echo "✅ Lifecycle policy aplicada ao repositório $repo_name."
       else
