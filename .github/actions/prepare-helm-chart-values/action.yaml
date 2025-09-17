@@ -22,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'v20.6.2'
+        ref: 'feat/job-template'
 
     - name: Determinar chart_type
       id: set_chart_type
