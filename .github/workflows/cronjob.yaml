@@ -189,7 +189,7 @@ jobs:
           helm_values: helm-values-${{ matrix.artifacts }}
           release: ${{ matrix.artifacts }}
           chart_name: orbitspot/orbitspot-cron
-          chart_version: 0.2.5
+          chart_version: 0.2.6
           sets: |
             --set environment=${{env.ENV}} \
             --set region=${{ env.CLUSTER_REGION }} \
