@@ -43,24 +43,24 @@ runs:
         echo "✅ Repositório $repo_name criado."
 
         echo "📜 Criando lifecycle policy para manter apenas as últimas 5 imagens..."
-        cat > policy.json <<'EOF'
-        {
-          "rules": [
-            {
-              "rulePriority": 1,
-              "description": "Mantenha somente as últimas 5 imagens",
-              "selection": {
-                "tagStatus": "any",
-                "countType": "imageCountMoreThan",
-                "countNumber": 5
-              },
-              "action": {
-                "type": "expire"
-              }
+      cat > policy.json <<'EOF'
+      {
+        "rules": [
+          {
+            "rulePriority": 1,
+            "description": "Mantenha somente as últimas 5 imagens",
+            "selection": {
+              "tagStatus": "any",
+              "countType": "imageCountMoreThan",
+              "countNumber": 5
+            },
+            "action": {
+              "type": "expire"
             }
-          ]
-        }
-        EOF
+          }
+        ]
+      }
+      EOF
         aws ecr put-lifecycle-policy \
           --repository-name "$repo_name" \
           --lifecycle-policy-text file://policy.json \
