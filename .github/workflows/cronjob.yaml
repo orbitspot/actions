@@ -154,7 +154,7 @@ jobs:
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.6.2
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@feat/job-template
         with:
           deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
