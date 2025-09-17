@@ -49,4 +49,5 @@ runs:
         --namespace ${{ inputs.namespace}} ${{ inputs.chart_name }} \
         --version ${{ inputs.chart_version }} \
         --set region=${{ env.CLUSTER_REGION }} \
+        --debug \
         -f values.yaml ${{ inputs.sets }}
