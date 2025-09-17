@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@v20.6.2
+        uses:  orbitspot/actions/.github/actions/setup-config@v20.7.0
         with:
           setup: 'migration'
           repo_vars: '${{ toJson(vars) }}'
@@ -49,7 +49,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v20.6.2
+        uses: orbitspot/actions/.github/actions/package-manager-install@v20.7.0
         with:
           node_version: '20'
           customized_dockerfile: '${{ inputs.dockerfile_path  }}'
@@ -67,7 +67,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/generate-docker@v20.6.2
+        uses: orbitspot/actions/.github/actions/generate-docker@v20.7.0
         with:
           deployment_name: migration
           dockerfile_path: ${{ inputs.dockerfile_path }}
@@ -92,7 +92,7 @@ jobs:
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.6.2
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v20.7.0
         with:
           deployment_name: migration
           grafana_tag: ${{ inputs.grafana_tag }}
@@ -118,7 +118,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v20.6.2
+        uses: orbitspot/actions/.github/actions/helm-deploy@v20.7.0
         with:
           namespace: '${{ github.event.repository.name }}'
           helm_values: helm-values-migration
