@@ -50,4 +50,5 @@ runs:
         --version ${{ inputs.chart_version }} \
         --set region=${{ env.CLUSTER_REGION }} \
         --debug \
+        --dry-run \
         -f values.yaml ${{ inputs.sets }}
