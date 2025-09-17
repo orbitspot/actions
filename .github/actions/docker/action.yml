@@ -41,11 +41,11 @@ runs:
         echo "⚠️ Repositório $repo_name não encontrado. Criando..."
         aws ecr create-repository --repository-name "$repo_name" --region "$AWS_REGION"
         echo "✅ Repositório $repo_name criado."
-
+        aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/ecr/ecr-policy.json ecr-policy.json
         echo "📜 Aplicando lifecycle policy..."
         aws ecr put-lifecycle-policy \
           --repository-name "$repo_name" \
-          --lifecycle-policy-text file://.github/actions/docker/ecr-policy.json \
+          --lifecycle-policy-text file://ecr-policy.json \
           --region "$AWS_REGION"
         echo "✅ Lifecycle policy aplicada ao repositório $repo_name."
       else
