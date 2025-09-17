@@ -33,7 +33,6 @@ runs:
     shell: bash
     env:
       AWS_REGION: ${{ env.CLUSTER_REGION }}
-      AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT_NUMBER }}
     run: |
       set -e
       repo_name="${{ inputs.image }}"
