@@ -35,20 +35,32 @@ runs:
       run: |
         ls -ltra
 
-    - name: CheckValues
+    - name: Check Values
       shell: bash
       run: |
+        echo "Values"
         cat values.yaml
+    
+    - name: Check Template
+      shell: bash
+      run: |
+        echo "Files"
+        helm template ${{ inputs.release}} \
+          --version ${{ inputs.chart_version }} \
+          --set region=${{ env.CLUSTER_REGION }} \
+          -f values.yaml \
+          ${{ inputs.sets }}
+          --debug > rendered.yaml
+        cat rendered.yaml
 
     - name: Helm Install
       shell: bash
       run: |
-        helm upgrade ${{ inputs.release}}  \
-        --install \
-        --create-namespace \
-        --namespace ${{ inputs.namespace}} ${{ inputs.chart_name }} \
-        --version ${{ inputs.chart_version }} \
-        --set region=${{ env.CLUSTER_REGION }} \
-        --debug \
-        --dry-run \
-        -f values.yaml ${{ inputs.sets }}
+        helm upgrade ${{ inputs.release}} \
+          --install \
+          --create-namespace \
+          --namespace ${{ inputs.namespace}} ${{ inputs.chart_name }} \
+          --version ${{ inputs.chart_version }} \
+          --set region=${{ env.CLUSTER_REGION }} \
+          -f values.yaml \
+          ${{ inputs.sets }}
