@@ -74,8 +74,8 @@ jobs:
           version: '20'
           build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
           before_building: |
-            echo "${{ inputs.run_command }}" >> migration.sh
-            cat base_script.sh migration.sh > migration.sh
+            echo "${{ inputs.run_command }}" >> command.sh
+            cat base_script.sh command.sh > migration.sh
             cat migration.sh
 
   prepare-helm-replacements:
