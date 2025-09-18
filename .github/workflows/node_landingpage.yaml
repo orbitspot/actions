@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@v20.7.0
+        uses:  orbitspot/actions/.github/actions/setup-config@v20.8.0
         with:
           setup: 'landingpage'
           repo_vars: '${{ toJson(vars) }}'
@@ -70,7 +70,7 @@ jobs:
             name: Checkout
             with:
                 repository: 'orbitspot/actions'
-                ref: v20.7.0
+                ref: v20.8.0
                 path: orbitspot-actions
 
           - name: Fetch landingpage variables
@@ -84,7 +84,7 @@ jobs:
               cat .env
 
           - name: Generate Build Args
-            uses: orbitspot/actions/.github/actions/generate-build-args@v20.7.0
+            uses: orbitspot/actions/.github/actions/generate-build-args@v20.8.0
             with:
               landingpage_config: '${{ vars._LANDINGPAGE_CONFIG }}'
               branch: '${{ github.ref_name }}'
@@ -94,7 +94,7 @@ jobs:
               aws s3 sync s3://devops.orbitspot.com/build-github-actions/v1/deploy/landingpage .
           
           - name: docker-build
-            uses: orbitspot/actions/.github/actions/docker@v20.7.0
+            uses: orbitspot/actions/.github/actions/docker@v20.8.0
             with:
                 image: ${{ github.event.repository.name }}
                 tag: ${{ github.sha }}
@@ -115,14 +115,14 @@ jobs:
         AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
       steps:
           - name: create-role
-            uses: orbitspot/actions/.github/actions/create-role-service-account@v20.7.0
+            uses: orbitspot/actions/.github/actions/create-role-service-account@v20.8.0
             with:
                 role: "${{ github.event.repository.name }}-${{ env.ENV }}"
                 namespace: ${{ github.event.repository.name }}
                 service_account_name: "application-permission"
 
           - name: create-namespace
-            uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.7.0
+            uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.8.0
             with:
                 namespace: ${{ github.event.repository.name }}
                 service_account_name: "application-permission"
@@ -151,14 +151,14 @@ jobs:
               python-version: '3.x'
 
         - name: Authenticate
-          uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.7.0
+          uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.8.0
 
         - name: Checkout script repository
           uses: actions/checkout@v4
           with:
             repository: 'orbitspot/actions'
             path: orbitspot-actions
-            ref: 'v20.7.0'
+            ref: 'v20.8.0'
 
         - name: Copy Helm from S3 - 1 Host
           if: ${{ vars.HOST_MF_2 == ''}}
@@ -215,7 +215,7 @@ jobs:
       steps:
           - name: Helm Apply 1 host
             if: ${{ vars.HOST_MF_2 == ''}}
-            uses: orbitspot/actions/.github/actions/helm-deploy@v20.7.0
+            uses: orbitspot/actions/.github/actions/helm-deploy@v20.8.0
             with:
               namespace: ${{ github.event.repository.name }}
               helm_values: helm-values
@@ -232,7 +232,7 @@ jobs:
                 
           - name: Helm Apply 2 hosts
             if: ${{ vars.HOST_MF_2 != ''}}
-            uses: orbitspot/actions/.github/actions/helm-deploy@v20.7.0
+            uses: orbitspot/actions/.github/actions/helm-deploy@v20.8.0
             with:
               namespace: ${{ github.event.repository.name }}
               helm_values: helm-values
