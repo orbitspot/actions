@@ -10,7 +10,7 @@ on:
 
 jobs:
   update-and-trigger:
-    runs-on: ubuntu-latest
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     strategy:
       matrix:
         repository:
