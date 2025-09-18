@@ -140,7 +140,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: create-role
-        uses: orbitspot/actions/.github/actions/create-role-service-account@v20.7.0
+        uses: orbitspot/actions/.github/actions/create-role-service-account@feat/default-role
         with:
           role: '${{ github.event.repository.name }}-${{ env.ENV }}'
           namespace: ${{ github.event.repository.name }}
