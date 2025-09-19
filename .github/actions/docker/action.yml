@@ -29,18 +29,41 @@ runs:
     env:
       AWS_REGION: ${{ env.CLUSTER_REGION }}
 
+  - name: Ensure ECR Repository exists
+    shell: bash
+    env:
+      AWS_REGION: ${{ env.CLUSTER_REGION }}
+    run: |
+      set -e
+      repo_name="${{ inputs.image }}"
+      echo "🔎 Verificando se o repositório $repo_name existe..."
+      if ! aws ecr describe-repositories --repository-names "$repo_name" --region "$AWS_REGION" >/dev/null 2>&1; then
+        echo "⚠️ Repositório $repo_name não encontrado. Criando..."
+        aws ecr create-repository --repository-name "$repo_name" --region "$AWS_REGION"
+        echo "✅ Repositório $repo_name criado."
+        aws s3 cp s3://devops.orbitspot.com/build-github-actions/v1/ecr/ecr-policy.json ecr-policy.json
+        echo "📜 Aplicando lifecycle policy..."
+        aws ecr put-lifecycle-policy \
+          --repository-name "$repo_name" \
+          --lifecycle-policy-text file://ecr-policy.json \
+          --region "$AWS_REGION"
+        echo "✅ Lifecycle policy aplicada ao repositório $repo_name."
+      else
+        echo "✅ Repositório $repo_name já existe."
+      fi
+
   - name: Download Building files
     uses: actions/download-artifact@v4
     if: ${{ inputs.content != '' }}
     with:
-        name: ${{ inputs.content }}
+      name: ${{ inputs.content }}
   
   - name: Before Image Building
     shell: bash
     if: ${{ inputs.before_building != '' }}
     run: ${{ inputs.before_building }}
 
-  - name: "Building Image ${{ matrix.artifacts }}"
+  - name: "Building and pushing image"
     shell: bash
     run: |
       docker build -t ${{ inputs.image }}:${{ inputs.tag }} ${{ inputs.build_args }} .
