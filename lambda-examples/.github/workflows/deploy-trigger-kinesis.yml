@@ -1,0 +1,80 @@
+name: Deploy Lambda - Kinesis Trigger
+
+on:
+  push:
+    branches: [develop, homolog, master]
+  workflow_dispatch:
+    inputs:
+      stream_name:
+        description: 'Kinesis stream name'
+        required: false
+        type: string
+        default: 'lambda-examples-stream'
+      batch_size:
+        description: 'Batch size for processing records'
+        required: false
+        type: string
+        default: '100'
+      starting_position:
+        description: 'Starting position (TRIM_HORIZON or LATEST)'
+        required: false
+        type: choice
+        options:
+          - TRIM_HORIZON
+          - LATEST
+        default: 'LATEST'
+      parallelization_factor:
+        description: 'Parallelization factor (1-10)'
+        required: false
+        type: string
+        default: '1'
+      maximum_batching_window:
+        description: 'Maximum batching window in seconds'
+        required: false
+        type: string
+        default: '0'
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/lambda.yaml
+    with:
+      module: "lambda-examples"
+      function_name: "lambda-examples-kinesis"
+      handler: "index.handler"
+      runtime: "nodejs18.x"
+      trigger_type: "kinesis"
+      kinesis_config: '[]'  # Usa configuração da organização por padrão
+    secrets: inherit
+
+  summary:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "## 🌊 Kinesis Lambda Deployment" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Function:** lambda-examples-kinesis-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Stream:** ${{ github.event.inputs.stream_name || 'lambda-examples-stream' }}-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Batch Size:** ${{ github.event.inputs.batch_size || '100' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Starting Position:** ${{ github.event.inputs.starting_position || 'LATEST' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Parallelization:** ${{ github.event.inputs.parallelization_factor || '1' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Batching Window:** ${{ github.event.inputs.maximum_batching_window || '0' }}s" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Kinesis Settings" >> $GITHUB_STEP_SUMMARY
+        echo "- **TRIM_HORIZON:** Process from oldest available record" >> $GITHUB_STEP_SUMMARY
+        echo "- **LATEST:** Process only new records after Lambda starts" >> $GITHUB_STEP_SUMMARY
+        echo "- **Batch Size:** Number of records per Lambda invocation (1-10000)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Parallelization:** Number of concurrent executions per shard (1-10)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🧪 Test Commands" >> $GITHUB_STEP_SUMMARY
+        echo '```bash' >> $GITHUB_STEP_SUMMARY
+        echo '# Send test record to Kinesis stream' >> $GITHUB_STEP_SUMMARY
+        echo 'aws kinesis put-record \' >> $GITHUB_STEP_SUMMARY
+        echo '  --stream-name "${{ github.event.inputs.stream_name || 'lambda-examples-stream' }}-${{ github.ref_name }}" \' >> $GITHUB_STEP_SUMMARY
+        echo '  --data "$(echo '"'"'{"message":"test-record","timestamp":"'"'"'$(date -u +%Y-%m-%dT%H:%M:%S.%3NZ)'"'"'"}'"'"' | base64)" \' >> $GITHUB_STEP_SUMMARY
+        echo '  --partition-key "test-partition"' >> $GITHUB_STEP_SUMMARY
+        echo '' >> $GITHUB_STEP_SUMMARY
+        echo '# Check stream status' >> $GITHUB_STEP_SUMMARY
+        echo 'aws kinesis describe-stream --stream-name "${{ github.event.inputs.stream_name || 'lambda-examples-stream' }}-${{ github.ref_name }}"' >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY

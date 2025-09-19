@@ -1,0 +1,70 @@
+name: Deploy Lambda - CloudWatch Events Trigger
+
+on:
+  push:
+    branches: [develop, homolog, master]
+  workflow_dispatch:
+    inputs:
+      schedule_expression:
+        description: 'Schedule expression (cron or rate)'
+        required: false
+        type: string
+        default: 'rate(5 minutes)'
+      rule_name:
+        description: 'CloudWatch Events rule name'
+        required: false
+        type: string
+        default: 'lambda-examples-schedule'
+      rule_description:
+        description: 'Description for the CloudWatch Events rule'
+        required: false
+        type: string
+        default: 'Scheduled trigger for Lambda examples'
+      enabled:
+        description: 'Enable the CloudWatch Events rule'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/lambda.yaml
+    with:
+      module: "lambda-examples"
+      function_name: "lambda-examples-cloudwatch-events"
+      handler: "index.handler"
+      runtime: "nodejs18.x"
+      trigger_type: "cloudwatch-events"
+      cloudwatch_events_config: '[]'  # Usa configuração da organização por padrão
+    secrets: inherit
+
+  summary:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "## 🚀 CloudWatch Events Lambda Deployment" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Function:** lambda-examples-cloudwatch-events-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Rule Name:** ${{ github.event.inputs.rule_name || 'lambda-examples-schedule' }}-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Schedule:** ${{ github.event.inputs.schedule_expression || 'rate(5 minutes)' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Description:** ${{ github.event.inputs.rule_description || 'Scheduled trigger for Lambda examples' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Enabled:** ${{ github.event.inputs.enabled || 'true' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📅 Schedule Examples" >> $GITHUB_STEP_SUMMARY
+        echo "- **Every 5 minutes:** \`rate(5 minutes)\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Hourly:** \`rate(1 hour)\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Daily at 2 AM:** \`cron(0 2 * * ? *)\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Weekdays at 9 AM:** \`cron(0 9 ? * MON-FRI *)\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **First day of month:** \`cron(0 0 1 * ? *)\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🧪 Test Commands" >> $GITHUB_STEP_SUMMARY
+        echo '```bash' >> $GITHUB_STEP_SUMMARY
+        echo '# View CloudWatch Events rule' >> $GITHUB_STEP_SUMMARY
+        echo 'aws events describe-rule --name "${{ github.event.inputs.rule_name || 'lambda-examples-schedule' }}-${{ github.ref_name }}"' >> $GITHUB_STEP_SUMMARY
+        echo '' >> $GITHUB_STEP_SUMMARY
+        echo '# Manually trigger the rule for testing' >> $GITHUB_STEP_SUMMARY
+        echo 'aws events put-events \' >> $GITHUB_STEP_SUMMARY
+        echo '  --entries "Source=manual,DetailType=Manual Test,Detail={\"test\":\"manual-trigger\"}"' >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY

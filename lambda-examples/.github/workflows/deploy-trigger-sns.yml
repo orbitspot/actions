@@ -1,0 +1,50 @@
+name: Deploy Lambda - SNS Trigger
+
+on:
+  push:
+    branches: [develop, homolog, master]
+  workflow_dispatch:
+    inputs:
+      topic_name:
+        description: 'SNS Topic name (will add environment suffix)'
+        required: false
+        type: string
+        default: 'lambda-examples-notifications'
+      create_topic:
+        description: 'Create SNS topic if it does not exist'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/lambda.yaml
+    with:
+      module: "lambda-examples"
+      function_name: "lambda-examples-sns"
+      handler: "index.handler"
+      runtime: "nodejs18.x"
+      trigger_type: "sns"
+      sns_config: '[]'  # Usa configuração da organização por padrão
+    secrets: inherit
+
+  summary:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "## 🚀 SNS Lambda Deployment" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Function:** lambda-examples-sns-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Topic:** ${{ github.event.inputs.topic_name || 'lambda-examples-notifications' }}-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Create Topic:** ${{ github.event.inputs.create_topic || 'true' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🧪 Test Commands" >> $GITHUB_STEP_SUMMARY
+        echo '```bash' >> $GITHUB_STEP_SUMMARY
+        echo '# Publish a test message' >> $GITHUB_STEP_SUMMARY
+        echo 'aws sns publish \' >> $GITHUB_STEP_SUMMARY
+        echo '  --topic-arn "arn:aws:sns:us-east-1:931670397156:${{ github.event.inputs.topic_name || 'lambda-examples-notifications' }}-${{ github.ref_name }}" \' >> $GITHUB_STEP_SUMMARY
+        echo '  --message '\''{"test": "sns-trigger", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}'\'' \' >> $GITHUB_STEP_SUMMARY
+        echo '  --subject "Test SNS Trigger"' >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,331 @@
+name: Lambda Deploy
+
+on:
+  workflow_call:
+    inputs:
+      module:
+        description: 'Module name for tagging and organization'
+        required: true
+        type: string
+      function_name:
+        description: 'Lambda function name (optional, defaults to repository-branch)'
+        required: false
+        type: string
+        default: ''
+      handler:
+        description: 'Lambda function handler'
+        required: false
+        type: string
+        default: 'index.handler'
+      runtime:
+        description: 'Lambda runtime'
+        required: false
+        type: string
+        default: 'nodejs18.x'
+      timeout:
+        description: 'Lambda timeout in seconds'
+        required: false
+        type: number
+        default: 30
+      memory_size:
+        description: 'Lambda memory size in MB'
+        required: false
+        type: number
+        default: 128
+      build_command:
+        description: 'Command to build the Lambda package'
+        required: false
+        type: string
+        default: 'npm run build'
+      package_command:
+        description: 'Command to create deployment package'
+        required: false
+        type: string
+        default: 'zip -r function.zip .'
+      source_dir:
+        description: 'Source directory to package (relative to repo root)'
+        required: false
+        type: string
+        default: '.'
+      exclude_files:
+        description: 'Files/patterns to exclude from package (space-separated)'
+        required: false
+        type: string
+        default: 'node_modules/.bin tests/ *.test.js .git/ .github/ README.md'
+      node_version:
+        description: 'Node.js version for build (if using Node.js)'
+        required: false
+        type: string
+        default: '18'
+      use_docker_build:
+        description: 'Use Docker for building Lambda package'
+        required: false
+        type: boolean
+        default: false
+      docker_file:
+        description: 'Dockerfile path for Lambda build'
+        required: false
+        type: string
+        default: 'Dockerfile.lambda'
+      trigger_type:
+        description: 'Type of trigger to configure (api-gateway, s3, sqs, sns, kinesis, cloudwatch-events, cloudwatch-logs, function-url, all)'
+        required: false
+        type: string
+        default: 'all'
+      api_gateway_config:
+        description: 'API Gateway specific configuration (JSON)'
+        required: false
+        type: string
+        default: '[]'
+      s3_config:
+        description: 'S3 specific configuration (JSON)'
+        required: false
+        type: string
+        default: '[]'
+    sns_config:
+      description: 'SNS configuration as JSON string'
+      required: false
+      type: string
+      default: '[]'
+    sqs_config:
+      description: 'SQS configuration as JSON string'
+      required: false
+      type: string
+      default: '[]'
+    cloudwatch_events_config:
+      description: 'CloudWatch Events configuration as JSON string'
+      required: false
+      type: string
+      default: '[]'
+    kinesis_config:
+      description: 'Kinesis configuration as JSON string'
+      required: false
+      type: string
+      default: '[]'
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
+
+env:
+  AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
+  AWS_REGION: ${{ vars._AWS_REGION }}
+
+jobs:
+  setup-config:
+    name: Set Up Config
+    runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    environment: ${{ github.ref_name }}
+    outputs:
+      CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
+      AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
+      S3_BUCKET: '${{ steps.set-output.outputs.S3_BUCKET }}'
+    steps:
+      - name: Set up
+        id: set-output
+        uses: orbitspot/actions/.github/actions/setup-config@v20.8.0
+        with:
+          devops_config: ${{ vars._DEVOPS_CONFIG }}
+          branch: ${{ github.ref_name }}
+
+  build-lambda:
+    name: Build Lambda Package
+    runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    environment: ${{ github.ref_name }}
+    needs: [setup-config]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        if: ${{ contains(inputs.runtime, 'nodejs') && !inputs.use_docker_build }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      - name: Set up Python
+        if: ${{ contains(inputs.runtime, 'python') && !inputs.use_docker_build }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Cache dependencies
+        if: ${{ contains(inputs.runtime, 'nodejs') && !inputs.use_docker_build }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Node.js dependencies
+        if: ${{ contains(inputs.runtime, 'nodejs') && !inputs.use_docker_build }}
+        working-directory: ${{ inputs.source_dir }}
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci --only=production
+          fi
+
+      - name: Install Python dependencies
+        if: ${{ contains(inputs.runtime, 'python') && !inputs.use_docker_build }}
+        working-directory: ${{ inputs.source_dir }}
+        run: |
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt -t .
+          fi
+
+      - name: Build Lambda function
+        if: ${{ !inputs.use_docker_build }}
+        working-directory: ${{ inputs.source_dir }}
+        run: |
+          if [ -n "${{ inputs.build_command }}" ] && [ "${{ inputs.build_command }}" != "skip" ]; then
+            ${{ inputs.build_command }}
+          fi
+
+      - name: Docker build Lambda package
+        if: ${{ inputs.use_docker_build }}
+        run: |
+          docker build -f ${{ inputs.docker_file }} -t lambda-builder .
+          docker run --rm -v $(pwd)/build:/output lambda-builder
+          cd build && zip -r ../function.zip .
+
+      - name: Create deployment package
+        if: ${{ !inputs.use_docker_build }}
+        working-directory: ${{ inputs.source_dir }}
+        run: |
+          # Remove files that shouldn't be in the package
+          if [ -n "${{ inputs.exclude_files }}" ]; then
+            for pattern in ${{ inputs.exclude_files }}; do
+              find . -name "$pattern" -exec rm -rf {} + 2>/dev/null || true
+            done
+          fi
+          
+          # Create the zip package
+          if [ "${{ inputs.package_command }}" = "zip -r function.zip ." ]; then
+            zip -r function.zip . -x "*.git*" "*.github*" "node_modules/.bin/*" "tests/*" "*.test.*"
+          else
+            ${{ inputs.package_command }}
+          fi
+
+      - name: Upload Lambda package
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-package
+          path: ${{ inputs.source_dir }}/function.zip
+          retention-days: 1
+
+  deploy-lambda:
+    name: Deploy Lambda Function
+    runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    environment: ${{ github.ref_name }}
+    needs: [setup-config, build-lambda]
+    env:
+      CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
+      S3_BUCKET: ${{ needs.setup-config.outputs.S3_BUCKET }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout infrastructure code
+        uses: actions/checkout@v4
+
+      - name: Download Lambda package
+        uses: actions/download-artifact@v4
+        with:
+          name: lambda-package
+          path: ./
+
+      - name: Upload to S3
+        id: s3-upload
+        run: |
+          # Configure AWS credentials
+          export AWS_ROLE_ARN="arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ env.AWS_ROLE_NAME }}"
+          aws sts get-caller-identity
+          
+          # Upload Lambda package to S3
+          S3_KEY="lambda-packages/${{ github.event.repository.name }}/${{ github.ref_name }}/function-${{ github.sha }}.zip"
+          aws s3 cp function.zip s3://${{ env.S3_BUCKET }}/$S3_KEY
+          
+          echo "s3_bucket=${{ env.S3_BUCKET }}" >> $GITHUB_OUTPUT
+          echo "s3_key=$S3_KEY" >> $GITHUB_OUTPUT
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.0"
+
+      - name: Deploy Lambda with Terraform
+        working-directory: ./terraform/lambda
+        env:
+          TF_VAR_branch: ${{ github.ref_name }}
+          TF_VAR_repository_name: ${{ github.event.repository.name }}
+          TF_VAR_function_name: ${{ inputs.function_name }}
+          TF_VAR_handler: ${{ inputs.handler }}
+          TF_VAR_runtime: ${{ inputs.runtime }}
+          TF_VAR_timeout: ${{ vars.LAMBDA_TIMEOUT || inputs.timeout }}
+          TF_VAR_memory_size: ${{ vars.LAMBDA_MEMORY_SIZE || inputs.memory_size }}
+          TF_VAR_s3_bucket: ${{ steps.s3-upload.outputs.s3_bucket }}
+          TF_VAR_s3_key: ${{ steps.s3-upload.outputs.s3_key }}
+          TF_VAR_log_retention_days: ${{ vars.LAMBDA_LOG_RETENTION || 14 }}
+          TF_VAR_reserved_concurrent_executions: ${{ vars.LAMBDA_RESERVED_CONCURRENCY || -1 }}
+          TF_VAR_environment_variables: ${{ vars.LAMBDA_ENV_VARS || '{}' }}
+          TF_VAR_vpc_config: ${{ vars.LAMBDA_VPC_CONFIG || 'null' }}
+          TF_VAR_iam_policies: ${{ vars.LAMBDA_IAM_POLICIES || '[]' }}
+          TF_VAR_dead_letter_queue_arn: ${{ vars.LAMBDA_DLQ_ARN || '' }}
+          TF_VAR_function_url_auth_type: ${{ vars.LAMBDA_FUNCTION_URL_AUTH_TYPE || 'AWS_IAM' }}
+          TF_VAR_function_url_cors: ${{ vars.LAMBDA_FUNCTION_URL_CORS || 'null' }}
+          TF_VAR_api_gateway_triggers: ${{ (inputs.trigger_type == 'api-gateway' || inputs.trigger_type == 'all') && (inputs.api_gateway_config != '[]' && inputs.api_gateway_config || vars.LAMBDA_API_GATEWAY_TRIGGERS) || '[]' }}
+          TF_VAR_s3_triggers: ${{ (inputs.trigger_type == 's3' || inputs.trigger_type == 'all') && (inputs.s3_config != '[]' && inputs.s3_config || vars.LAMBDA_S3_TRIGGERS) || '[]' }}
+          TF_VAR_sns_triggers: ${{ (inputs.trigger_type == 'sns' || inputs.trigger_type == 'all') && (inputs.sns_config != '[]' && inputs.sns_config || vars.LAMBDA_SNS_TRIGGERS) || '[]' }}
+          TF_VAR_sqs_triggers: ${{ (inputs.trigger_type == 'sqs' || inputs.trigger_type == 'all') && (inputs.sqs_config != '[]' && inputs.sqs_config || vars.LAMBDA_SQS_TRIGGERS) || '[]' }}
+          TF_VAR_dynamodb_triggers: ${{ (inputs.trigger_type == 'dynamodb' || inputs.trigger_type == 'all') && vars.LAMBDA_DYNAMODB_TRIGGERS || '[]' }}
+          TF_VAR_kinesis_triggers: ${{ (inputs.trigger_type == 'kinesis' || inputs.trigger_type == 'all') && (inputs.kinesis_config != '[]' && inputs.kinesis_config || vars.LAMBDA_KINESIS_TRIGGERS) || '[]' }}
+          TF_VAR_cloudwatch_event_triggers: ${{ (inputs.trigger_type == 'cloudwatch-events' || inputs.trigger_type == 'all') && (inputs.cloudwatch_events_config != '[]' && inputs.cloudwatch_events_config || vars.LAMBDA_CLOUDWATCH_EVENT_TRIGGERS) || '[]' }}
+          TF_VAR_cloudwatch_log_triggers: ${{ (inputs.trigger_type == 'cloudwatch-logs' || inputs.trigger_type == 'all') && vars.LAMBDA_CLOUDWATCH_LOG_TRIGGERS || '[]' }}
+          TF_VAR_cognito_triggers: ${{ (inputs.trigger_type == 'cognito' || inputs.trigger_type == 'all') && vars.LAMBDA_COGNITO_TRIGGERS || '[]' }}
+          TF_VAR_alb_triggers: ${{ (inputs.trigger_type == 'alb' || inputs.trigger_type == 'all') && vars.LAMBDA_ALB_TRIGGERS || '[]' }}
+          TF_VAR_function_url_enabled: ${{ inputs.trigger_type == 'function-url' && 'true' || (inputs.trigger_type == 'all' && vars.LAMBDA_FUNCTION_URL_ENABLED) || 'false' }}
+          TF_VAR_tags: |
+            {
+              "Module": "${{ inputs.module }}",
+              "Repository": "${{ github.event.repository.name }}",
+              "Branch": "${{ github.ref_name }}",
+              "Commit": "${{ github.sha }}",
+              "Environment": "${{ github.ref_name }}"
+            }
+        run: |
+          # Initialize Terraform with S3 backend
+          terraform init \
+            -backend-config="bucket=${{ env.S3_BUCKET }}" \
+            -backend-config="key=terraform-state/lambda/${{ github.event.repository.name }}/${{ github.ref_name }}/terraform.tfstate" \
+            -backend-config="region=${{ env.CLUSTER_REGION }}"
+          
+          # Plan and apply
+          terraform plan -out=tfplan
+          terraform apply tfplan
+
+      - name: Get Lambda outputs
+        id: lambda-outputs
+        working-directory: ./terraform/lambda
+        run: |
+          echo "function_name=$(terraform output -raw function_name)" >> $GITHUB_OUTPUT
+          echo "function_arn=$(terraform output -raw function_arn)" >> $GITHUB_OUTPUT
+          if terraform output function_url >/dev/null 2>&1; then
+            echo "function_url=$(terraform output -raw function_url)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Lambda function code
+        run: |
+          # Update the function code to ensure it's using the latest package
+          aws lambda update-function-code \
+            --function-name "${{ steps.lambda-outputs.outputs.function_name }}" \
+            --s3-bucket "${{ steps.s3-upload.outputs.s3_bucket }}" \
+            --s3-key "${{ steps.s3-upload.outputs.s3_key }}" \
+            --region "${{ env.CLUSTER_REGION }}"
+
+      - name: Clean up
+        if: always()
+        run: |
+          rm -f function.zip
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*

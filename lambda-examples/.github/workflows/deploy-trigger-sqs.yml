@@ -1,0 +1,68 @@
+name: Deploy Lambda - SQS Trigger
+
+on:
+  push:
+    branches: [develop, homolog, master]
+  workflow_dispatch:
+    inputs:
+      queue_name:
+        description: 'SQS Queue name (will add environment suffix)'
+        required: false
+        type: string
+        default: 'lambda-examples-queue'
+      batch_size:
+        description: 'Batch size for SQS processing'
+        required: false
+        type: number
+        default: 10
+      visibility_timeout:
+        description: 'Visibility timeout in seconds'
+        required: false
+        type: number
+        default: 60
+      create_queue:
+        description: 'Create SQS queue if it does not exist'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/lambda.yaml
+    with:
+      module: "lambda-examples"
+      function_name: "lambda-examples-sqs"
+      handler: "index.handler"
+      runtime: "nodejs18.x"
+      trigger_type: "sqs"
+      sqs_config: '[]'  # Usa configuração da organização por padrão
+    secrets: inherit
+
+  summary:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "## 🚀 SQS Lambda Deployment" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Function:** lambda-examples-sqs-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Queue:** ${{ github.event.inputs.queue_name || 'lambda-examples-queue' }}-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Batch Size:** ${{ github.event.inputs.batch_size || 10 }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Visibility Timeout:** ${{ github.event.inputs.visibility_timeout || 60 }}s" >> $GITHUB_STEP_SUMMARY
+        echo "**Create Queue:** ${{ github.event.inputs.create_queue || 'true' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🧪 Test Commands" >> $GITHUB_STEP_SUMMARY
+        echo '```bash' >> $GITHUB_STEP_SUMMARY
+        echo '# Send a test message' >> $GITHUB_STEP_SUMMARY
+        echo 'aws sqs send-message \' >> $GITHUB_STEP_SUMMARY
+        echo '  --queue-url "https://sqs.us-east-1.amazonaws.com/931670397156/${{ github.event.inputs.queue_name || 'lambda-examples-queue' }}-${{ github.ref_name }}" \' >> $GITHUB_STEP_SUMMARY
+        echo '  --message-body '\''{"test": "sqs-trigger", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}'\''' >> $GITHUB_STEP_SUMMARY
+        echo '' >> $GITHUB_STEP_SUMMARY
+        echo '# Send batch messages' >> $GITHUB_STEP_SUMMARY
+        echo 'for i in {1..5}; do' >> $GITHUB_STEP_SUMMARY
+        echo '  aws sqs send-message \' >> $GITHUB_STEP_SUMMARY
+        echo '    --queue-url "https://sqs.us-east-1.amazonaws.com/931670397156/${{ github.event.inputs.queue_name || 'lambda-examples-queue' }}-${{ github.ref_name }}" \' >> $GITHUB_STEP_SUMMARY
+        echo '    --message-body "{\\"batch\\": true, \\"number\\": $i}"' >> $GITHUB_STEP_SUMMARY
+        echo 'done' >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY

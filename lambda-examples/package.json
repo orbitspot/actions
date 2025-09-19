@@ -1,0 +1,28 @@
+{
+  "name": "lambda-examples",
+  "version": "1.0.0",
+  "description": "Exemplos de Lambda com múltiplos triggers para testes",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"No build step required for Node.js Lambda\"",
+    "local": "sam local start-api",
+    "invoke": "sam local invoke"
+  },
+  "keywords": [
+    "lambda",
+    "aws",
+    "serverless",
+    "triggers",
+    "examples"
+  ],
+  "author": "OrbitSpot",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.1400.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18"
+  }
+}

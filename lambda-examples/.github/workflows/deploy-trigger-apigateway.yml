@@ -1,0 +1,46 @@
+name: Deploy Lambda - API Gateway Trigger
+
+on:
+  push:
+    branches: [develop, homolog, master]
+  workflow_dispatch:
+    inputs:
+      endpoints:
+        description: 'Endpoints to create (comma-separated: health,webhook,users)'
+        required: false
+        type: string
+        default: 'health,webhook'
+      methods:
+        description: 'HTTP methods (comma-separated: GET,POST,PUT,DELETE)'
+        required: false
+        type: string
+        default: 'GET,POST'
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/lambda.yaml
+    with:
+      module: "lambda-examples"
+      function_name: "lambda-examples-apigateway"
+      handler: "index.handler"
+      runtime: "nodejs18.x"
+      trigger_type: "api-gateway"
+      api_gateway_config: '[]'  # Usa configuração da organização por padrão
+    secrets: inherit
+
+  summary:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "## 🚀 API Gateway Lambda Deployment" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Function:** lambda-examples-apigateway-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Endpoints:** ${{ github.event.inputs.endpoints || 'health,webhook' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Methods:** ${{ github.event.inputs.methods || 'GET,POST' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📋 Configuration Used" >> $GITHUB_STEP_SUMMARY
+        echo "- Uses organization API Gateway settings" >> $GITHUB_STEP_SUMMARY
+        echo "- Custom authorizers configured per environment" >> $GITHUB_STEP_SUMMARY
+        echo "- API Gateway IDs from organization variables" >> $GITHUB_STEP_SUMMARY

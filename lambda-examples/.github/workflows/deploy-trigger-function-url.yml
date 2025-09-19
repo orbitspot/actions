@@ -1,0 +1,17 @@
+name: Deploy Lambda - Function URL
+
+on:
+  push:
+    branches: [develop, homolog, master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/lambda.yaml
+    with:
+      module: "lambda-examples"
+      function_name: "lambda-examples-function-url"
+      handler: "index.handler"
+      runtime: "nodejs18.x"
+      trigger_type: "function-url"
+    secrets: inherit

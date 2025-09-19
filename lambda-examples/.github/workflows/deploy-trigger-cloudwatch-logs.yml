@@ -1,0 +1,17 @@
+name: Deploy Lambda - CloudWatch Logs Trigger
+
+on:
+  push:
+    branches: [develop, homolog, master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/lambda.yaml
+    with:
+      module: "lambda-examples"
+      function_name: "lambda-examples-cloudwatch-logs"
+      handler: "index.handler"
+      runtime: "nodejs18.x"
+      trigger_type: "cloudwatch-logs"
+    secrets: inherit

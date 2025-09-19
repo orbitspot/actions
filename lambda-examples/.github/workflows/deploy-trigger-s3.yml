@@ -1,0 +1,47 @@
+name: Deploy Lambda - S3 Trigger
+
+on:
+  push:
+    branches: [develop, homolog, master]
+  workflow_dispatch:
+    inputs:
+      bucket_name:
+        description: 'S3 Bucket name (will add environment suffix)'
+        required: false
+        type: string
+        default: 'lambda-examples-uploads'
+      events:
+        description: 'S3 events to trigger on'
+        required: false
+        type: string
+        default: 's3:ObjectCreated:*'
+      prefix_filter:
+        description: 'Prefix filter for S3 objects'
+        required: false
+        type: string
+        default: 'incoming/'
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/lambda.yaml
+    with:
+      module: "lambda-examples"
+      function_name: "lambda-examples-s3"
+      handler: "index.handler"
+      runtime: "nodejs18.x"
+      trigger_type: "s3"
+      s3_config: '[]'  # Usa configuração da organização por padrão
+    secrets: inherit
+
+  summary:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "## 🚀 S3 Lambda Deployment" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Function:** lambda-examples-s3-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Bucket:** ${{ github.event.inputs.bucket_name || 'lambda-examples-uploads' }}-${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Events:** ${{ github.event.inputs.events || 's3:ObjectCreated:*' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Prefix Filter:** ${{ github.event.inputs.prefix_filter || 'incoming/' }}" >> $GITHUB_STEP_SUMMARY
