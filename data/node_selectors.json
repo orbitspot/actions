@@ -86,12 +86,12 @@
   },
   "production": {
     "fiscal": {
-      "public": "ng_fiscal_sa-east-1c_public",
-      "private": "tf_ng_fiscal_brasil_app_private_v1_medium"
+      "public": "ng_fiscal_sa-east-1a_public",
+      "private": "ng_fiscal_sa-east-1a_private"
     },
     "4unity": {
-      "public": "tf_ng_4_unity_app_v1_large",
-      "private": "tf_ng_4_unity_app_private_v1_large"
+      "public": "ng_4unity_sa-east-1a_public",
+      "private": "ng_4unity_sa-east-1a_private"
     },
     "inbound": {
       "public": "ng_inbound_sa-east-1a_public",
@@ -111,7 +111,7 @@
     },
     "timeflow": {
       "public": "",
-      "private": "tf_ng_timeflow_app_private_v1_large"
+      "private": "ng_timeflow_sa-east-1a_private"
     },
     "seidor-analytics": {
       "public": "ng_seidor-analytics_sa-east-1b_public",
