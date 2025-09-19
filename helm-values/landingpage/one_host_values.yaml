@@ -32,8 +32,8 @@ containers:
         protocol: TCP
     resources:
       requests:
-        cpu: 50m
-        memory: 110Mi
+        cpu: 10m
+        memory: 8Mi
       limits:
         cpu: 25m
         memory: 16Mi
