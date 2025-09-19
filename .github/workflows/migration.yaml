@@ -74,7 +74,8 @@ jobs:
           version: '20'
           build_args: '--build-arg sha=${{ github.sha }} --build-arg RUNNER=migration'
           before_building: |
-            echo "${{ inputs.run_command }}" >> migration.sh
+            echo "${{ inputs.run_command }}" >> command.sh
+            cat base_script.sh command.sh > migration.sh
             cat migration.sh
 
   prepare-helm-replacements:
@@ -97,6 +98,7 @@ jobs:
           deployment_name: migration
           grafana_tag: ${{ inputs.grafana_tag }}
         env:
+          MODULE: ${{ inputs.module }}
           BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
           DB_PORT: ${{ vars.DB_PORT }}
           DB_HOST: ${{ vars.DB_HOST }}

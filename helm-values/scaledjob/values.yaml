@@ -35,7 +35,6 @@ keda:
   failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
   successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
   activeDeadlineSeconds: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.activeDeadlineSeconds}
-  
   triggers:
     - type: rabbitmq
       authenticationRef:

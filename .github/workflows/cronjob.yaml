@@ -159,6 +159,7 @@ jobs:
           deployment_name: ${{ matrix.artifacts }}
           grafana_tag: ${{ inputs.grafana_tag }}
         env:
+          MODULE: ${{ inputs.module }}
           DB_PORT: ${{ vars.DB_PORT }}
           DB_HOST: ${{ vars.DB_HOST }}
           PROPERTIES: ${{ vars._PROPERTIES_CRONJOB }}
