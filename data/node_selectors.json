@@ -57,7 +57,7 @@
     "inbound": {
       "public": "ng_inbound_us-east-2a_public",
       "private": "ng_inbound_us-east-2a_private",
-      "mail-attachment-service-consumer": "ng_inbound_us-east-2a_public_mail-attachment-service"
+      "mail-attachment-service-consumer": "ng_inbound_us-east-2a_private_mail-attachment-service"
     },
     "common": {
       "public": "ng_platform_us-east-2a_public",
