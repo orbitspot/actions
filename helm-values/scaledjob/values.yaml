@@ -33,7 +33,7 @@ keda:
   pollingInterval: 5
   maxReplicaCount: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
   failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
-  successfulJobsHistoryLimit: 0
+  successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
   activeDeadlineSeconds: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.activeDeadlineSeconds}
   triggers:
     - type: rabbitmq
