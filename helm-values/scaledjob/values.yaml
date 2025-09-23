@@ -17,6 +17,7 @@ containers:
         cpu: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.cpu}
         memory: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.memory}
 
+
 keda:
   secrets:
     name: scaledjob-<DEPLOYMENT-NAME>
@@ -34,9 +35,6 @@ keda:
   failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
   successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
   activeDeadlineSeconds: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.activeDeadlineSeconds}
-
-  batchStrategy: "accurate"
-
   triggers:
     - type: rabbitmq
       authenticationRef:
