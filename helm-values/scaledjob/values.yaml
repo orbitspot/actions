@@ -30,7 +30,7 @@ keda:
           name: scaledjob-<DEPLOYMENT-NAME>
           parameter: host
 
-  pollingInterval: 30
+  pollingInterval: 5
   maxReplicaCount: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
   failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
   successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
