@@ -36,7 +36,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'v20.6.1'
+        ref: 'v20.8.0'
     
     - name: Check required variables
       shell: bash
@@ -48,7 +48,7 @@ runs:
 
     - name: Fetch devops variables
       id: set-output
-      uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.6.1
+      uses: orbitspot/actions/.github/actions/fetch-devops-variables@v20.8.0
       with:
         devops_config: '${{ inputs.devops_config }}'
         branch: '${{ github.ref_name }}'

@@ -16,11 +16,11 @@ match setup:
     case 'migration':
         required=['_PROPERTIES_MIGRATION']
     case 'scaledjob':
-        required=['_PROPERTIES_SCALEDJOB','_POLICY_JSON']
+        required=['_PROPERTIES_SCALEDJOB']
     case 'cronjob':
         required=['_PROPERTIES_CRONJOB']
     case 'api':
-        required=['_PROPERTIES_API','_POLICY_JSON']
+        required=['_PROPERTIES_API']
     case 'frontend':
         required=['HOST_MF']
     case 'landingpage':

@@ -23,7 +23,7 @@ runs:
   using: composite
   steps:
     - name: configure
-      uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.6.1
+      uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.8.0
 
     - name: Download Building files
       uses: actions/download-artifact@v4
@@ -43,4 +43,11 @@ runs:
     - name: Helm Install
       shell: bash
       run: |
-        helm upgrade ${{ inputs.release}}  --install --create-namespace --namespace ${{ inputs.namespace}} ${{ inputs.chart_name }} --version ${{ inputs.chart_version }} --set region=${{ env.CLUSTER_REGION }} -f values.yaml ${{ inputs.sets }}
+        helm upgrade ${{ inputs.release}}  \
+        --install \
+        --create-namespace \
+        --namespace ${{ inputs.namespace}} ${{ inputs.chart_name }} \
+        --version ${{ inputs.chart_version }} \
+        --set region=${{ env.CLUSTER_REGION }} \
+        -f values.yaml \
+        ${{ inputs.sets }}

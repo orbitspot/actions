@@ -16,7 +16,7 @@ inputs:
   policy_name:
     description: 'Policy Role'
     required: false
-    default: 'default'
+    default: 'additional-policy'
 
 runs:
   using: composite
@@ -95,6 +95,29 @@ runs:
         ]
       }'
 
+  - name: Adicionar Policy Default à Role
+    shell: bash
+    run: |
+      aws iam put-role-policy --role-name "${{ inputs.role }}" --policy-name "default" --policy-document '{
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "ssm:DescribeParameters",
+            "ssm:GetParameters",
+            "ssm:GetParameter",
+            "ssm:GetParametersByPath",
+            "secretsmanager:GetSecretValue",
+            "secretsmanager:DescribeSecret"
+          ],
+          "Resource": [
+            "arn:aws:ssm:${{ env.CLUSTER_REGION }}:931670397156:parameter/*"
+          ]
+        }
+      ]
+      }'
+  
   - name: Adicionar Policy à Role
     if: inputs.policy != ''
     shell: bash
