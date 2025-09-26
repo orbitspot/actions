@@ -15,7 +15,7 @@ jobs:
       matrix:
         repository:
           - infra-api-example
-          - infra-api-consumer-example
+          - infra-api-scaledjob-example
           - infra-scaledjob-example
           - infra-api-migration-example
           - infra-frontend-example
