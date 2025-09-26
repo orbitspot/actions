@@ -21,6 +21,7 @@ jobs:
           - infra-api-migration-example
           - infra-frontend-example
           - infra-landingpage-example
+          - infra-cronjob-example
 
     steps:
       - name: Update reusable workflow version in all branches
