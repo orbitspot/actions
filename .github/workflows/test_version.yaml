@@ -11,6 +11,7 @@ on:
 jobs:
   update-and-trigger:
     runs-on: ubuntu-latest
+    environment: main
     strategy:
       matrix:
         repository:
@@ -36,7 +37,7 @@ jobs:
           fi
 
           echo "Cloning repository $repo on branch $target_branch..."
-          git clone --depth 1 --branch "$target_branch" "https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/orbitspot/$repo.git"
+          git clone --depth 1 --branch "$target_branch" "https://x-access-token:${{ secrets.GITHUBGITHUB_TOKEN_TOKEN }}@github.com/orbitspot/$repo.git"
           cd "$repo"
 
           file=".github/workflows/push.yaml"
