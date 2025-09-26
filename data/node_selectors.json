@@ -106,12 +106,12 @@
       "private": "ng_inbound_sa-east-1a_private"
     },
     "common": {
-      "public": "ng_common_sa-east-1a_public",
-      "private": "ng_common_sa-east-1b_private"
+      "public": "ng_platform_sa-east-1a_public",
+      "private": "ng_platform_sa-east-1a_private"
     },
     "commom": {
-      "public": "ng_common_sa-east-1a_public",
-      "private": "ng_common_sa-east-1b_private"
+      "public": "ng_platform_sa-east-1a_public",
+      "private": "ng_platform_sa-east-1a_private"
     },
     "outbound": {
       "public": "ng_outbound_sa-east-1a_public",
