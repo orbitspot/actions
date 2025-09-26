@@ -37,7 +37,7 @@ jobs:
           fi
 
           echo "Cloning repository $repo on branch $target_branch..."
-          git clone --depth 1 --branch "$target_branch" "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/orbitspot/$repo.git"
+          git clone --depth 1 --branch "$target_branch" "https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/orbitspot/$repo.git"
           cd "$repo"
 
           file=".github/workflows/push.yaml"
