@@ -43,6 +43,9 @@
     "seidor4u": {
       "public": "ng_seidor4u_us-east-1a_public",
       "private": ""
+    },
+    "utils": {
+      "public": "ng_utils_us-east-1a_public"
     }
   },
   "homolog": {
@@ -90,9 +93,13 @@
     "seidor4u": {
       "public": "ng_seidor4u_us-east-2a_public",
       "private": ""
+    },
+    "utils": {
+      "public": "ng_utils_us-east-2a_public"
     }
   },
   "production": {
+
     "fiscal": {
       "public": "ng_fiscal_sa-east-1a_public",
       "private": "ng_fiscal_sa-east-1a_private"
@@ -108,6 +115,9 @@
     "common": {
       "public": "ng_platform_sa-east-1a_public",
       "private": "ng_platform_sa-east-1a_private"
+    },
+    "utils": {
+      "public": "ng_utils_sa-east-1a_public"
     },
     "commom": {
       "public": "ng_platform_sa-east-1a_public",
