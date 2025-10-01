@@ -18,7 +18,7 @@
     },
     "commom": {
       "public": "ng_platform_us-east-1a_public",
-      "private": "ng_platform_us-east-1a_private"
+      "private": "ng_platform_us-east-1a_private"                                                             
     },
     "outbound": {
       "public": "ng_outbound_us-east-1a_public",
@@ -45,7 +45,8 @@
       "private": ""
     },
     "devops": {
-      "public": "ng_utils_us-east-1a_public"
+      "public": "ng_utils_us-east-1a_public",
+      "private": ""
     }
   },
   "homolog": {
@@ -95,7 +96,8 @@
       "private": ""
     },
     "devops": {
-      "public": "ng_utils_us-east-2a_public"
+      "public": "ng_utils_us-east-2a_public",
+      "private": ""
     }
   },
   "production": {
@@ -117,7 +119,8 @@
       "private": "ng_platform_sa-east-1a_private"
     },
     "devops": {
-      "public": "ng_utils_sa-east-1a_public"
+      "public": "ng_utils_sa-east-1a_public",
+      "private": ""
     },
     "commom": {
       "public": "ng_platform_sa-east-1a_public",
