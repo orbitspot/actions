@@ -46,7 +46,7 @@
     },
     "devops": {
       "public": "ng_utils_us-east-1a_public",
-      "private": ""
+      "private": "ng_utils_us-east-1a_private"
     }
   },
   "homolog": {
@@ -97,7 +97,7 @@
     },
     "devops": {
       "public": "ng_utils_us-east-2a_public",
-      "private": ""
+      "private": "ng_utils_us-east-2a_private"
     }
   },
   "production": {
@@ -148,7 +148,7 @@
     },
     "seidor4u": {
       "public": "ng_seidor4u_sa-east-1a_public",
-      "private": ""
+      "private": "ng_seidor4u_sa-east-1a_private"
     }
   }
 }
