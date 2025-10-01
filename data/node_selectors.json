@@ -44,7 +44,7 @@
       "public": "ng_seidor4u_us-east-1a_public",
       "private": ""
     },
-    "utils": {
+    "devops": {
       "public": "ng_utils_us-east-1a_public"
     }
   },
@@ -94,7 +94,7 @@
       "public": "ng_seidor4u_us-east-2a_public",
       "private": ""
     },
-    "utils": {
+    "devops": {
       "public": "ng_utils_us-east-2a_public"
     }
   },
@@ -116,7 +116,7 @@
       "public": "ng_platform_sa-east-1a_public",
       "private": "ng_platform_sa-east-1a_private"
     },
-    "utils": {
+    "devops": {
       "public": "ng_utils_sa-east-1a_public"
     },
     "commom": {
