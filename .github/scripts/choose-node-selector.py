@@ -38,6 +38,7 @@ if not node_selector:
     node_selector = exclusive_machine
   else:
     machine_type = 'private' if private_machine else 'public'
+    print("node_selector", node_selector)
     node_selector = data[environment][module][machine_type]
 
 placeholder_template = "${{.{repo}.{deployment}.node_selector}}"
