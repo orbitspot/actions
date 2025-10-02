@@ -1,7 +1,7 @@
 import re
 import os
 
-def replace_properties_in_yaml(properties_path, yaml_path, prefix):
+def replace_properties_in_yaml(properties_path, helm_values_path, prefix):
     print("Running replace-properties.py")
     # Carregar o arquivo properties em um dicionário
     properties = {}
@@ -16,29 +16,29 @@ def replace_properties_in_yaml(properties_path, yaml_path, prefix):
                     print(f"Erro ao processar linha: {line} - {e}")
 
     # Ler o conteúdo do arquivo YAML
-    with open(yaml_path, 'r') as yaml_file:
-        yaml_content = yaml_file.read()
+    with open(helm_values_path, 'r') as yaml_file:
+        helm_values = yaml_file.read()
         
     # Substituir as chaves no YAML pelos valores do properties
     for key, value in properties.items():
         placeholder = f"${{{prefix}.{key}}}"
-        if placeholder in yaml_content:
+        if placeholder in helm_values:
             print(f"Substituindo {placeholder} por {value}")
-            yaml_content = re.sub(re.escape(placeholder), value, yaml_content)
+            helm_values = re.sub(re.escape(placeholder), value, helm_values)
 
     # Escrever o conteúdo modificado de volta ao arquivo YAML
-    with open(yaml_path, 'w') as yaml_file:
-        yaml_file.write(yaml_content)
+    with open(helm_values_path, 'w') as yaml_file:
+        yaml_file.write(helm_values)
 
-    print(f"Substituicoes concluidas e salvas em {yaml_path}")
+    print(f"Substituicoes concluidas e salvas em {helm_values_path}")
 
 
 properties_path = os.getenv('PROPERTIES_PATH')
-yaml_path = os.getenv('YAML_PATH')
+helm_values_path = os.getenv('HELM_VALUES_PATH')
 prefix = os.getenv('PREFIX')
 
 print(f"Properties: {properties_path}")
-print(f"Yaml: {yaml_path}")
+print(f"Helm values path: {helm_values_path}")
 print(f"Prefix: {prefix}")
 
-replace_properties_in_yaml(properties_path, yaml_path, prefix)
+replace_properties_in_yaml(properties_path, helm_values_path, prefix)

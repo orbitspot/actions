@@ -215,7 +215,7 @@ jobs:
               DB_PORT: ${{ vars.DB_PORT }}
               DB_HOST: ${{ vars.DB_HOST }}
               PROPERTIES: ${{ vars._PROPERTIES }}
-              YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
+              HELM_VALUES_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
 
           - name: upload
             uses: actions/upload-artifact@v4

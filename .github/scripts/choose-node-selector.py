@@ -7,7 +7,7 @@ repo = os.getenv("REPOSITORY") # OK
 environment = os.getenv("ENV") # OK
 deployment = os.getenv("DEPLOYMENT_NAME", None) # OK
 properties = os.getenv("PROPERTIES")
-yaml_path = os.getenv("YAML_PATH")
+helm_values_path = os.getenv("HELM_VALUES_PATH")
 
 # Processa properties
 props_dict = {}
@@ -43,11 +43,11 @@ if not node_selector:
 placeholder_template = "${{.{repo}.{deployment}.node_selector}}"
 result = placeholder_template.format(repo=repo, deployment=deployment)
 
-with open(yaml_path, 'r') as yaml_file:
+with open(helm_values_path, 'r') as yaml_file:
   yaml_content = yaml_file.read()
   yaml_content = yaml_content.replace(result, node_selector)
 
-with open(yaml_path, 'w') as yaml_file:
+with open(helm_values_path, 'w') as yaml_file:
   yaml_file.write(yaml_content)
 
 print("NODE SELECTOR: ", node_selector)
