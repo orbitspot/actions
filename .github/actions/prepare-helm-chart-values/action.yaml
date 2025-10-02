@@ -102,10 +102,7 @@ runs:
         pip install pyyaml
         python orbitspot-actions/.github/scripts/choose-node-selector.py
         python orbitspot-actions/.github/scripts/replace-properties.py
-
-        if [ ${{ inputs.deployment_name }} != "frontend" ]; then
-          python orbitspot-actions/.github/scripts/replace-helm.py
-        fi
+        python orbitspot-actions/.github/scripts/replace-helm.py
         
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
