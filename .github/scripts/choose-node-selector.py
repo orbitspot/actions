@@ -45,6 +45,7 @@ result = placeholder_template.format(repo=repo, deployment=deployment)
 
 with open(helm_values_path, 'r') as yaml_file:
   yaml_content = yaml_file.read()
+  print("yaml content", yaml_content)
   yaml_content = yaml_content.replace(result, node_selector)
 
 with open(helm_values_path, 'w') as yaml_file:
