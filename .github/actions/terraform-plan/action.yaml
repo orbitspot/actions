@@ -39,7 +39,7 @@ runs:
     with:
       terraform_version: "1.5.0"
 
-  - name: configure aws credentials
+  - name: Configure AWS credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
       role-to-assume: arn:aws:iam::${{ inputs.aws_account_number }}:role/${{ inputs.aws_role_name }}
@@ -54,13 +54,11 @@ runs:
 
   - name: Show Files
     shell: bash
-    run: |
-      ls -ltra
+    run: ls -ltra
 
   - name: Set permissions for Terraform providers
     shell: bash
-    run: |
-      chmod -R +x .
+    run: chmod -R +x .
 
   - name: Terraform Init
     shell: bash
@@ -74,22 +72,22 @@ runs:
         -no-color
 
   - name: Terraform Plan (root)
-    shell: bash
     if: ${{ inputs.terraform_directory == '' }}
+    shell: bash
     run: |
       terraform plan -no-color -detailed-exitcode \
         | tee $GITHUB_WORKSPACE/terraform_plan.log 
 
   - name: Terraform Plan (with directory)
-    shell: bash
     if: ${{ inputs.terraform_directory != '' }}
+    shell: bash
     run: |
       cd ${{ inputs.terraform_directory }}
       terraform plan -no-color -detailed-exitcode \
         | tee $GITHUB_WORKSPACE/terraform_plan.log 
 
   - name: Upload Terraform Plan Log
-    if: failure()
+    if: always()
     uses: actions/upload-artifact@v4
     with:
       name: terraform-plan-log
