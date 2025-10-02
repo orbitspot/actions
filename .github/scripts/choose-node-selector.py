@@ -38,18 +38,13 @@ if not node_selector:
     node_selector = exclusive_machine
   else:
     machine_type = 'private' if private_machine else 'public'
-    print("environment", environment)
-    print("module", module)
-    print("machine_type", machine_type)
     node_selector = data[environment][module][machine_type]
-    print("node_selector", node_selector)
 
 placeholder_template = "${{.{repo}.{deployment}.node_selector}}"
 result = placeholder_template.format(repo=repo, deployment=deployment)
 
 with open(helm_values_path, 'r') as yaml_file:
   yaml_content = yaml_file.read()
-  print("yaml content", yaml_content)
   yaml_content = yaml_content.replace(result, node_selector)
 
 with open(helm_values_path, 'w') as yaml_file:
