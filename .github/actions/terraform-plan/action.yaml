@@ -32,12 +32,12 @@ runs:
   - name: Set up Node.js
     uses: actions/setup-node@v4
     with:
-        node-version: '20'
+      node-version: '20'
 
   - uses: hashicorp/setup-terraform@v3
     name: setup
     with:
-        terraform_version: "1.5.0"
+      terraform_version: "1.5.0"
 
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
@@ -67,24 +67,30 @@ runs:
     run: |
       ls -ltra
       terraform version
-      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
+      terraform init \
+        -backend-config=bucket=${{ inputs.terraform_bucket_name }} \
+        -backend-config=key=${{ inputs.terraform_state_file }} \
+        -backend-config=region=us-east-1 \
+        -no-color
 
-  - name: Terraform Plan
+  - name: Terraform Plan (root)
     shell: bash
     if: ${{ inputs.terraform_directory == '' }}
     run: |
-      terraform plan -no-color -detailed-exitcode | tee terraform_plan.log 
+      terraform plan -no-color -detailed-exitcode \
+        | tee $GITHUB_WORKSPACE/terraform_plan.log 
 
-  - name: Terraform Plan
+  - name: Terraform Plan (with directory)
     shell: bash
     if: ${{ inputs.terraform_directory != '' }}
     run: |
       cd ${{ inputs.terraform_directory }}
-      terraform plan -no-color -detailed-exitcode | tee terraform_plan.log 
+      terraform plan -no-color -detailed-exitcode \
+        | tee $GITHUB_WORKSPACE/terraform_plan.log 
 
   - name: Upload Terraform Plan Log
     if: failure()
     uses: actions/upload-artifact@v4
     with:
       name: terraform-plan-log
-      path: terraform_plan.log
+      path: ${{ github.workspace }}/terraform_plan.log
