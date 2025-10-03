@@ -4,7 +4,7 @@ nodeSelector:
     nodegroup-type: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.node_selector}
 
 jobTemplate:
-    activeDeadlineSeconds: 900
+    activeDeadlineSeconds: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.activeDeadlineSeconds}
     backoffLimit: 3
 
 csiSecrets:
