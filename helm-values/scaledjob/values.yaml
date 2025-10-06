@@ -17,7 +17,6 @@ containers:
         cpu: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.cpu}
         memory: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.resources.limits.memory}
 
-
 keda:
   secrets:
     name: scaledjob-<DEPLOYMENT-NAME>
@@ -30,7 +29,7 @@ keda:
           name: scaledjob-<DEPLOYMENT-NAME>
           parameter: host
 
-  pollingInterval: 30
+  pollingInterval: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.pollingInterval}
   maxReplicaCount: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
   failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
   successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
