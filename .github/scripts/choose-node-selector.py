@@ -26,8 +26,7 @@ key_to_lookup = f"{deployment}.node_selector"
 node_selector = props_dict.get(key_to_lookup)
 key_to_lookup = f"{deployment}.private"
 private_machine = False if not props_dict.get(key_to_lookup) else props_dict.get(key_to_lookup).capitalize() == "True"
-print("****************************")
-print(props_dict, key_to_lookup, props_dict.get(key_to_lookup), private_machine)
+
 # Escolhe node selector com base no arquivo data/node_selectors.json
 if not node_selector:
   with open("./orbitspot-actions/data/node_selectors.json", "r") as f:
