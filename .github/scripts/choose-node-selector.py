@@ -25,7 +25,7 @@ if properties:
 key_to_lookup = f"{deployment}.node_selector"
 node_selector = props_dict.get(key_to_lookup)
 key_to_lookup = f"{deployment}.private"
-private_machine = bool(props_dict.get(key_to_lookup))
+private_machine = False if not props_dict.get(key_to_lookup) else props_dict.get(key_to_lookup).capitalize() == "True"
 
 # Escolhe node selector com base no arquivo data/node_selectors.json
 if not node_selector:
