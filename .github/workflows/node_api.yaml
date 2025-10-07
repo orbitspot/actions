@@ -124,6 +124,9 @@ jobs:
           before_building: |
             cat base_script.sh scripts/${{ matrix.artifacts }}.sh > ${{ matrix.artifacts }}.sh
             cat ${{ matrix.artifacts }}.sh
+            echo "Debug"
+            pwd
+            ls -lah
 
   create-service-account-role: #virar action
     name: Creating Aws Resources
