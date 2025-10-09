@@ -3,7 +3,7 @@ resource "aws_ssm_parameter" "vars" {
    for index, value in local.variables : index => value
  }
  name        = "/${var.repository}/environment/${each.key}"
- description = "Environment ${each.value} from module ${var.modulo}"
+ description = substr(format("Environment %s from module %s", jsonencode(each.value), var.modulo), 0, 1023)
  type        = "String"
  value       = trimspace(each.value)
  tier        = "Standard"
@@ -19,7 +19,7 @@ resource "aws_ssm_parameter" "scrts" {
    for index, value in local.secrets : index => value
  }
  name        = "/${var.repository}/secret/${each.key}"
- description = "Secret ${each.key} from module ${var.modulo}"
+ description = substr(format("Secret %s from module %s", jsonencode(each.key), var.modulo), 0, 1023)
  type        = "SecureString"
  value       = trimspace(replace(each.value, "$$", "$"))
  tier        = "Standard"
