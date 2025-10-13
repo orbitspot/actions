@@ -169,7 +169,7 @@ jobs:
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@feat/remove-grafana
         with:
           deployment_name: ${{ matrix.artifacts }}
           module: ${{ inputs.module }}
