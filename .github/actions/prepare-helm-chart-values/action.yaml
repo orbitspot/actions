@@ -22,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'v21'
+        ref: 'feat/remove-grafana'
 
     - name: Determinar chart_type
       id: set_chart_type
