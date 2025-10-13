@@ -122,10 +122,11 @@ jobs:
                 service_account_name: "application-permission"
 
           - name: create-namespace
-            uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v21
+            uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@feat/remove-grafana
             with:
-                namespace: ${{ github.event.repository.name }}
-                service_account_name: "application-permission"
+              namespace: ${{ github.event.repository.name }}
+              service_account_name: "application-permission"
+              module: ${{ inputs.module }}
 
   prepare-helm-replacements:
     name: Building Helm Values

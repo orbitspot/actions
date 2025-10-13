@@ -7,6 +7,10 @@ inputs:
   service_account_name:
     description: 'Service Account name'
     required: true
+  module:
+    description: 'Module name'
+    required: true
+    type: string
 runs:
   using: composite
   steps:
@@ -29,6 +33,11 @@ runs:
         else
             echo "Namespace ${{ inputs.namespace }} already exists."
         fi
+  
+  - name: label namespace
+    shell: bash
+    run: |
+      kubectl label namespace ${{ inputs.namespace }} modulo=${{ inputs.module }} --overwrite
 
   - name: create service account yaml
     shell: bash
