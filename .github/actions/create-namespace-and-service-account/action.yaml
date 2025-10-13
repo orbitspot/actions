@@ -37,7 +37,7 @@ runs:
   - name: label namespace
     shell: bash
     run: |
-      kubectl label namespace ${{ inputs.namespace }} modulo=${{ inputs.module }} --overwrite
+      kubectl label namespace ${{ inputs.namespace }} module=${{ inputs.module }} --overwrite
 
   - name: create service account yaml
     shell: bash
