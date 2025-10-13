@@ -6,9 +6,6 @@ on:
       module:
         required: true
         type: string
-      grafana_tag: # vai desaparecer
-        required: true
-        type: string
       version:
         required: true
         type: string
@@ -175,7 +172,7 @@ jobs:
         uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21
         with:
           deployment_name: ${{ matrix.artifacts }}
-          grafana_tag: ${{ inputs.grafana_tag }}
+          module: ${{ inputs.module }}
         env:
           MODULE: ${{ inputs.module }}
           BROKER_AMQP: ${{ secrets.BROKER_AMQP }}

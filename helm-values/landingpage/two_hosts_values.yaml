@@ -1,4 +1,4 @@
-module: <GRAFANA-TAG>
+module: <MODULE>
 
 nodeSelector:
     nodegroup-type: ${.<NOME-REPOSITORIO>.landingpage.node_selector}

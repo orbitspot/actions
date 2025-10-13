@@ -4,8 +4,8 @@ inputs:
   deployment_name:
     description: "Nome do deployment (ex: api ou consumer)"
     required: true
-  grafana_tag:
-    description: "Tag do Grafana"
+  module:
+    description: "Nome do modulo"
     required: true
 
 runs:
@@ -51,7 +51,7 @@ runs:
         fi
         cd .github/helm/${{ inputs.deployment_name }}
         sed -i "s/<DEPLOYMENT-NAME>/${{ inputs.deployment_name }}/g" values.yaml
-        sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
+        sed -i "s/<MODULE>/${{ inputs.module }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
       shell: bash
 
@@ -60,7 +60,7 @@ runs:
       run: |
         cp orbitspot-actions/helm-values/${{ env.chart_type }}/old_ingress_values.yaml values.yaml
         sed -i "s/<DEPLOYMENT-NAME>/api/g" values.yaml
-        sed -i "s/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g" values.yaml
+        sed -i "s/<MODULE>/${{ inputs.module }}/g" values.yaml
         sed -i "s/<REPOSITORY-NAME>/${{ github.event.repository.name }}/g" values.yaml
         mkdir -p .github/helm/api
         echo "" >> .github/helm/api/values.yaml

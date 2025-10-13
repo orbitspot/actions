@@ -1,4 +1,4 @@
-module: <GRAFANA-TAG>
+module: <MODULE>
 
 nodeSelector:
   nodegroup-type: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.node_selector}
