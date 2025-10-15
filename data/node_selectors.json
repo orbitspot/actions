@@ -50,7 +50,7 @@
     }
   },
   "test": {
-    "common": {
+    "commom": {
       "public": "ng_platform_us-east-1a_public",
       "private": "ng_platform_us-east-1a_private"
     }
