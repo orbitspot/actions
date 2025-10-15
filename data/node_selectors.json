@@ -49,6 +49,12 @@
       "private": "ng_utils_us-east-1a_private"
     }
   },
+  "test": {
+    "common": {
+      "public": "ng_platform_us-east-1a_public",
+      "private": "ng_platform_us-east-1a_private"
+    }
+  },
   "homolog": {
     "fiscal": {
       "public": "ng_fiscal_us-east-2a_public",

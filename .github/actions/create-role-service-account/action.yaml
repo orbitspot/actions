@@ -112,7 +112,7 @@ runs:
             "secretsmanager:DescribeSecret"
           ],
           "Resource": [
-            "arn:aws:ssm:${{ env.CLUSTER_REGION }}:931670397156:parameter/*"
+            "arn:aws:ssm:${{ env.CLUSTER_REGION }}:${{ env.AWS_ACCOUNT_NUMBER }}:parameter/*"
           ]
         }
       ]
