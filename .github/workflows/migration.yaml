@@ -8,6 +8,10 @@ on:
       run_command:
         required: true
         type: string
+      grafana_tag: # retirar na proxima breaking
+        required: false
+        type: string
+        default: ''
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
