@@ -22,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'v20.8.0'
+        ref: 'v21'
 
     - name: Determinar chart_type
       id: set_chart_type
@@ -90,19 +90,20 @@ runs:
       env:
         PREFIX: .${{ github.event.repository.name }}
         PROPERTIES_PATH: values.properties
-        YAML_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
-        REPLACE_YAML_PATH: orbitspot-actions/.github/helm/${{ inputs.deployment_name }}/values.yaml
+        HELM_VALUES_PATH: .github/helm/${{ inputs.deployment_name }}/values.yaml
+        CUSTOM_HELM_VALUES_PATH: orbitspot-actions/.github/helm/${{ inputs.deployment_name }}/values.yaml
         REPOSITORY: ${{ github.event.repository.name }}
         DEPLOYMENT_NAME: ${{ inputs.deployment_name }}
       run: |
-        if [[ ! -f "$REPLACE_YAML_PATH" ]]; then
-          REPLACE_YAML_PATH=""
+        if [[ ! -f "$CUSTOM_HELM_VALUES_PATH" ]]; then
+          CUSTOM_HELM_VALUES_PATH=""
         fi
 
         pip install pyyaml
         python orbitspot-actions/.github/scripts/choose-node-selector.py
         python orbitspot-actions/.github/scripts/replace-properties.py
-        python orbitspot-actions/.github/scripts/replace-values.py
+        python orbitspot-actions/.github/scripts/replace-helm.py
+        
         cat .github/helm/${{ inputs.deployment_name }}/values.yaml
       shell: bash
     
