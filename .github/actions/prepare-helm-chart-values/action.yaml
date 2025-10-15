@@ -22,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'v22.0.0'
+        ref: 'v21.1.0'
 
     - name: Determinar chart_type
       id: set_chart_type
