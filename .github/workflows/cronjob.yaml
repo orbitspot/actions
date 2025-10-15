@@ -6,6 +6,10 @@ on:
       module:
         required: true
         type: string
+      grafana_tag: # retirar na proxima breaking
+        required: false
+        type: string
+        default: ''
       version:
         required: true
         type: string
