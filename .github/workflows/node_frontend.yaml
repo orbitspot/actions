@@ -217,7 +217,7 @@ jobs:
               DB_PORT: ${{ vars.DB_PORT }}
               DB_HOST: ${{ vars.DB_HOST }}
               PROPERTIES: ${{ vars._PROPERTIES }}
-              HELM_REPLACE_FILE: ${{ vars.HELM_REPLACE_FILE }}
+              HELM_MASS_REPLACE: ${{ vars.HELM_MASS_REPLACE }}
 
           - name: upload
             uses: actions/upload-artifact@v4

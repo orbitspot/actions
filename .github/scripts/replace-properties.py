@@ -5,7 +5,7 @@ def replace_properties_in_yaml(
         properties_path, 
         helm_values_path, 
         prefix, 
-        helm_values_replace,
+        helm_mass_replace,
     ):
         print("Running replace-properties.py")
         # Carregar o arquivo properties em um dicionário
@@ -31,12 +31,12 @@ def replace_properties_in_yaml(
                 print(f"Substituindo {placeholder} por {value}")
                 helm_values = re.sub(re.escape(placeholder), value, helm_values)
 
-        if helm_values_replace:
-            placeholder = f"${{HELM_REPLACE_FILE}}"
+        if helm_mass_replace:
+            placeholder = f"${{.helm_mass_replace}}"
             print(f"Substituindo {placeholder} em massa no arquivo")
             helm_values = re.sub(
-                re.sub(placeholder),
-                helm_values_replace, 
+                re.escape(placeholder),
+                helm_mass_replace, 
                 helm_values,
             )
 
@@ -50,16 +50,16 @@ def replace_properties_in_yaml(
 properties_path = os.getenv('PROPERTIES_PATH')
 helm_values_path = os.getenv('HELM_VALUES_PATH')
 prefix = os.getenv('PREFIX')
-helm_values_replace = os.getenv('HELM_REPLACE_FILE')
+helm_mass_replace = os.getenv('HELM_MASS_REPLACE')
 
 print(f"Properties: {properties_path}")
 print(f"Helm values path: {helm_values_path}")
 print(f"Prefix: {prefix}")
-print(f"Helm Values to replace {helm_values_replace}")
+print(f"Helm Values to replace {helm_mass_replace}")
 
 replace_properties_in_yaml(
     properties_path, 
     helm_values_path, 
     prefix, 
-    helm_values_replace,
+    helm_mass_replace,
 )
