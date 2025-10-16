@@ -32,9 +32,10 @@ def replace_properties_in_yaml(
                 helm_values = re.sub(re.escape(placeholder), value, helm_values)
 
         if helm_values_replace:
-            print("Substituindo em massa no arquivo.")
+            placeholder = f"${{HELM_REPLACE_FILE}}"
+            print(f"Substituindo {placeholder} em massa no arquivo")
             helm_values = re.sub(
-                '${{ vars.HELM_REPLACE_FILE }}'.format(), 
+                re.sub(placeholder),
                 helm_values_replace, 
                 helm_values,
             )
