@@ -94,6 +94,7 @@ runs:
         CUSTOM_HELM_VALUES_PATH: orbitspot-actions/.github/helm/${{ inputs.deployment_name }}/values.yaml
         REPOSITORY: ${{ github.event.repository.name }}
         DEPLOYMENT_NAME: ${{ inputs.deployment_name }}
+        HELM_REPLACE_FILE: ${{ vars.HELM_REPLACE_FILE }}
       run: |
         if [[ ! -f "$CUSTOM_HELM_VALUES_PATH" ]]; then
           CUSTOM_HELM_VALUES_PATH=""
