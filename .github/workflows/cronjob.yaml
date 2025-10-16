@@ -6,9 +6,10 @@ on:
       module:
         required: true
         type: string
-      grafana_tag: # vai desaparecer
-        required: true
+      grafana_tag: # retirar na proxima breaking
+        required: false
         type: string
+        default: ''
       version:
         required: true
         type: string
@@ -137,6 +138,7 @@ jobs:
         with:
           namespace: ${{ github.event.repository.name }}
           service_account_name: 'application-permission'
+          module: ${{ inputs.module }}
 
   prepare-helm-replacements:
     name: Building Helm Values
@@ -157,7 +159,7 @@ jobs:
         uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21
         with:
           deployment_name: ${{ matrix.artifacts }}
-          grafana_tag: ${{ inputs.grafana_tag }}
+          module: ${{ inputs.module }}
         env:
           MODULE: ${{ inputs.module }}
           DB_PORT: ${{ vars.DB_PORT }}

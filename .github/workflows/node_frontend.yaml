@@ -6,13 +6,14 @@ on:
       module:
         required: true
         type: string
-      grafana_tag:
-        required: true
-        type: string
       version:
         required: true
         type: string
       dockerfile_path:
+        required: false
+        type: string
+        default: ''
+      grafana_tag: # retirar na proxima breaking
         required: false
         type: string
         default: ''
@@ -187,6 +188,7 @@ jobs:
           with:
             namespace: ${{ github.event.repository.name }}
             service_account_name: 'application-permission'
+            module: ${{ inputs.module }}
 
   helm-deploy:
       name: K8s Deploy
@@ -208,13 +210,14 @@ jobs:
             uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21
             with:
               deployment_name: 'frontend'
-              grafana_tag: ${{ inputs.grafana_tag }}
+              module: ${{ inputs.module }}
             env:
               MODULE: ${{ inputs.module }}
               BROKER_AMQP: ${{ secrets.BROKER_AMQP }}
               DB_PORT: ${{ vars.DB_PORT }}
               DB_HOST: ${{ vars.DB_HOST }}
               PROPERTIES: ${{ vars._PROPERTIES }}
+              HELM_MASS_REPLACE: ${{ vars.HELM_MASS_REPLACE }}
 
           - name: upload
             uses: actions/upload-artifact@v4

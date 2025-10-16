@@ -6,9 +6,10 @@ on:
       module:
         required: true
         type: string
-      grafana_tag:
-        required: true
+      grafana_tag: # retirar na proxima breaking
+        required: false
         type: string
+        default: ''
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -124,8 +125,9 @@ jobs:
           - name: create-namespace
             uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v21
             with:
-                namespace: ${{ github.event.repository.name }}
-                service_account_name: "application-permission"
+              namespace: ${{ github.event.repository.name }}
+              service_account_name: "application-permission"
+              module: ${{ inputs.module }}
 
   prepare-helm-replacements:
     name: Building Helm Values
@@ -164,7 +166,7 @@ jobs:
           if: ${{ vars.HOST_MF_2 == ''}}
           run: |
             cp orbitspot-actions/helm-values/landingpage/one_host_values.yaml values.yaml
-            sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
+            sed -i 's/<MODULE>/${{ inputs.module }}/g' values.yaml
             sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
             mkdir -p .github/helm/next
             mv values.yaml .github/helm/next/values.yaml
@@ -174,7 +176,7 @@ jobs:
           if: ${{ vars.HOST_MF_2 != ''}}
           run: |
             cp orbitspot-actions/helm-values/landingpage/two_hosts_values.yaml values.yaml 
-            sed -i 's/<GRAFANA-TAG>/${{ inputs.grafana_tag }}/g' values.yaml
+            sed -i 's/<MODULE>/${{ inputs.module }}/g' values.yaml
             sed -i 's/<NOME-REPOSITORIO>/${{ github.event.repository.name }}/g' values.yaml
             mkdir -p .github/helm/next
             mv values.yaml .github/helm/next/values.yaml
