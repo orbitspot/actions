@@ -43,6 +43,7 @@ jobs:
       ENV: '${{ steps.set-output.outputs.ENV }}'
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       scaledjob-matrix: ${{ steps.set-matrix.outputs.scaledjob_matrix }}
+      AWS_ACCOUNT_NUMBER: ${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Set up
         id: set-output
@@ -91,7 +92,7 @@ jobs:
       id-token: write
       contents: read
     env:
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Building
         uses: orbitspot/actions/.github/actions/package-manager-install@v21
@@ -112,7 +113,7 @@ jobs:
       contents: read
     env:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/generate-docker@v21
@@ -137,7 +138,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: create-role
         uses: orbitspot/actions/.github/actions/create-role-service-account@v21
@@ -196,7 +197,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: helm-apply (sem ingress antigo)
         if: ${{ vars.OLD_INGRESS_HOST == '' }}
@@ -210,7 +211,7 @@ jobs:
           sets: |
             --set environment=${{ env.ENV }} \
             --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.image=${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}'
 
       - name: helm-apply (com OLD_INGRESS_HOST)
@@ -225,7 +226,7 @@ jobs:
           sets: |
             --set environment=${{ env.ENV }} \
             --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.image=${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}' \
             --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
 
@@ -245,7 +246,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: helm-apply
         uses: orbitspot/actions/.github/actions/helm-deploy@v21
@@ -258,7 +259,7 @@ jobs:
           sets: |
             --set environment=${{env.ENV}} \
             --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.image=${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
             --set 'keda.secrets.data.rabbitmq_http_host=${{ secrets.BROKER_AMQP_SCALEDJOB_BASE64 }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}' \
             --set 'containers[0].environments.SERVICE_TYPE=${{ matrix.artifacts }}'

@@ -27,6 +27,7 @@ jobs:
       CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
+      AWS_ACCOUNT_NUMBER: ${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Set up
         id: set-output
@@ -46,12 +47,12 @@ jobs:
         contents: read
       env:
         CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-        AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+        AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
       steps:
           - name: Configure aws credentials
             uses: aws-actions/configure-aws-credentials@v4
             with:
-              role-to-assume: "arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
+              role-to-assume: "arn:aws:iam::${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}:role/${{ vars.AWS_ROLE_NAME }}"
               role-session-name: "${{ vars.AWS_ROLE_NAME }}"
               aws-region: "us-east-1"
           
@@ -112,7 +113,7 @@ jobs:
         CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
         ENV: '${{ needs.setup-config.outputs.ENV }}'
-        AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+        AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
       steps:
           - name: create-role
             uses: orbitspot/actions/.github/actions/create-role-service-account@v21
@@ -137,7 +138,7 @@ jobs:
         contents: read
     env:
       ENV: '${{ needs.setup-config.outputs.ENV }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
         - uses: actions/checkout@v4
           name: Checkout
@@ -219,7 +220,7 @@ jobs:
         CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
         CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
         ENV: '${{ needs.setup-config.outputs.ENV }}'
-        AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+        AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
       steps:
           - name: Helm Apply 1 host
             if: ${{ vars.HOST_MF_2 == ''}}
@@ -233,7 +234,7 @@ jobs:
               sets: |
                 --set environment=${{ env.ENV}} \
                 --set region=${{ env.CLUSTER_REGION }} \
-                --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
+                --set 'containers[0].repository.image=${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
                 --set 'containers[0].repository.tag=${{ github.sha }}' \
                 --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
                 --set ingress.rules[0].host=${{ vars.HOST_MF }} 
@@ -250,7 +251,7 @@ jobs:
               sets: |
                 --set environment=${{ env.ENV}} \
                 --set region=${{ env.CLUSTER_REGION }} \
-                --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
+                --set 'containers[0].repository.image=${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
                 --set 'containers[0].repository.tag=${{ github.sha }}' \
                 --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
                 --set ingress.rules[0].host=${{ vars.HOST_MF }} \

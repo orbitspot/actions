@@ -23,6 +23,9 @@ outputs:
   ENV:
     description: 'cluster region'
     value: ${{ steps.set-output.outputs.ENV }}
+  AWS_ACCOUNT_NUMBER:
+    description: 'AWS Account Number based on branch'
+    value: ${{ steps.get-aws-account.outputs.account-number }}
 runs:
   using: composite
   steps:
@@ -52,3 +55,9 @@ runs:
       with:
         devops_config: '${{ inputs.devops_config }}'
         branch: '${{ github.ref_name }}'
+
+    - name: Get AWS Account Number
+      id: get-aws-account
+      uses: orbitspot/actions/.github/actions/get-aws-account-number@v21
+      with:
+        aws_account_number_json: ${{ fromJson(inputs.repo_vars)._AWS_ACCOUNT_NUMBER }}

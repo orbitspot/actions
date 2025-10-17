@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
+      AWS_ACCOUNT_NUMBER: ${{ steps.get-aws-account.outputs.account-number }}
     steps:
       - name: Fetch devops variables
         id: set-output
@@ -24,6 +25,12 @@ jobs:
         with:
           devops_config: ${{ vars._DEVOPS_CONFIG }}
           branch: ${{ github.ref_name }}
+
+      - name: Get AWS Account Number
+        id: get-aws-account
+        uses: orbitspot/actions/.github/actions/get-aws-account-number@v21
+        with:
+          aws_account_number_json: ${{ vars._AWS_ACCOUNT_NUMBER }}
 
   create-parameters-vars:
       name: Create parameters
@@ -87,7 +94,7 @@ jobs:
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
           AWS_REGION: ${{ env.CLUSTER_REGION }}
-          AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
 
       - name: Clean up machine
         shell: bash

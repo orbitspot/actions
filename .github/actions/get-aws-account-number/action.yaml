@@ -1,0 +1,39 @@
+name: 'Get AWS Account Number'
+description: 'Selects the appropriate AWS Account Number based on the current branch from _AWS_ACCOUNT_NUMBER variable'
+inputs:
+  aws_account_number_json:
+    description: 'JSON string with AWS Account Numbers by branch from vars._AWS_ACCOUNT_NUMBER'
+    required: true
+outputs:
+  account-number:
+    description: 'The AWS Account Number for the current branch'
+    value: ${{ steps.get-account.outputs.account_number }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get AWS Account Number
+      id: get-account
+      shell: bash
+      run: |
+        BRANCH_NAME="${{ github.ref_name }}"
+        AWS_ACCOUNT_JSON='${{ inputs.aws_account_number_json }}'
+        
+        # Parse JSON para obter o account number da branch atual
+        ACCOUNT_NUMBER=$(echo "$AWS_ACCOUNT_JSON" | jq -r --arg branch "$BRANCH_NAME" '.[$branch].AWS_ACCOUNT_NUMBER // empty')
+        
+        # Se não encontrar a branch, usar master como fallback
+        if [ -z "$ACCOUNT_NUMBER" ]; then
+          echo "Branch '$BRANCH_NAME' não encontrada em _AWS_ACCOUNT_NUMBER, usando 'master' como fallback"
+          ACCOUNT_NUMBER=$(echo "$AWS_ACCOUNT_JSON" | jq -r '.master.AWS_ACCOUNT_NUMBER // empty')
+          
+          if [ -z "$ACCOUNT_NUMBER" ]; then
+            echo "::error::Não foi possível obter AWS Account Number nem para branch '$BRANCH_NAME' nem para 'master'"
+            echo "::error::JSON recebido: $AWS_ACCOUNT_JSON"
+            echo "::error::Branches disponíveis: $(echo "$AWS_ACCOUNT_JSON" | jq -r 'keys[]')"
+            exit 1
+          fi
+        fi
+        
+        echo "account_number=$ACCOUNT_NUMBER" >> $GITHUB_OUTPUT
+        echo "✅ AWS Account Number para branch '$BRANCH_NAME': $ACCOUNT_NUMBER"

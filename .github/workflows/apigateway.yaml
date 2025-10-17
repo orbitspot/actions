@@ -27,9 +27,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  get-aws-account:
+    name: Get AWS Account Number
+    runs-on: ubuntu-latest
+    outputs:
+      account-number: ${{ steps.get-account.outputs.account-number }}
+    steps:
+      - name: Get AWS Account Number
+        id: get-account
+        uses: orbitspot/actions/.github/actions/get-aws-account-number@v21
+        with:
+          aws_account_number_json: ${{ vars._AWS_ACCOUNT_NUMBER }}
+
   create-api-gateway:
     name: Create
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    needs: [get-aws-account]
     permissions:
       id-token: write
       contents: read
@@ -49,7 +62,7 @@ jobs:
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
           AWS_REGION: ${{ vars._AWS_REGION }}
-          AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          AWS_ACCOUNT_NUMBER: ${{ needs.get-aws-account.outputs.account-number }}
           TF_VAR_branch: '${{ github.ref_name }}'
           TF_VAR_repository_name: '${{ github.event.repository.name }}'
           TF_VAR_hosts: '${{ inputs.hosts }}'
