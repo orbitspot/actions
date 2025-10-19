@@ -45,7 +45,8 @@ jobs:
           setup: 'scaledjob'
           repo_vars: '${{ toJson(vars) }}'
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
-
+          aws_account_number_json: ${{ vars._AWS_ACCOUNT_NUMBER }}
+          
       - name: Checkout
         uses: actions/checkout@v4
         with:

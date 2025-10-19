@@ -44,6 +44,7 @@ jobs:
           setup: 'frontend'
           repo_vars: '${{ toJson(vars) }}'
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
+          aws_account_number_json: ${{ vars._AWS_ACCOUNT_NUMBER }}
 
   building:
       name: Building
