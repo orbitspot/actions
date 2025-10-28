@@ -71,6 +71,24 @@ runs:
         echo "build.istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
         echo "build.istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
 
+        branch=${{ github.ref_name }}
+
+        if [ "$branch" == "develop" ]; then
+            url="ingress.dev.orbitspot.com"
+            private_url="private-ingress.dev.orbitspot.com"
+        elif [ "$branch" == "homolog" ]; then
+            url="ingress.hom.orbitspot.com"
+            private_url="private-ingress.hom.orbitspot.com"
+        elif [ "$branch" == "master" ]; then
+            url="ingress.orbitspot.com"
+            private_url="private-ingress.orbitspot.com"
+        elif [ "$branch" == "test" ]; then
+            url="tingress.test.orbitspot.com"
+            private_url="private-tingress.test.orbitspot.com"
+
+        echo ".build.istio.ingress.host=$url" >> values.properties
+        echo ".build.istio.ingress.private_host=$private_url" >> values.properties
+
         if [[ -n "${{ inputs.BROKER_AMQP }}" ]]; then
           RABBITMQ_BASE64=$(echo -n "${{ inputs.BROKER_AMQP }}" | base64 -w0)
           echo "build.secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties

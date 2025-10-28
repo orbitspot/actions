@@ -34,6 +34,7 @@ istio:
         virtualService:
             hosts:
                 - ${.<REPOSITORY-NAME>.build.istio.ingress.host}
+                - ${.<REPOSITORY-NAME>.build.istio.ingress.private_host}
             gateways:
                 - 'istio-system/orbit-egress'
             tcp:
@@ -56,6 +57,7 @@ istio:
         virtualService:
             hosts:
                 - ${.<REPOSITORY-NAME>.build.istio.ingress.host}
+                - ${.<REPOSITORY-NAME>.build.istio.ingress.private_host}
                 - 'api.<REPOSITORY-NAME>.svc.cluster.local'
             gateways:
                 - 'istio-system/orbit-ingress'
