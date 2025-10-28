@@ -64,14 +64,14 @@ runs:
       ls -ltra
       
       terraform version
-      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
+      terraform init -backend-config=bucket=${{ env.TERRAFORM_BUCKET }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
 
   - name: Terraform Init
     if: ${{ inputs.terraform_directory == '' }}
     shell: bash
     run: |
       ls -ltra
-      terraform init -backend-config=bucket=${{ inputs.terraform_bucket_name }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
+      terraform init -backend-config=bucket=${{ env.TERRAFORM_BUCKET }} -backend-config=key=${{ inputs.terraform_state_file }} -backend-config=region=us-east-1 -no-color
 
   - name: Upload artifact
     if: ${{ inputs.terraform_directory == '' }}

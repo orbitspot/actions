@@ -50,6 +50,7 @@ jobs:
       contents: read
     env:
       AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
+      TERRAFORM_BUCKET: '${{ needs.setup-config.outputs.TERRAFORM_BUCKET }}'
     steps:
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -76,6 +77,7 @@ jobs:
           TF_VAR_api_gateway: '${{ vars._API_GATEWAY }}'
         with:
           tag: 'v21.1.1'
+          terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
       
       - name: Clean up machine
         shell: bash

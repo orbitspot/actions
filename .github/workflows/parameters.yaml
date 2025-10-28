@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
+      AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: Fetch devops variables
         id: set-output
@@ -84,6 +85,7 @@ jobs:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
           tag: 'v21.1.1'
+          terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
           AWS_REGION: ${{ env.CLUSTER_REGION }}
