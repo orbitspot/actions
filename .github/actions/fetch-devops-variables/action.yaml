@@ -20,6 +20,9 @@ outputs:
   ENV:
     description: 'cluster region'
     value: ${{ steps.set-output.outputs.ENV }}
+  AWS_ACCOUNT_NUMBER:
+    description: 'AWS account number'
+    value: ${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}
 runs:
   using: composite
   steps:

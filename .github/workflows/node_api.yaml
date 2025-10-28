@@ -35,6 +35,7 @@ jobs:
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
+      AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       consumer-matrix: ${{ steps.set-matrix.outputs.consumer_matrix }}
     steps:
@@ -90,11 +91,13 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    env:
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.5.1
         with:
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_account_number: ${{ env.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
           aws_region: 'us-east-1'
 
@@ -126,11 +129,12 @@ jobs:
       contents: read
     env:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.5.1
         with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+          aws_account_number: '${{ env.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: us-east-1
 
@@ -152,7 +156,7 @@ jobs:
       - name: docker-build
         uses: orbitspot/actions/.github/actions/docker@v20.5.1
         with:
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_account_number: ${{ env.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
           aws_region: ${{ env.CLUSTER_REGION }}
           content: 'building'
@@ -175,6 +179,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: create-role
         uses: orbitspot/actions/.github/actions/create-role-service-account@v20.5.1
@@ -182,7 +187,7 @@ jobs:
           role: '${{ github.event.repository.name }}-${{ env.ENV }}'
           namespace: ${{ github.event.repository.name }}
           service_account_name: 'application-permission'
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_account_number: ${{ env.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
           aws_region: ${{ vars._AWS_REGION }}
           policy: ${{ vars._POLICY_JSON }}
@@ -190,12 +195,12 @@ jobs:
       - name: create-namespace
         uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v20.5.1
         with:
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_account_number: ${{ env.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
           aws_region: ${{ env.CLUSTER_REGION }}
           cluster_name: ${{ env.CLUSTER_NAME }}
           namespace: ${{ github.event.repository.name }}
-          role_arn: 'arn:aws:iam::${{ vars.AWS_ACCOUNT_NUMBER }}:role/${{ github.event.repository.name }}-${{ env.ENV }}'
+          role_arn: 'arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ github.event.repository.name }}-${{ env.ENV }}'
           service_account_name: 'application-permission'
 
   prepare-helm-replacements:
@@ -212,6 +217,7 @@ jobs:
     env:
       ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - uses: actions/checkout@v4
         name: Checkout
@@ -234,7 +240,7 @@ jobs:
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v20.5.1
         with:
-          aws_account_number: '${{ vars.AWS_ACCOUNT_NUMBER }}'
+          aws_account_number: '${{ env.AWS_ACCOUNT_NUMBER }}'
           aws_role_name: '${{ vars.AWS_ROLE_NAME }}'
           aws_region: us-east-1
 
@@ -287,6 +293,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - uses: actions/checkout@v4
         name: Checkout
@@ -297,7 +304,7 @@ jobs:
       - name: configure
         uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.5.1
         with:
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_account_number: ${{ env.AWS_ACCOUNT_NUMBER }}
           aws_role_name: ${{ vars.AWS_ROLE_NAME }}
           aws_region: ${{ env.CLUSTER_REGION }}
           cluster_name: ${{ env.CLUSTER_NAME }}
@@ -306,7 +313,7 @@ jobs:
         if: ${{ vars.OLD_INGRESS_HOST == '' }}
         uses: orbitspot/actions/.github/actions/helm-deploy@v20.5.1
         with:
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_account_number: ${{ env.AWS_ACCOUNT_NUMBER }}
           aws_region: ${{ env.CLUSTER_REGION }}
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-api
@@ -316,14 +323,14 @@ jobs:
           sets: |
             --set environment=${{ env.ENV }} \
             --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}'
 
       - name: helm-apply (com OLD_INGRESS_HOST)
         if: ${{ vars.OLD_INGRESS_HOST != '' }}
         uses: orbitspot/actions/.github/actions/helm-deploy@v20.5.1
         with:
-          aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          aws_account_number: ${{ env.AWS_ACCOUNT_NUMBER }}
           aws_region: ${{ env.CLUSTER_REGION }}
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-api
@@ -333,7 +340,7 @@ jobs:
           sets: |
             --set environment=${{ env.ENV }} \
             --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}' \
             --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
 
@@ -353,6 +360,7 @@ jobs:
           CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
           CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
           ENV: '${{ needs.setup-config.outputs.ENV }}'
+          AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
         steps:
           - uses: actions/checkout@v4
             name: Checkout
@@ -363,7 +371,7 @@ jobs:
           - name: configure
             uses: orbitspot/actions/.github/actions/kubernetes-auth@v20.5.1
             with:
-              aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+              aws_account_number: ${{ env.AWS_ACCOUNT_NUMBER }}
               aws_role_name: ${{ vars.AWS_ROLE_NAME }}
               aws_region: ${{ env.CLUSTER_REGION }}
               cluster_name: ${{ env.CLUSTER_NAME }}
@@ -371,7 +379,7 @@ jobs:
           - name: helm-apply
             uses: orbitspot/actions/.github/actions/helm-deploy@v20.5.1
             with:
-              aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+              aws_account_number: ${{ env.AWS_ACCOUNT_NUMBER }}
               aws_region: ${{ env.CLUSTER_REGION }}
               namespace: ${{ github.event.repository.name }}
               helm_values: helm-values-${{ matrix.artifacts }}
@@ -381,7 +389,7 @@ jobs:
               sets: |
                     --set environment=${{env.ENV}} \
                     --set region=${{ env.CLUSTER_REGION }} \
-                    --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
+                    --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
                     --set 'keda.secrets.data.rabbitmq_http_host=${{ secrets.BROKER_AMQP_SCALED_JOB_BASE64 }}' \
                     --set 'containers[0].repository.tag=${{ github.sha }}' \
                     --set 'containers[0].environments.SERVICE_TYPE=${{ matrix.artifacts }}'
