@@ -20,6 +20,12 @@ outputs:
   ENV:
     description: 'cluster region'
     value: ${{ steps.set-output.outputs.ENV }}
+  AWS_ACCOUNT_NUMBER:
+    description: 'AWS account number'
+    value: ${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}
+  TERRAFORM_BUCKET:
+    description: 'AWS account number'
+    value: ${{ steps.set-output.outputs.TERRAFORM_BUCKET }}
 runs:
   using: composite
   steps:
