@@ -26,7 +26,7 @@ match setup:
     case 'landingpage':
         required=['HOST_MF','ACM_ARN', '_PROPERTIES']
     case _:
-        exit(1)
+        exit(0)
 
 for item in required:
     if item not in variables or variables[item] == '':
