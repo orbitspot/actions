@@ -49,6 +49,56 @@
       "private": "ng_utils_us-east-1a_private"
     }
   },
+  "test": {
+    "fiscal": {
+      "public": "ng_fiscal_us-east-1a_public",
+      "private": ""
+    },
+    "4unity": {
+      "public": "ng_4unity_us-east-1a_public",
+      "private": ""
+    },
+    "inbound": {
+      "public": "",
+      "private": "ng_inbound_us-east-1a_private"
+    },
+    "common": {
+      "public": "ng_platform_us-east-1a_public",
+      "private": "ng_platform_us-east-1a_private"
+    },
+    "commom": {
+      "public": "ng_platform_us-east-1a_public",
+      "private": "ng_platform_us-east-1a_private"                                                             
+    },
+    "outbound": {
+      "public": "ng_outbound_us-east-1a_public",
+      "private": "ng_outbound_us-east-1a_private"
+    },
+    "timeflow": {
+      "public": "",
+      "private": "ng_timeflow_us-east-1a_private"
+    },
+    "seidor-analytics": {
+      "public": "ng_seidor-analytics_us-east-1a_public",
+      "private": ""
+    },
+    "bank": {
+      "public": "ng_4pay_us-east-1a_public",
+      "private": "ng_4pay_us-east-1a_private"
+    },
+    "4pay": {
+      "public": "ng_4pay_us-east-1a_public",
+      "private": "ng_4pay_us-east-1a_private"
+    },
+    "seidor4u": {
+      "public": "ng_seidor4u_us-east-1a_public",
+      "private": ""
+    },
+    "devops": {
+      "public": "ng_utils_us-east-1a_public",
+      "private": "ng_utils_us-east-1a_private"
+    }
+  },
   "homolog": {
     "fiscal": {
       "public": "ng_fiscal_us-east-2a_public",
