@@ -40,10 +40,11 @@ jobs:
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
+      AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@v21
+        uses:  orbitspot/actions/.github/actions/setup-config@v21.1.1
         with:
           setup: 'cronjob'
           repo_vars: '${{ toJson(vars) }}'
@@ -77,10 +78,10 @@ jobs:
       id-token: write
       contents: read
     env:
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v21
+        uses: orbitspot/actions/.github/actions/package-manager-install@v21.1.1
         with:
           node_version: '${{ inputs.version }}'
           customized_dockerfile: '${{ inputs.dockerfile_path  }}'
@@ -98,10 +99,10 @@ jobs:
       contents: read      
     env:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/generate-docker@v21
+        uses: orbitspot/actions/.github/actions/generate-docker@v21.1.1
         with:
           deployment_name: ${{ matrix.artifacts }}
           dockerfile_path: ${{ inputs.dockerfile_path }}
@@ -123,10 +124,10 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: create-role
-        uses: orbitspot/actions/.github/actions/create-role-service-account@v21
+        uses: orbitspot/actions/.github/actions/create-role-service-account@v21.1.1
         with:
           role: '${{ github.event.repository.name }}-${{ env.ENV }}'
           namespace: ${{ github.event.repository.name }}
@@ -134,7 +135,7 @@ jobs:
           policy: ${{ vars._POLICY_JSON }}
 
       - name: create-namespace
-        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v21
+        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v21.1.1
         with:
           namespace: ${{ github.event.repository.name }}
           service_account_name: 'application-permission'
@@ -156,7 +157,7 @@ jobs:
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21.1.1
         with:
           deployment_name: ${{ matrix.artifacts }}
           module: ${{ inputs.module }}
@@ -183,10 +184,10 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v21
+        uses: orbitspot/actions/.github/actions/helm-deploy@v21.1.1
         with:
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-${{ matrix.artifacts }}
@@ -196,7 +197,7 @@ jobs:
           sets: |
             --set environment=${{env.ENV}} \
             --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}' \
             --set 'scheduler="${{ inputs.scheduler }}"'
     

@@ -27,12 +27,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  setup-config:
+    name: Set up pipeline config  
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    outputs:
+      AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
+    steps:
+      - name: Set up
+        id: set-output
+        uses:  orbitspot/actions/.github/actions/setup-config@v21.1.1.1.1
+        with:
+          setup: 'api'
+          repo_vars: '${{ toJson(vars) }}'
+          devops_config: '${{ vars._DEVOPS_CONFIG }}'
+
   create-api-gateway:
     name: Create
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     permissions:
       id-token: write
       contents: read
+    env:
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -45,11 +62,11 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Start
-        uses: orbitspot/actions/.github/actions/api-gateway@v21
+        uses: orbitspot/actions/.github/actions/api-gateway@v21.1.1
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
           AWS_REGION: ${{ vars._AWS_REGION }}
-          AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+          AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}
           TF_VAR_branch: '${{ github.ref_name }}'
           TF_VAR_repository_name: '${{ github.event.repository.name }}'
           TF_VAR_hosts: '${{ inputs.hosts }}'
@@ -58,7 +75,7 @@ jobs:
           TF_VAR_resource_name: '${{ inputs.resource_name }}'
           TF_VAR_api_gateway: '${{ vars._API_GATEWAY }}'
         with:
-          tag: 'v21'
+          tag: 'v21.1.1'
       
       - name: Clean up machine
         shell: bash

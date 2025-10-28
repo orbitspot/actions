@@ -13,7 +13,6 @@ service:
 containers:
     - name: migration
       repository:
-          image: 931670397156.dkr.ecr.${region}.amazonaws.com/migration-<REPOSITORY-NAME>
           tag: latest
       ports:
           - targetPort: 3000

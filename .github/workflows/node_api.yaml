@@ -41,13 +41,14 @@ jobs:
       CLUSTER_REGION: '${{ steps.set-output.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
+      AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       scaledjob-matrix: ${{ steps.set-matrix.outputs.scaledjob_matrix }}
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@v21
+        uses:  orbitspot/actions/.github/actions/setup-config@v21.1.1
         with:
           setup: 'api'
           repo_vars: '${{ toJson(vars) }}'
@@ -92,10 +93,10 @@ jobs:
       id-token: write
       contents: read
     env:
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v21
+        uses: orbitspot/actions/.github/actions/package-manager-install@v21.1.1
         with:
           node_version: '${{ inputs.version }}'
           customized_dockerfile: '${{ inputs.dockerfile_path  }}'
@@ -113,10 +114,10 @@ jobs:
       contents: read
     env:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/generate-docker@v21
+        uses: orbitspot/actions/.github/actions/generate-docker@v21.1.1
         with:
           deployment_name: ${{ matrix.artifacts }}
           dockerfile_path: ${{ inputs.dockerfile_path }}
@@ -141,7 +142,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: create-role
-        uses: orbitspot/actions/.github/actions/create-role-service-account@v21
+        uses: orbitspot/actions/.github/actions/create-role-service-account@v21.1.1
         with:
           role: '${{ github.event.repository.name }}-${{ env.ENV }}'
           namespace: ${{ github.event.repository.name }}
@@ -149,7 +150,7 @@ jobs:
           policy: ${{ vars._POLICY_JSON }}
 
       - name: create-namespace
-        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v21
+        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v21.1.1
         with:
           namespace: ${{ github.event.repository.name }}
           service_account_name: 'application-permission'
@@ -173,7 +174,7 @@ jobs:
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21.1.1
         with:
           deployment_name: ${{ matrix.artifacts }}
           module: ${{ inputs.module }}
@@ -202,7 +203,7 @@ jobs:
     steps:
       - name: helm-apply (sem ingress antigo)
         if: ${{ vars.OLD_INGRESS_HOST == '' }}
-        uses: orbitspot/actions/.github/actions/helm-deploy@v21
+        uses: orbitspot/actions/.github/actions/helm-deploy@v21.1.1
         with:
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-api
@@ -217,7 +218,7 @@ jobs:
 
       - name: helm-apply (com OLD_INGRESS_HOST)
         if: ${{ vars.OLD_INGRESS_HOST != '' }}
-        uses: orbitspot/actions/.github/actions/helm-deploy@v21
+        uses: orbitspot/actions/.github/actions/helm-deploy@v21.1.1
         with:
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-api
@@ -250,7 +251,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v21
+        uses: orbitspot/actions/.github/actions/helm-deploy@v21.1.1
         with:
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-${{ matrix.artifacts }}

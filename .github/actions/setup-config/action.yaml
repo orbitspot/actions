@@ -23,6 +23,9 @@ outputs:
   ENV:
     description: 'cluster region'
     value: ${{ steps.set-output.outputs.ENV }}
+  AWS_ACCOUNT_NUMBER:
+    description: 'AWS account number'
+    value: ${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}
 runs:
   using: composite
   steps:
@@ -36,7 +39,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'v21'
+        ref: 'v21.1.1'
     
     - name: Check required variables
       shell: bash
@@ -48,7 +51,7 @@ runs:
 
     - name: Fetch devops variables
       id: set-output
-      uses: orbitspot/actions/.github/actions/fetch-devops-variables@v21
+      uses: orbitspot/actions/.github/actions/fetch-devops-variables@v21.1.1
       with:
         devops_config: '${{ inputs.devops_config }}'
         branch: '${{ github.ref_name }}'
