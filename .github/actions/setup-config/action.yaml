@@ -3,7 +3,7 @@ description: 'Basic config for pipeline run'
 inputs:
   setup:
     description: 'api/landingpage/scaledjob/migration/etc'
-    required: true
+    required: false
   repo_vars: # action não tem acesso às vars
     description: 'repository variables'
     required: true
