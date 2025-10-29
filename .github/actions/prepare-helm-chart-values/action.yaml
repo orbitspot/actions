@@ -94,6 +94,7 @@ runs:
         elif [ "$branch" == "test" ]; then
             url="ingress.test.orbitspot.com"
             private_url="private-ingress.test.orbitspot.com"
+        fi
 
         echo ".build.istio.ingress.host=$url" >> values.properties
         echo ".build.istio.ingress.private_host=$private_url" >> values.properties
