@@ -45,6 +45,7 @@ jobs:
   create-api-gateway:
     name: Create
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    needs: [setup-config]
     permissions:
       id-token: write
       contents: read
