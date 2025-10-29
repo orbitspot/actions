@@ -33,6 +33,7 @@ jobs:
     environment: ${{ github.ref_name }}
     outputs:
       AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
+      TERRAFORM_BUCKET: '${{ steps.set-output.outputs.TERRAFORM_BUCKET }}'
     steps:
       - name: Set up
         id: set-output
