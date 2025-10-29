@@ -36,7 +36,7 @@ jobs:
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@v21.1.1.1.1
+        uses:  orbitspot/actions/.github/actions/setup-config@v21.1.1
         with:
           setup: 'api'
           repo_vars: '${{ toJson(vars) }}'
