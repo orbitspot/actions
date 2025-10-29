@@ -11,6 +11,7 @@ variable "hosts" {
     master  = string
     homolog = string
     develop = string
+    test    = string
   })
 }
 
