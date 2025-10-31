@@ -65,6 +65,7 @@ jobs:
       needs: [setup-config, create-parameters-vars, create-parameters-secrets]
       env:
         CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
+        AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
       permissions:
         id-token: write
         contents: read
