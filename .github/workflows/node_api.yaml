@@ -228,7 +228,7 @@ jobs:
           sets: |
             --set environment=${{ env.ENV }} \
             --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}' \
             --set ingress.rules[0].host=${{ vars.OLD_INGRESS_HOST }}
 
