@@ -199,7 +199,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
       ENV: '${{ needs.setup-config.outputs.ENV }}'
-      AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: helm-apply (sem ingress antigo)
         if: ${{ vars.OLD_INGRESS_HOST == '' }}
@@ -213,7 +213,7 @@ jobs:
           sets: |
             --set environment=${{ env.ENV }} \
             --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ vars.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
+            --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/api-${{ github.event.repository.name }}' \
             --set 'containers[0].repository.tag=${{ github.sha }}'
 
       - name: helm-apply (com OLD_INGRESS_HOST)
