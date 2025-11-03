@@ -68,7 +68,7 @@ jobs:
       - name: Trigger workflow in all branches
         run: |
           repo="${{ matrix.repository }}"
-          branches=("develop" "homolog" "master")
+          branches=("develop" "test" "homolog" "master")
 
           for branch in "${branches[@]}"; do
             echo "Triggering workflow in $repo on branch $branch..."
