@@ -24,8 +24,6 @@ inputs:
     description: 'Artifact Upload Name'
     required: false
     default: 'terraform'
-
-
 runs:
   using: composite
   steps:

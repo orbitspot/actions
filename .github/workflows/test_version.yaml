@@ -28,7 +28,7 @@ jobs:
         run: |
           repo="${{ matrix.repository }}"
           version="${{ github.event.inputs.version }}"
-          branches=("develop" "homolog" "master")
+          branches=("develop" "test" "homolog" "master")
 
           echo "Processing repository $repo ..."
 
