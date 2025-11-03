@@ -33,10 +33,11 @@ jobs:
     environment: ${{ github.ref_name }}
     outputs:
       AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
+      TERRAFORM_BUCKET: '${{ steps.set-output.outputs.TERRAFORM_BUCKET }}'
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@v21.1.1.1.1
+        uses:  orbitspot/actions/.github/actions/setup-config@v21.1.1
         with:
           setup: 'api'
           repo_vars: '${{ toJson(vars) }}'
@@ -45,6 +46,7 @@ jobs:
   create-api-gateway:
     name: Create
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    needs: [setup-config]
     permissions:
       id-token: write
       contents: read

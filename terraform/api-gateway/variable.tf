@@ -11,6 +11,7 @@ variable "hosts" {
     master  = string
     homolog = string
     develop = string
+    test    = string
   })
 }
 
@@ -66,6 +67,18 @@ variable "api_gateway" {
       region      = string
     }))
     develop = list(object({
+      oauth2 = object({
+        parent_id         = string
+        custom_authorizer = string
+      })
+      default = object({
+        parent_id         = string
+        custom_authorizer = string
+      })
+      rest_api_id = string
+      region      = string
+    }))
+    test = list(object({
       oauth2 = object({
         parent_id         = string
         custom_authorizer = string
