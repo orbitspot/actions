@@ -15,13 +15,13 @@ jobs:
     strategy:
       matrix:
         repository:
-          # - infra-api-example
-          # - infra-api-scaledjob-example
+          - infra-api-example
+          - infra-api-scaledjob-example
           - infra-scaledjob-example
-          # - infra-api-migration-example
+          - infra-api-migration-example
           - infra-frontend-example
           - infra-landingpage-example
-          # - infra-cronjob-example
+          - infra-cronjob-example
 
     steps:
       - name: Update reusable workflow version in all branches

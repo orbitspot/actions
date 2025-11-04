@@ -12,7 +12,7 @@ csiSecrets:
     serviceAccountName: "application-permission"
 
 service:
-    type: ClustehelrIP
+    type: ClusterIP
 
 containers:
     - name: cronjob-<REPOSITORY-NAME>
