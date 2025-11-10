@@ -23,6 +23,13 @@ runs:
   - name: Set up Docker Buildx
     uses: docker/setup-buildx-action@v3
 
+  - name: configure aws credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ env.AWS_ROLE_NAME }}
+      role-session-name: ${{ env.AWS_ROLE_NAME }}
+      aws-region: ${{ env.AWS_REGION }}
+
   - name: Login to Amazon ECR
     id: login-ecr
     uses: aws-actions/amazon-ecr-login@v2

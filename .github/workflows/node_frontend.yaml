@@ -156,7 +156,7 @@ jobs:
             mv ${{ inputs.dockerfile_path }} Dockerfile
 
         - name: docker-build
-          uses: orbitspot/actions/.github/actions/docker@v21
+          uses: orbitspot/actions/.github/actions/docker@fix/frontend-lib
           with:
               content: "building"
               image: ${{ github.event.repository.name }}
