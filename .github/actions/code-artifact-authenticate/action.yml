@@ -12,7 +12,7 @@ runs:
   - name: configure aws credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
-      role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ env.AWS_ROLE_NAME }}
+      role-to-assume: arn:aws:iam::931670397156:role/${{ env.AWS_ROLE_NAME }}
       role-session-name: ${{ env.AWS_ROLE_NAME }}
       aws-region: ${{ env.AWS_REGION }}
 
