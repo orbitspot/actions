@@ -58,7 +58,7 @@ jobs:
         AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
       steps:
           - name: Authenticate
-            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix/frontend-lib
+            uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v21
 
           - name: Configurar Python
             uses: actions/setup-python@v5
@@ -143,7 +143,7 @@ jobs:
         AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
       steps:
         - name: Authenticate
-          uses: orbitspot/actions/.github/actions/code-artifact-authenticate@fix/frontend-lib
+          uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v21
 
         - name: Download Dockerfile from S3
           if: ${{ inputs.dockerfile_path == ''}}
