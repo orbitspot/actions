@@ -51,8 +51,8 @@ resource "aws_api_gateway_integration_response" "integration_400" {
     aws_api_gateway_integration.default,
     aws_api_gateway_method.default,
     aws_api_gateway_method_response.default,
-    aws_api_gateway_integration_response.inregration_201,
-    aws_api_gateway_integration_response.inregration_204,
+    aws_api_gateway_integration_response.integration_201,
+    aws_api_gateway_integration_response.integration_204,
     aws_api_gateway_integration_response.integration_403,
     aws_api_gateway_integration_response.integration_404
   ]
@@ -66,13 +66,13 @@ resource "aws_api_gateway_integration_response" "integration_400" {
   region              = "us-east-1"
 }
 
-resource "aws_api_gateway_integration_response" "inregration_500" {
+resource "aws_api_gateway_integration_response" "integration_500" {
   depends_on = [
     aws_api_gateway_integration.default,
     aws_api_gateway_method.default,
     aws_api_gateway_method_response.default,
-    aws_api_gateway_integration_response.inregration_201,
-    aws_api_gateway_integration_response.inregration_204,
+    aws_api_gateway_integration_response.integration_201,
+    aws_api_gateway_integration_response.integration_204,
     aws_api_gateway_integration_response.integration_403,
     aws_api_gateway_integration_response.integration_404
   ]
@@ -86,13 +86,13 @@ resource "aws_api_gateway_integration_response" "inregration_500" {
   region              = "us-east-1"
 }
 
-resource "aws_api_gateway_integration_response" "inregration_200" {
+resource "aws_api_gateway_integration_response" "integration_200" {
   depends_on = [
     aws_api_gateway_integration.default,
     aws_api_gateway_method.default,
     aws_api_gateway_method_response.default,
-    aws_api_gateway_integration_response.inregration_201,
-    aws_api_gateway_integration_response.inregration_204,
+    aws_api_gateway_integration_response.integration_201,
+    aws_api_gateway_integration_response.integration_204,
     aws_api_gateway_integration_response.integration_403,
     aws_api_gateway_integration_response.integration_404
   ]
