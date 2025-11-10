@@ -23,18 +23,18 @@ runs:
       role-session-name: ${{ env.AWS_ROLE_NAME }}
       aws-region: ${{ env.AWS_REGION }}
 
-  - name: Delete resource if it exists
-    shell: bash
-    run: |
-      cd orbitspot-actions/terraform/api-gateway
-      terraform destroy -auto-approve
-
   - name: Checkout code
     uses: actions/checkout@v4
     with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
         ref: '${{ inputs.tag }}'
+  
+  - name: Delete resource if it exists
+    shell: bash
+    run: |
+      cd orbitspot-actions/terraform/api-gateway
+      terraform destroy -auto-approve
 
   - name: Terraform Init
     shell: bash
