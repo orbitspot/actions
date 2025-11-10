@@ -29,12 +29,6 @@ runs:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
         ref: '${{ inputs.tag }}'
-  
-  - name: Delete resource if it exists
-    shell: bash
-    run: |
-      cd orbitspot-actions/terraform/api-gateway
-      terraform destroy -auto-approve
 
   - name: Terraform Init
     shell: bash
@@ -42,6 +36,12 @@ runs:
       cd orbitspot-actions/terraform/api-gateway
       terraform init -backend-config=bucket=${{ env.TERRAFORM_BUCKET }} -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
 
+  # - name: Delete resource if it exists
+  #   shell: bash
+  #   run: |
+  #     cd orbitspot-actions/terraform/api-gateway
+  #     terraform destroy -auto-approve
+      
   - name: Terraform Plan
     shell: bash
     env:
