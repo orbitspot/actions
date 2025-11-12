@@ -45,15 +45,6 @@ runs:
   - name: Set up Helm
     uses: azure/setup-helm@v4
 
-  - name: Cache Helm plugins
-    id: cache-helm-plugins
-    uses: actions/cache@v4
-    with:
-      path: ~/.local/share/helm/plugins/
-      key: ${{ runner.os }}-helm-plugins-${{ hashFiles('role.json') }}
-      restore-keys: |
-        ${{ runner.os }}-helm-plugins-
-
   - name: Install Plugins Helm Git
     shell: bash
     run: |
