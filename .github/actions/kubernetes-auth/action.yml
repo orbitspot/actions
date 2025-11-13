@@ -45,10 +45,13 @@ runs:
   - name: Set up Helm
     uses: azure/setup-helm@v4
 
+  - name: Add no verify to helm install
+    shell: bash
+    run: export HELM_NO_VERIFY=true
+
   - name: Install Plugins Helm Git
     shell: bash
     run: |
-      helm plugin list
       if ! helm plugin list | grep -q "helm-git"; then
         helm plugin install https://github.com/aslafy-z/helm-git.git
       else
