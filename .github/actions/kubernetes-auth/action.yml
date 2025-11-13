@@ -47,9 +47,14 @@ runs:
     with:
       version: v3.19.1
 
-  - name: Add no verify to helm install
-    shell: bash
-    run: export HELM_NO_VERIFY=true
+  - name: Cache Helm plugins
+    id: cache-helm-plugins
+    uses: actions/cache@v4
+    with:
+      path: ~/.local/share/helm/plugins/
+      key: ${{ runner.os }}-helm-plugins-${{ hashFiles('role.json') }}
+      restore-keys: |
+        ${{ runner.os }}-helm-plugins-
 
   - name: Install Plugins Helm Git
     shell: bash
