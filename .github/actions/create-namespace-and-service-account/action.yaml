@@ -34,7 +34,6 @@ runs:
       echo "Region: ${{ inputs.aws_region }}"
       echo "Role: ${{ inputs.aws_role_name }}"
       echo "Cluster: ${{ inputs.cluster_name }}"
-      helm plugin list
 
   - name: configure
     uses: orbitspot/actions/.github/actions/kubernetes-auth@master
