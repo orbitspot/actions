@@ -36,7 +36,7 @@ runs:
       echo "Cluster: ${{ inputs.cluster_name }}"
 
   - name: configure
-    uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.6
+    uses: orbitspot/actions/.github/actions/kubernetes-auth@master
     with:
         aws_account_number: ${{ inputs.aws_account_number }}
         aws_role_name: ${{ inputs.aws_role_name }}
