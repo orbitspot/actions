@@ -75,7 +75,7 @@ runs:
     - name: Gerar values.properties
       run: |
         set -o noglob
-        IFS=
+        unset IFS
 
         printf "%s\n" "${{ env.PROPERTIES }}" | tr '\r' '\n' > values.properties
         cat values.properties
