@@ -74,11 +74,14 @@ runs:
 
     - name: Gerar values.properties
       run: |
+        echo "*********************"
         echo "${{ env.PROPERTIES }}" | tr '\r' '\n' > values.properties
+        cat values.properties
         echo "istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
         echo "istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
         echo "acm_arn=${{ env.ACM_ARN }}" >> values.properties
         echo "environment=${{ env.ENV }}" >> values.properties
+        cat values.properties
 
         branch=${{ github.ref_name }}
 
@@ -98,11 +101,13 @@ runs:
 
         echo "istio.ingress.host=$url" >> values.properties
         echo "istio.ingress.private_host=$private_url" >> values.properties
+        cat values.properties
 
         if [[ -n "${{ env.BROKER_AMQP }}" ]]; then
           RABBITMQ_BASE64=$(echo -n "${{ env.BROKER_AMQP }}" | base64 -w0)
           echo "secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
         fi
+        echo "*********************"
       shell: bash
 
     - name: Replace values
