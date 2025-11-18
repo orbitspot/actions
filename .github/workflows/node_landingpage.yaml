@@ -29,6 +29,7 @@ jobs:
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
       AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
+      ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
     steps:
       - name: Set up
         id: set-output
@@ -223,6 +224,7 @@ jobs:
         CLUSTER_NAME: '${{ needs.setup-config.outputs.CLUSTER_NAME }}'
         ENV: '${{ needs.setup-config.outputs.ENV }}'
         AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
+        ACM_ARN: '${{ needs.setup-config.outputs.ACM_ARN }}'
       steps:
           - name: Helm Apply 1 host
             if: ${{ vars.HOST_MF_2 == ''}}
@@ -238,7 +240,7 @@ jobs:
                 --set region=${{ env.CLUSTER_REGION }} \
                 --set 'containers[0].repository.image=${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
                 --set 'containers[0].repository.tag=${{ github.sha }}' \
-                --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
+                --set ingress.annotations.acm=${{ env.ACM_ARN }} \
                 --set ingress.rules[0].host=${{ vars.HOST_MF }} 
                 
           - name: Helm Apply 2 hosts
@@ -255,7 +257,7 @@ jobs:
                 --set region=${{ env.CLUSTER_REGION }} \
                 --set 'containers[0].repository.image=${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ github.event.repository.name }}' \
                 --set 'containers[0].repository.tag=${{ github.sha }}' \
-                --set ingress.annotations.acm=${{ vars.ACM_ARN }} \
+                --set ingress.annotations.acm=${{ env.ACM_ARN }} \
                 --set ingress.rules[0].host=${{ vars.HOST_MF }} \
                 --set ingress.rules[1].host=${{ vars.HOST_MF_2 }}
           
