@@ -1,6 +1,6 @@
 module: <MODULE>
 
-scheduler: '"${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.scheduler}"'
+scheduler: '${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.scheduler}'
 
 nodeSelector:
     nodegroup-type: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.node_selector}
