@@ -76,11 +76,12 @@ runs:
       run: |
         set -o noglob
         IFS=   # disable word splitting
-        printf "%s" "${{ env.PROPERTIES }}" | tr '\r' '\n' > values.properties
-        printf "%s" "istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
-        printf "%s" "istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
-        printf "%s" "acm_arn=${{ env.ACM_ARN }}" >> values.properties
-        printf "%s" "environment=${{ env.ENV }}" >> values.properties
+
+        printf "%s\n" "${{ env.PROPERTIES }}" | tr '\r' '\n' > values.properties
+        printf "%s\n" "istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
+        printf "%s\n" "istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
+        printf "%s\n" "acm_arn=${{ env.ACM_ARN }}" >> values.properties
+        printf "%s\n" "environment=${{ env.ENV }}" >> values.properties
 
         branch=${{ github.ref_name }}
 
@@ -98,12 +99,12 @@ runs:
             private_url="private-ingress.test.orbitspot.com"
         fi
 
-        printf "%s" "istio.ingress.host=$url" >> values.properties
-        printf "%s" "istio.ingress.private_host=$private_url" >> values.properties
+        printf "%s\n" "istio.ingress.host=$url" >> values.properties
+        printf "%s\n" "istio.ingress.private_host=$private_url" >> values.properties
 
         if [[ -n "${{ env.BROKER_AMQP }}" ]]; then
           RABBITMQ_BASE64=$(echo -n "${{ env.BROKER_AMQP }}" | base64 -w0)
-          printf "%s" "secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
+          printf "%s\n" "secrets.rabbitmq_auth_host=$RABBITMQ_BASE64" >> values.properties
         fi
       shell: bash
 
