@@ -190,13 +190,16 @@ jobs:
       - id: build-sets
         shell: bash
         run: |
-          set_args="--set environment=${{env.ENV}} \
-          --set region=${{ env.CLUSTER_REGION }} \
-          --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
-          --set 'containers[0].repository.tag=${{ github.sha }}'\"
-          [ -n "${{ inputs.scheduler }}" ] && set_args="$set_args --set 'scheduler="${{ inputs.scheduler }}"'"
+          set_args="--set environment=${{ env.ENV }} \
+            --set region=${{ env.CLUSTER_REGION }} \
+            --set containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }} \
+            --set containers[0].repository.tag=${{ github.sha }} \"
 
-          echo "set_args=$set_args" >> $GITHUB_OUTPUT 
+          if [ -n "${{ inputs.scheduler }}" ]; then
+            set_args="$set_args --set scheduler=${{ inputs.scheduler }}"
+          fi
+
+          echo "set_args=$set_args" >> "$GITHUB_OUTPUT"
 
       - name: helm-apply
         uses: orbitspot/actions/.github/actions/helm-deploy@feat/multiple-schedules
