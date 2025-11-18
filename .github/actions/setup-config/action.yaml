@@ -42,7 +42,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'v21'
+        ref: 'feat/acm-arn'
     
     - name: Check required variables
       shell: bash
