@@ -78,6 +78,7 @@ runs:
         IFS=   # disable word splitting
 
         printf "%s\n" "${{ env.PROPERTIES }}" | tr '\r' '\n' > values.properties
+        cat values.properties
         printf "%s\n" "istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
         printf "%s\n" "istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
         printf "%s\n" "acm_arn=${{ env.ACM_ARN }}" >> values.properties
