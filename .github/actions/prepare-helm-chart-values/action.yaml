@@ -80,7 +80,6 @@ runs:
         unset IFS
 
         printf "%s\n" "$PROPERTIES_JSON" | jq -r . > values.properties
-        cat values.properties
         printf "%s\n" "istio.egress.databases.default.port=${{ env.DB_PORT }}" >> values.properties
         printf "%s\n" "istio.egress.databases.default.host=${{ env.DB_HOST }}" >> values.properties
         printf "%s\n" "acm_arn=${{ env.ACM_ARN }}" >> values.properties
