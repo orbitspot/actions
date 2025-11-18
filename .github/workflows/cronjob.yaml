@@ -13,9 +13,10 @@ on:
       version:
         required: true
         type: string
-      scheduler:
-        required: true
+      scheduler: # retirar na proxima breaking
+        required: false
         type: string
+        default: ''
       dockerfile_path:
         required: false
         type: string
@@ -44,7 +45,7 @@ jobs:
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@v21
+        uses:  orbitspot/actions/.github/actions/setup-config@feat/multiple-schedules
         with:
           setup: 'cronjob'
           repo_vars: '${{ toJson(vars) }}'
@@ -81,7 +82,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v21
+        uses: orbitspot/actions/.github/actions/package-manager-install@feat/multiple-schedules
         with:
           node_version: '${{ inputs.version }}'
           customized_dockerfile: '${{ inputs.dockerfile_path  }}'
@@ -102,7 +103,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: Authenticate
-        uses: orbitspot/actions/.github/actions/generate-docker@v21
+        uses: orbitspot/actions/.github/actions/generate-docker@feat/multiple-schedules
         with:
           deployment_name: ${{ matrix.artifacts }}
           dockerfile_path: ${{ inputs.dockerfile_path }}
@@ -127,7 +128,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - name: create-role
-        uses: orbitspot/actions/.github/actions/create-role-service-account@v21
+        uses: orbitspot/actions/.github/actions/create-role-service-account@feat/multiple-schedules
         with:
           role: '${{ github.event.repository.name }}-${{ env.ENV }}'
           namespace: ${{ github.event.repository.name }}
@@ -135,7 +136,7 @@ jobs:
           policy: ${{ vars._POLICY_JSON }}
 
       - name: create-namespace
-        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@v21
+        uses: orbitspot/actions/.github/actions/create-namespace-and-service-account@feat/multiple-schedules
         with:
           namespace: ${{ github.event.repository.name }}
           service_account_name: 'application-permission'
@@ -157,7 +158,7 @@ jobs:
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@feat/multiple-schedules
         with:
           deployment_name: ${{ matrix.artifacts }}
           module: ${{ inputs.module }}
@@ -186,20 +187,26 @@ jobs:
       ENV: '${{ needs.setup-config.outputs.ENV }}'
       AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
+      - id: build-sets
+        shell: bash
+        run: |
+          set_args="--set environment=${{env.ENV}} \
+          --set region=${{ env.CLUSTER_REGION }} \
+          --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
+          --set 'containers[0].repository.tag=${{ github.sha }}'\"
+          [ -n "${{ inputs.scheduler }}" ] && set_args="$set_args --set 'scheduler="${{ inputs.scheduler }}"'"
+
+          echo "set_args=$set_args" >> $GITHUB_OUTPUT 
+
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v21
+        uses: orbitspot/actions/.github/actions/helm-deploy@feat/multiple-schedules
         with:
           namespace: ${{ github.event.repository.name }}
           helm_values: helm-values-${{ matrix.artifacts }}
           release: ${{ matrix.artifacts }}
           chart_name: orbitspot/orbitspot-cron
           chart_version: 0.2.6
-          sets: |
-            --set environment=${{env.ENV}} \
-            --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
-            --set 'containers[0].repository.tag=${{ github.sha }}' \
-            --set 'scheduler="${{ inputs.scheduler }}"'
+          sets: ${{ steps.build-sets.outputs.set_args }}
     
       - name: Clean up machine
         shell: bash
