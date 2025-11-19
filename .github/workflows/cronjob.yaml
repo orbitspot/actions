@@ -13,9 +13,10 @@ on:
       version:
         required: true
         type: string
-      scheduler:
-        required: true
+      scheduler: # retirar na proxima breaking
+        required: false
         type: string
+        default: ''
       dockerfile_path:
         required: false
         type: string
@@ -186,6 +187,20 @@ jobs:
       ENV: '${{ needs.setup-config.outputs.ENV }}'
       AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
+      - id: build-sets
+        shell: bash
+        run: |
+          set_args="--set environment=${{ env.ENV }} \
+            --set region=${{ env.CLUSTER_REGION }} \
+            --set containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{ env.CLUSTER_REGION }}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }} \
+            --set containers[0].repository.tag=${{ github.sha }}"
+
+          if [ -n "${{ inputs.scheduler }}" ]; then
+            set_args="$set_args --set scheduler='\"${{ inputs.scheduler }}\"'"
+          fi
+
+          echo "set_args=$set_args" >> "$GITHUB_OUTPUT"
+
       - name: helm-apply
         uses: orbitspot/actions/.github/actions/helm-deploy@v21
         with:
@@ -194,12 +209,7 @@ jobs:
           release: ${{ matrix.artifacts }}
           chart_name: orbitspot/orbitspot-cron
           chart_version: 0.2.6
-          sets: |
-            --set environment=${{env.ENV}} \
-            --set region=${{ env.CLUSTER_REGION }} \
-            --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
-            --set 'containers[0].repository.tag=${{ github.sha }}' \
-            --set 'scheduler="${{ inputs.scheduler }}"'
+          sets: ${{ steps.build-sets.outputs.set_args }}
     
       - name: Clean up machine
         shell: bash
