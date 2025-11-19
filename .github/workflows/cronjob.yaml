@@ -196,7 +196,7 @@ jobs:
             --set containers[0].repository.tag=${{ github.sha }}"
 
           if [ -n "${{ inputs.scheduler }}" ]; then
-            set_args="$set_args --set scheduler=\"${{ inputs.scheduler }}\""
+            set_args="$set_args --set scheduler='\"${{ inputs.scheduler }}\"'"
           fi
 
           echo "set_args=$set_args" >> "$GITHUB_OUTPUT"
