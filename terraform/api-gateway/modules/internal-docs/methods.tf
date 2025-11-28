@@ -67,8 +67,8 @@ module "options" {
     status_code        = { "200" : "" }
     response_templates = {}
     response_parameters = {
-      "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token,token,X-Requested-With,Cache-Control,accesstoken'",
-      "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+      "method.response.header.Access-Control-Allow-Headers" = "'*'",
+      "method.response.header.Access-Control-Allow-Methods" = "'*'",
       "method.response.header.Access-Control-Allow-Origin"  = "'*'",
     }
   }
