@@ -30,6 +30,7 @@ keda:
           parameter: host
 
   pollingInterval: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.pollingInterval}
+  minReplicaCount: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.minReplicaCount}
   maxReplicaCount: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.maxReplicaCount}
   failedJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.failedJobsHistoryLimit}
   successfulJobsHistoryLimit: ${.<REPOSITORY-NAME>.<DEPLOYMENT-NAME>.keda.successfulJobsHistoryLimit}
