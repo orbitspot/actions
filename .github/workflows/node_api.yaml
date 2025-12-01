@@ -96,7 +96,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v21
+        uses: orbitspot/actions/.github/actions/package-manager-install@chore/comment-zip
         with:
           node_version: '${{ inputs.version }}'
           customized_dockerfile: '${{ inputs.dockerfile_path  }}'
