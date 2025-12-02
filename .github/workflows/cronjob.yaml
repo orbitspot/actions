@@ -102,7 +102,7 @@ jobs:
       CLUSTER_REGION: '${{ needs.setup-config.outputs.CLUSTER_REGION }}'
       AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
-      - name: Authenticate
+      - name: Generate Docker
         uses: orbitspot/actions/.github/actions/generate-docker@v21
         with:
           deployment_name: ${{ matrix.artifacts }}

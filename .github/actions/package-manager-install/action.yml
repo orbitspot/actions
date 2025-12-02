@@ -72,7 +72,7 @@ runs:
       run: |
         npm prune --production
 
-    - name: Zip Docker Content
+    - name: Copy Files
       shell: bash
       run: |
         mkdir -p building
@@ -93,6 +93,7 @@ runs:
         cd building
         sudo apt install zip
         zip node_modules.zip node_modules -r
+        rm -rf node_modules
         ls
 
     - name: Upload Artifacts
