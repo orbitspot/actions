@@ -13,6 +13,7 @@ variable "docs" {
 variable "api_data" {
   type = object({
     parent_id         = string
+    rest_api_id = string
     vpc_id = string
   })
 }

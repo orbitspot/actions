@@ -41,6 +41,7 @@ module "internal_docs" {
   for_each = local.api_data
   api_data = {
     parent_id         = each.value["default"].parent_id
+    rest_api_id       = each.value["rest_api_id"]
     vpc_id = each.value["vpc_id"]
   }
   load_balancer = local.uri
