@@ -121,7 +121,7 @@ jobs:
       name: Apply parameters
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
       environment: ${{ github.ref_name }}
-      needs: [create-parameters-vars, create-parameters-secrets]
+      needs: [setup-config, create-parameters-vars, create-parameters-secrets]
       env:
         CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
         AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
