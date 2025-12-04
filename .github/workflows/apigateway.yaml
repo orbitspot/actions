@@ -65,7 +65,7 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      - name: Start
+      - name: Terraform
         uses: orbitspot/actions/.github/actions/api-gateway@feat/add-vpc
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
