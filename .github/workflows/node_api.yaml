@@ -42,6 +42,7 @@ jobs:
       CLUSTER_NAME: '${{ steps.set-output.outputs.CLUSTER_NAME }}'
       ACM_ARN: '${{ steps.set-output.outputs.ACM_ARN }}'
       AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
+      TERRAFORM_BUCKET: '${{ steps.set-output.outputs.TERRAFORM_BUCKET }}'
       ENV: '${{ steps.set-output.outputs.ENV }}'
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       scaledjob-matrix: ${{ steps.set-matrix.outputs.scaledjob_matrix }}
