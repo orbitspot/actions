@@ -85,15 +85,72 @@ jobs:
               echo "EOF"
             } >> "$GITHUB_OUTPUT"
 
-  parameters:
-    needs: [setup-config]
-    permissions:
-        contents: read
+  create-parameters-vars:
+      name: Create parameters
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: ${{ github.ref_name }}
+      needs: [setup-config]
+      permissions:
         id-token: write
-    uses: orbitspot/actions/.github/workflows/parameters.yaml@add-variaveis-globais-modulo
-    with: 
-        module: ${{ inputs.module }}
-    secrets: inherit
+        contents: read
+      steps:
+        - name: Generate Envs
+          id: generate-environments-vars
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
+          with:
+            environment_json: ${{ toJson(vars) }}
+            file_name: variables
+
+  create-parameters-secrets:
+      name: Create parameters secrets
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: ${{ github.ref_name }}
+      # needs: [setup-config]
+      permissions:
+        id-token: write
+        contents: read
+      steps:
+        - name: Generate Envs
+          id: generate-environments-secrets
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
+          with:
+            environment_json: ${{ toJson(secrets) }}
+            file_name: secrets
+
+  apply-parameters:
+      name: Apply parameters
+      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: ${{ github.ref_name }}
+      needs: [create-parameters-vars, create-parameters-secrets]
+      env:
+        CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
+        AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
+        TERRAFORM_BUCKET: ${{ needs.setup-config.outputs.TERRAFORM_BUCKET }}
+      permissions:
+        id-token: write
+        contents: read
+      steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: hashicorp/setup-terraform@v3
+        name: setup
+        with:
+          terraform_version: "1.5.0"
+              
+      - name: Start terraform
+        uses: orbitspot/actions/.github/actions/parameter-store@v21
+        with:
+          modulo: '${{ inputs.module }}'
+          repository: "${{ github.event.repository.name }}"
+          tag: 'v21'
+          terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
+        env:
+          AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
+          AWS_REGION: ${{ env.CLUSTER_REGION }}
+          AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}
 
   building:
     name: Building
