@@ -155,6 +155,16 @@ jobs:
           namespace: ${{ github.event.repository.name }}
           service_account_name: 'application-permission'
           module: ${{ inputs.module }}
+  
+  parameters:
+    needs: [create-service-account-role]
+    permissions:
+        contents: read
+        id-token: write
+    uses: orbitspot/actions/.github/workflows/parameters.yaml@v21
+    with: 
+        module: ${{ inputs.module }}
+    secrets: inherit
 
   prepare-helm-replacements:
     name: Building Helm Values
@@ -191,7 +201,7 @@ jobs:
     name: K8s Deploy api
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [setup-config, prepare-helm-replacements]
+    needs: [setup-config, prepare-helm-replacements, parameters]
     permissions:
       id-token: write
       contents: read
@@ -237,7 +247,7 @@ jobs:
     if: ${{ needs.setup-config.outputs.scaledjob-matrix != '[]' }}
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [setup-config, prepare-helm-replacements]
+    needs: [setup-config, prepare-helm-replacements, parameters]
     strategy:
       matrix:
         artifacts: ${{fromJson(needs.setup-config.outputs.scaledjob-matrix) }}
