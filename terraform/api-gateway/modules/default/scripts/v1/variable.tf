@@ -17,3 +17,11 @@ variable "rest_api_id" {
 variable "resource_id" {
   type = string
 }
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "region" {
+  type = string
+}

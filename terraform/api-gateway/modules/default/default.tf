@@ -1,9 +1,8 @@
 module "default-get" {
   source = "../api-gateway-resources"
-  depends_on = [
-    aws_api_gateway_resource.default
-  ]
   rest_api_id = var.api_data.rest_api_id
+   vpc_id = var.api_data.vpc_id
+  region = var.region
   http_method = "GET"
   method = {
     authorization                   = "NONE"
@@ -40,11 +39,9 @@ module "default-get" {
 
 module "default-option" {
   source = "../api-gateway-resources"
-  depends_on = [
-    aws_api_gateway_resource.default,
-    module.default-get
-  ]
   rest_api_id = var.api_data.rest_api_id
+   vpc_id = var.api_data.vpc_id
+  region = var.region
   http_method = "OPTIONS"
   method = {
     authorization                   = "NONE"

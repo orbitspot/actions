@@ -1,10 +1,6 @@
 name: 'Terraform Init'
 description: 'terraform init commands'
 inputs:
-  terraform_bucket_name:
-    description: 'Bucket'
-    required: true
-    default: 'terraform-orbit'
   tag:
     description: 'tag'
     required: true
@@ -34,7 +30,11 @@ runs:
     shell: bash
     run: |
       cd orbitspot-actions/terraform/api-gateway
-      terraform init -backend-config=bucket=${{ env.TERRAFORM_BUCKET }} -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate -backend-config=region=us-east-1 -no-color
+      terraform init \
+        -backend-config=bucket=${{ env.TERRAFORM_BUCKET }} \
+        -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate \
+        -backend-config=region=${{ env.AWS_REGION }} \
+        -no-color
 
   - name: Delete resource if it exists
     shell: bash

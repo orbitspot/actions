@@ -46,3 +46,13 @@ variable "timeout_milliseconds" {
   type = number
   default = 29000
 }
+
+variable "vpc_id" {
+  type = string
+  default = ""
+}
+
+variable "region" {
+  type = string
+  default = "us-east-1"
+}

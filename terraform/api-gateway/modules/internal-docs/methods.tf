@@ -1,8 +1,7 @@
 module "get" {
   source = "../api-gateway-resources"
-  depends_on = [
-    aws_api_gateway_resource.internal_docs
-  ]
+  region = var.region
+  vpc_id = var.api_data.vpc_id
   rest_api_id = var.api_data.rest_api_id
   http_method = "GET"
   method = {
@@ -43,9 +42,8 @@ module "get" {
 
 module "options" {
   source = "../api-gateway-resources"
-  depends_on = [
-    aws_api_gateway_resource.internal_docs,
-  ]
+  region = var.region
+  vpc_id = var.api_data.vpc_id
   rest_api_id = var.api_data.rest_api_id
   http_method = "OPTIONS"
   method = {
