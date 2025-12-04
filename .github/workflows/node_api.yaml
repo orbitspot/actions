@@ -86,6 +86,7 @@ jobs:
               echo "EOF"
             } >> "$GITHUB_OUTPUT"
 
+  # TORNAR ACTION 
   create-parameters-vars:
       name: Create parameters
       runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
