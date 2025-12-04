@@ -85,6 +85,16 @@ jobs:
               echo "EOF"
             } >> "$GITHUB_OUTPUT"
 
+  parameters:
+    needs: [setup-config]
+    permissions:
+        contents: read
+        id-token: write
+    uses: orbitspot/actions/.github/workflows/parameters.yaml@v21
+    with: 
+        module: ${{ inputs.module }}
+    secrets: inherit
+
   building:
     name: Building
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
@@ -155,16 +165,6 @@ jobs:
           namespace: ${{ github.event.repository.name }}
           service_account_name: 'application-permission'
           module: ${{ inputs.module }}
-  
-  parameters:
-    needs: [create-service-account-role]
-    permissions:
-        contents: read
-        id-token: write
-    uses: orbitspot/actions/.github/workflows/parameters.yaml@v21
-    with: 
-        module: ${{ inputs.module }}
-    secrets: inherit
 
   prepare-helm-replacements:
     name: Building Helm Values
