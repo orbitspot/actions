@@ -14,7 +14,7 @@ module "default_routes" {
     vpc_id            = each.value["vpc"].id
     load_balancer     = each.value["vpc"].load_balancer
   }
-  load_balancer         = local.uri
+  uri                   = local.uri
   path                  = local.api_gateway_resource
   istio_enabled         = var.istio_enabled
   apply_response_script = var.apply_response_script
@@ -31,7 +31,7 @@ module "oauth_routes" {
     vpc_id            = each.value["vpc"].id
     load_balancer     = each.value["vpc"].load_balancer
   }
-  load_balancer         = local.uri
+  uri                   = local.uri
   path                  = local.api_gateway_resource
   istio_enabled         = var.istio_enabled
   apply_response_script = var.apply_response_script
@@ -47,8 +47,8 @@ module "internal_docs" {
     vpc_id        = each.value["vpc"].id
     load_balancer = each.value["vpc"].load_balancer
   }
-  load_balancer = local.uri
-  path          = local.api_gateway_resource
-  docs          = var.docs
-  region        = each.value["region"]
+  uri    = local.uri
+  path   = local.api_gateway_resource
+  docs   = var.docs
+  region = each.value["region"]
 }

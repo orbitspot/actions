@@ -12,7 +12,7 @@ variable "path" {
   type = string
 }
 
-variable "load_balancer" {
+variable "uri" {
   type = string
 }
 

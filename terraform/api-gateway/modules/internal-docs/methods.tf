@@ -13,7 +13,7 @@ module "get" {
   }
   integration = {
     integration_http_method = "GET"
-    uri                     = "${var.load_balancer}/${var.docs}"
+    uri                     = "${var.uri}/${var.docs}"
     type                    = "HTTP"
     request_parameters = {
       "integration.request.header.target" = "'${var.path}'"

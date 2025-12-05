@@ -25,3 +25,7 @@ variable "region" {
 variable "load_balancer" {
   type = string
 }
+
+variable "uri" {
+  type = string
+}

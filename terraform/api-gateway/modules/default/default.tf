@@ -12,7 +12,7 @@ module "default-get" {
     request_parameters              = {}
   }
   integration = {
-    uri                     = var.istio_enabled ? "${var.load_balancer}/" : var.load_balancer
+    uri                     = var.istio_enabled ? "${var.uri}/" : var.uri
     type                    = "HTTP"
     integration_http_method = "GET"
     request_parameters = {
