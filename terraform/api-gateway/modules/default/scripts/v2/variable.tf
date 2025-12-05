@@ -1,7 +1,3 @@
-variable "load_balancer" {
-  type = string
-}
-
 variable "path" {
   type = string
 }
