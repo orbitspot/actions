@@ -11,9 +11,8 @@ module "default_routes" {
     rest_api_id       = each.value["rest_api_id"]
     parent_id         = each.value["default"].parent_id
     custom_authorizer = each.value["default"].custom_authorizer
-    vpc_id            = each.value["vpc"].id
-    load_balancer     = each.value["vpc"].load_balancer
   }
+  vpc                   = each.value["vpc"]
   uri                   = local.uri
   path                  = local.api_gateway_resource
   istio_enabled         = var.istio_enabled
@@ -28,9 +27,8 @@ module "oauth_routes" {
     rest_api_id       = each.value["rest_api_id"]
     parent_id         = each.value["oauth2"].parent_id
     custom_authorizer = each.value["oauth2"].custom_authorizer
-    vpc_id            = each.value["vpc"].id
-    load_balancer     = each.value["vpc"].load_balancer
   }
+  vpc                   = each.value["vpc"]
   uri                   = local.uri
   path                  = local.api_gateway_resource
   istio_enabled         = var.istio_enabled
@@ -42,11 +40,10 @@ module "internal_docs" {
   source   = "./modules/internal-docs"
   for_each = local.api_data
   api_data = {
-    rest_api_id   = each.value["rest_api_id"]
-    parent_id     = each.value["default"].parent_id
-    vpc_id        = each.value["vpc"].id
-    load_balancer = each.value["vpc"].load_balancer
+    rest_api_id = each.value["rest_api_id"]
+    parent_id   = each.value["default"].parent_id
   }
+  vpc    = each.value["vpc"]
   uri    = local.uri
   path   = local.api_gateway_resource
   docs   = var.docs

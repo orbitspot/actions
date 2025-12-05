@@ -3,8 +3,6 @@ variable "api_data" {
     parent_id         = string
     rest_api_id       = string
     custom_authorizer = string
-    vpc_id            = string
-    load_balancer     = string
   })
 }
 
@@ -27,3 +25,11 @@ variable "apply_response_script" {
 variable "region" {
   type = string
 }
+
+variable "vpc" {
+  type = object({
+    link_id       = string
+    load_balancer = string
+  })
+}
+

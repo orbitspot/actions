@@ -12,9 +12,14 @@ variable "docs" {
 
 variable "api_data" {
   type = object({
-    parent_id     = string
-    rest_api_id   = string
-    vpc_id        = string
+    parent_id   = string
+    rest_api_id = string
+  })
+}
+
+variable "vpc" {
+  type = object({
+    link_id       = string
     load_balancer = string
   })
 }

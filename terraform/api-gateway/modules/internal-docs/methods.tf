@@ -2,8 +2,8 @@ module "get" {
   source        = "../api-gateway-resources"
   region        = var.region
   rest_api_id   = var.api_data.rest_api_id
-  vpc_id        = var.api_data.vpc_id
-  load_balancer = var.api_data.load_balancer
+  vpc_id        = var.vpc.link_id
+  load_balancer = var.vpc.load_balancer
   http_method   = "GET"
   method = {
     authorization                   = "NONE"
