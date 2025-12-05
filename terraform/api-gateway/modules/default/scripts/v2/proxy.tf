@@ -106,8 +106,6 @@ module "proxy-option" {
       "method.response.header.Access-Control-Allow-Origin"  = true
     }
   }
-  resource_id   = var.resource_id
-  vpc_id        = var.vpc_id
-  load_balancer = var.load_balancer
-  region        = var.region
+  resource_id = var.resource_id
+  region      = var.region
 }

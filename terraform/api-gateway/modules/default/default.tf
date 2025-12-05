@@ -39,12 +39,10 @@ module "default-get" {
 
 
 module "default-option" {
-  source        = "../api-gateway-resources"
-  rest_api_id   = var.api_data.rest_api_id
-  vpc_id        = var.api_data.vpc_id
-  load_balancer = var.api_data.load_balancer
-  region        = var.region
-  http_method   = "OPTIONS"
+  source      = "../api-gateway-resources"
+  rest_api_id = var.api_data.rest_api_id
+  region      = var.region
+  http_method = "OPTIONS"
   method = {
     authorization                   = "NONE"
     authorizer_id                   = ""
