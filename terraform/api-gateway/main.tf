@@ -11,7 +11,8 @@ module "default_routes" {
     rest_api_id       = each.value["rest_api_id"]
     parent_id         = each.value["default"].parent_id
     custom_authorizer = each.value["default"].custom_authorizer
-    vpc_id            = each.value["vpc_id"]
+    vpc_id            = each.value["vpc"].id
+    load_balancer     = each.value["vpc"].load_balancer
   }
   load_balancer         = local.uri
   path                  = local.api_gateway_resource
@@ -27,7 +28,8 @@ module "oauth_routes" {
     rest_api_id       = each.value["rest_api_id"]
     parent_id         = each.value["oauth2"].parent_id
     custom_authorizer = each.value["oauth2"].custom_authorizer
-    vpc_id            = each.value["vpc_id"]
+    vpc_id            = each.value["vpc"].id
+    load_balancer     = each.value["vpc"].load_balancer
   }
   load_balancer         = local.uri
   path                  = local.api_gateway_resource
@@ -40,9 +42,10 @@ module "internal_docs" {
   source   = "./modules/internal-docs"
   for_each = local.api_data
   api_data = {
-    parent_id   = each.value["default"].parent_id
-    rest_api_id = each.value["rest_api_id"]
-    vpc_id      = each.value["vpc_id"]
+    rest_api_id   = each.value["rest_api_id"]
+    parent_id     = each.value["default"].parent_id
+    vpc_id        = each.value["vpc"].id
+    load_balancer = each.value["vpc"].load_balancer
   }
   load_balancer = local.uri
   path          = local.api_gateway_resource

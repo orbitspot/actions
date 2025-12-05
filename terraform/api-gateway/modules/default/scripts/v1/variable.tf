@@ -25,3 +25,7 @@ variable "vpc_id" {
 variable "region" {
   type = string
 }
+
+variable "load_balancer" {
+  type = string
+}

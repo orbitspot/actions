@@ -8,32 +8,32 @@ variable "http_method" {
 
 variable "method" {
   type = object({
-    authorization = string
-    authorizer_id = string
+    authorization                   = string
+    authorizer_id                   = string
     request_method_api_key_required = bool
-    request_parameters = map(string)
+    request_parameters              = map(string)
   })
 }
 variable "integration" {
   type = object({
-    uri = string
-    type = string
+    uri                     = string
+    type                    = string
     integration_http_method = string
-    request_parameters = map(string)
-    request_templates = map(string)
+    request_parameters      = map(string)
+    request_templates       = map(string)
   })
 }
 variable "integration_response" {
   type = object({
-    status_code = map(string)
-    response_templates = map(string)
+    status_code         = map(string)
+    response_templates  = map(string)
     response_parameters = map(string)
   })
 }
 variable "method_response" {
   type = object({
-    status_code = map(string)
-    response_models = map(string)
+    status_code         = map(string)
+    response_models     = map(string)
     response_parameters = map(string)
   })
 }
@@ -43,16 +43,21 @@ variable "resource_id" {
 }
 
 variable "timeout_milliseconds" {
-  type = number
+  type    = number
   default = 29000
 }
 
 variable "vpc_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "region" {
-  type = string
+  type    = string
   default = "us-east-1"
+}
+
+variable "load_balancer" {
+  type    = string
+  default = ""
 }
