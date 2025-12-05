@@ -53,7 +53,7 @@ variable "api_gateway" {
       })
       rest_api_id = string
       region      = string
-      vpc_id = string
+      vpc_id      = string
     }))
     homolog = list(object({
       oauth2 = object({
@@ -66,7 +66,7 @@ variable "api_gateway" {
       })
       rest_api_id = string
       region      = string
-      vpc_id = string
+      vpc_id      = string
     }))
     develop = list(object({
       oauth2 = object({
@@ -79,7 +79,7 @@ variable "api_gateway" {
       })
       rest_api_id = string
       region      = string
-      vpc_id = string
+      vpc_id      = string
     }))
     test = list(object({
       oauth2 = object({
@@ -92,7 +92,11 @@ variable "api_gateway" {
       })
       rest_api_id = string
       region      = string
-      vpc_id = string
+      vpc_id      = string
     }))
   })
+}
+
+variable "region" {
+  type = string
 }
