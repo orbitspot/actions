@@ -315,7 +315,7 @@ jobs:
                   fetch-depth: 0
 
             - name: configure
-              uses: orbitspot/actions/.github/actions/kubernetes-auth@v19.0
+              uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.6
               with:
                   aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
                   aws_role_name: ${{ vars.AWS_ROLE_NAME }}
@@ -380,7 +380,7 @@ jobs:
             fetch-depth: 0
 
         - name: configure
-          uses: orbitspot/actions/.github/actions/kubernetes-auth@v19.0
+          uses: orbitspot/actions/.github/actions/kubernetes-auth@v18.6
           with:
             aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
             aws_role_name: ${{ vars.AWS_ROLE_NAME }}
