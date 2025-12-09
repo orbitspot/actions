@@ -1,8 +1,14 @@
 import json
 import os
 
-variables = os.getenv("variables_json", "{}")
+variables_json = os.getenv("variables_json", "{}")
 module = os.getenv("module")
+
+try:
+    variables = json.loads(variables_json)
+except json.JSONDecodeError:
+    print("Invalid JSON input")
+    exit(1)
 
 result_json = {}
 print("Variables: ", variables)
