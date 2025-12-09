@@ -129,6 +129,7 @@ jobs:
         with:
           repository: orbitspot/actions
           path: code
+          ref: 'v19.0'
       
       - name: Authenticate
         uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v19.0
