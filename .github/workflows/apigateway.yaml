@@ -78,9 +78,7 @@ jobs:
           TF_VAR_istio_enabled: '${{ inputs.istio_enabled }}'
           TF_VAR_resource_name: '${{ inputs.resource_name }}'
           TF_VAR_api_gateway: '${{ vars._API_GATEWAY_TESTE }}'
-          TF_VAR_region: '${{ env.CLUSTER_REGION }}'
-        with:
-          tag: 'feat/add-vpc'
+          # TF_VAR_region: '${{ env.CLUSTER_REGION }}'
       
       - name: Clean up machine
         shell: bash

@@ -1,9 +1,6 @@
 name: 'Terraform Init'
 description: 'terraform init commands'
 inputs:
-  tag:
-    description: 'tag'
-    required: true
   apply_response_script:
     description: 'Apply new scripts on integration'
     required: false
@@ -24,7 +21,7 @@ runs:
     with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: '${{ inputs.tag }}'
+        ref: 'feat/add-vpc'
 
   - name: Terraform Init
     shell: bash
@@ -33,7 +30,7 @@ runs:
       terraform init \
         -backend-config=bucket=${{ env.TERRAFORM_BUCKET }} \
         -backend-config=key=api-gateway/${{ github.event.repository.name }}/${{ github.ref_name }}.tfstate \
-        -backend-config=region=${{ env.AWS_REGION }} \
+        -backend-config=region=us-east-1 \
         -no-color
 
   - name: Delete resource if it exists

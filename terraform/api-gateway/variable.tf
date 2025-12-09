@@ -108,7 +108,3 @@ variable "api_gateway" {
     }))
   })
 }
-
-variable "region" {
-  type = string
-}
