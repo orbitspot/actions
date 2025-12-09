@@ -6,7 +6,7 @@ module = os.getenv("module")
 
 result_json = {}
 print("Variables: ", variables)
-for key in variables:
+for key in variables.keys():
   print("Key: ", key)
   value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
   print(key.split("_")[1])
