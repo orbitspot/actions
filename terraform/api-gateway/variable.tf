@@ -15,11 +15,6 @@ variable "hosts" {
   })
 }
 
-variable "ssl" {
-  type    = bool
-  default = true
-}
-
 variable "istio_enabled" {
   type    = bool
   default = true
