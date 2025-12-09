@@ -4,5 +4,5 @@ locals {
   api_gateway_resource = var.resource_name != "" ? var.resource_name : replace(var.repository_name, "-", "")
   protocol             = var.ssl ? "https" : "http"
   uri                  = var.istio_enabled ? "${local.protocol}://${local.current_host}/${var.repository_name}" : "${local.protocol}://${local.current_host}"
-  region               = local.current_api_gateway.region
+  region               = local.current_api_gateway[0].region
 }
