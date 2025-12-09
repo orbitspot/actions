@@ -1,9 +1,10 @@
 name: Create global variable and secrets
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       module:
+        description: 'Module name to create global variables (e.g., outbound)'
         required: true
         type: string
 
