@@ -1,3 +1,4 @@
+# TODO: replace env variables with action inputs
 name: "Prepare Helm Values"
 description: "Prepara values.yaml com variáveis substituídas"
 inputs:

@@ -1,0 +1,38 @@
+# TODO: Transformar em um arquivo python
+name: 'Global Parameter Store'
+description: 'Generate Global Parameter Store Enviroments for Backend Applications'
+inputs:
+  environment_json:
+    description: 'environment values'
+    required: true
+  file_name:
+    description: 'file name'
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+          python-version: '3.x'
+  
+    - uses: actions/checkout@v4
+      name: Checkout
+      with:
+          repository: 'orbitspot/actions'
+          ref: add-variaveis-globais-modulo
+          path: orbitspot-actions
+
+    - name: Create global variables
+      shell: bash
+      env:
+          variables_json: ${{ inputs.environment_json }}
+          module: '${{ inputs.module }}'
+      run: python orbitspot-actions/.github/scripts/generate-global-environments.py
+
+    - name: Upload encrypted artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.file_name }}
+        path: ${{ inputs.file_name }}.json
+        retention-days: 1
