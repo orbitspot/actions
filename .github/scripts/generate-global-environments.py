@@ -5,7 +5,9 @@ variables = os.getenv("variables_json", "{}")
 module = os.getenv("module")
 
 result_json = {}
+print("Variables: ", variables)
 for key in variables:
+  print("Key: ", key)
   value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
   print(key.split("_")[1])
   if len(value) > 0 and key.split("_")[1] == module.upper(): # adiciona apenas as variáveis do módulo selecionado
