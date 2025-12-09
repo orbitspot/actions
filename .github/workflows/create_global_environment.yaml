@@ -1,4 +1,4 @@
-name: Parameters
+name: Create global variable and secrets
 
 on:
   workflow_call:
@@ -12,57 +12,57 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # setup-config:
-  #   name: Set Up Config
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
-  #     AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
-  #     TERRAFORM_BUCKET: '${{ steps.set-output.outputs.TERRAFORM_BUCKET }}'
-  #   steps:
-  #     - name: Fetch devops variables
-  #       id: set-output
-  #       uses: orbitspot/actions/.github/actions/fetch-devops-variables@v21
-  #       with:
-  #         devops_config: ${{ vars._DEVOPS_CONFIG }}
-  #         branch: ${{ github.ref_name }}
+  setup-config:
+    name: Set Up Config
+    runs-on: ubuntu-latest
+    outputs:
+      CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
+      AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
+      TERRAFORM_BUCKET: '${{ steps.set-output.outputs.TERRAFORM_BUCKET }}'
+    steps:
+      - name: Fetch devops variables
+        id: set-output
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@add-variaveis-globais-modulo
+        with:
+          devops_config: ${{ vars._DEVOPS_CONFIG }}
+          branch: develop
 
   create-parameters-vars:
       name: Create parameters
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
-      # needs: [setup-config]
+      runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: develop
+      needs: [setup-config]
       permissions:
         id-token: write
         contents: read
       steps:
         - name: Generate Envs
           id: generate-environments-vars
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
+          uses: orbitspot/actions/.github/actions/global-parameter-store-environments@add-variaveis-globais-modulo
           with:
             environment_json: ${{ toJson(vars) }}
             file_name: variables
 
   create-parameters-secrets:
       name: Create parameters secrets
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
-      # needs: [setup-config]
+      runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: develop
+      needs: [setup-config]
       permissions:
         id-token: write
         contents: read
       steps:
         - name: Generate Envs
-          id: generate-environments-secrets
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
+          id: generate-environments-vars
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@add-variaveis-globais-modulo
           with:
-            environment_json: ${{ toJson(secrets) }}
-            file_name: secrets
+            environment_json: ${{ toJson(vars) }}
+            file_name: variables
 
   apply-parameters:
       name: Apply parameters
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
+      runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: develop
       needs: [create-parameters-vars, create-parameters-secrets]
       env:
         CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
@@ -83,13 +83,13 @@ jobs:
           terraform_version: "1.5.0"
               
       - name: Start terraform
-        uses: orbitspot/actions/.github/actions/parameter-store@v21
+        uses: orbitspot/actions/.github/actions/parameter-store@add-variaveis-globais-modulo
         with:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
           tag: 'add-variaveis-globais-modulo'
           terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
-          global: false
+          global: true
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
           AWS_REGION: ${{ env.CLUSTER_REGION }}
