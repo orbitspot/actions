@@ -106,7 +106,7 @@ jobs:
 
   prepare-helm-replacements:
     name: Building Helm Values
-    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    runs-on: ubuntu-latest
     environment: '${{ github.ref_name }}'
     needs: [generate-docker]
     permissions:
