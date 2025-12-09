@@ -1,0 +1,102 @@
+name: Create global variable and secrets
+
+on:
+  workflow_call:
+    inputs:
+      module:
+        required: true
+        type: string
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  setup-config:
+    name: Set Up Config
+    runs-on: ubuntu-latest
+    outputs:
+      CLUSTER_REGION: ${{ steps.set-output.outputs.CLUSTER_REGION }}
+      AWS_ACCOUNT_NUMBER: '${{ steps.set-output.outputs.AWS_ACCOUNT_NUMBER }}'
+      TERRAFORM_BUCKET: '${{ steps.set-output.outputs.TERRAFORM_BUCKET }}'
+    steps:
+      - name: Fetch devops variables
+        id: set-output
+        uses: orbitspot/actions/.github/actions/fetch-devops-variables@add-variaveis-globais-modulo
+        with:
+          devops_config: ${{ vars._DEVOPS_CONFIG }}
+          branch: develop
+
+  create-parameters-vars:
+      name: Create parameters
+      runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: develop
+      needs: [setup-config]
+      permissions:
+        id-token: write
+        contents: read
+      steps:
+        - name: Generate Envs
+          id: generate-environments-vars
+          uses: orbitspot/actions/.github/actions/global-parameter-store-environments@add-variaveis-globais-modulo
+          with:
+            environment_json: ${{ toJson(vars) }}
+            file_name: variables
+
+  create-parameters-secrets:
+      name: Create parameters secrets
+      runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: develop
+      needs: [setup-config]
+      permissions:
+        id-token: write
+        contents: read
+      steps:
+        - name: Generate Envs
+          id: generate-environments-vars
+          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@add-variaveis-globais-modulo
+          with:
+            environment_json: ${{ toJson(vars) }}
+            file_name: variables
+
+  apply-parameters:
+      name: Apply parameters
+      runs-on: [ 'develop', '${{ inputs.module }}', linux, self-hosted, x64]
+      environment: develop
+      needs: [create-parameters-vars, create-parameters-secrets]
+      env:
+        CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
+        AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
+        TERRAFORM_BUCKET: ${{ needs.setup-config.outputs.TERRAFORM_BUCKET }}
+      permissions:
+        id-token: write
+        contents: read
+      steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: hashicorp/setup-terraform@v3
+        name: setup
+        with:
+          terraform_version: "1.5.0"
+              
+      - name: Start terraform
+        uses: orbitspot/actions/.github/actions/parameter-store@add-variaveis-globais-modulo
+        with:
+          modulo: '${{ inputs.module }}'
+          repository: "${{ github.event.repository.name }}"
+          tag: 'add-variaveis-globais-modulo'
+          terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
+          global: true
+        env:
+          AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
+          AWS_REGION: ${{ env.CLUSTER_REGION }}
+          AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}
+
+      - name: Clean up machine
+        shell: bash
+        run: |
+          rm -rf /opt/actions-runner/_work/${{ github.repository }}/*
+          df -h
