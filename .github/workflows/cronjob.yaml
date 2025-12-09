@@ -33,7 +33,7 @@ env: # global env
 jobs:
   setup-config:
     name: Set up pipeline config  
-    runs-on: ubuntu-latest
+    runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
