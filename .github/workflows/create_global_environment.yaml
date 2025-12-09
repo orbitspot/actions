@@ -4,9 +4,28 @@ on:
   workflow_dispatch:
     inputs:
       module:
-        description: 'Module name to create global variables (e.g., outbound)'
+        description: 'Orbit Module'
         required: true
-        type: string
+        type: choice
+        options:
+          - common
+          - fiscal
+          - bank
+          - inbound
+          - outbound
+          - 4unity
+          - timeflow
+          - seidor-analytics
+          - devops
+          - seidor4u
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        type: choice
+        options:
+          - develop
+          - homolog
+          - master
 
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
@@ -26,12 +45,12 @@ jobs:
         uses: orbitspot/actions/.github/actions/fetch-devops-variables@add-variaveis-globais-modulo
         with:
           devops_config: ${{ vars._DEVOPS_CONFIG }}
-          branch: develop
+          branch: ${{ inputs.branch }}
 
   create-parameters-vars:
       name: Create parameters
       runs-on: ubuntu-latest
-      environment: develop
+      environment: ${{ inputs.branch }}
       needs: [setup-config]
       permissions:
         id-token: write
@@ -47,7 +66,7 @@ jobs:
   create-parameters-secrets:
       name: Create parameters secrets
       runs-on: ubuntu-latest
-      environment: develop
+      environment: ${{ inputs.branch }}
       needs: [setup-config]
       permissions:
         id-token: write
@@ -63,7 +82,7 @@ jobs:
   apply-parameters:
       name: Apply parameters
       runs-on: ubuntu-latest
-      environment: develop
+      environment: ${{ inputs.branch }}
       needs: [create-parameters-vars, create-parameters-secrets]
       env:
         CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
