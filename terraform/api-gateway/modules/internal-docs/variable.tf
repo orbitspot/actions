@@ -19,7 +19,7 @@ variable "api_data" {
 
 variable "vpc" {
   type = object({
-    vpc_link_id   = string
+    link_id       = string
     load_balancer = string
   })
 }

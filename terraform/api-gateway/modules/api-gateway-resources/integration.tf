@@ -13,8 +13,8 @@ resource "aws_api_gateway_integration" "default" {
   timeout_milliseconds    = var.timeout_milliseconds
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
 
-  connection_type    = var.vpc_id != "" ? "VPC_LINK" : "INTERNET"
-  connection_id      = var.vpc_id
+  connection_type    = var.vpc_link_id != "" ? "VPC_LINK" : "INTERNET"
+  connection_id      = var.vpc_link_id
   integration_target = var.load_balancer
 
   region = var.region

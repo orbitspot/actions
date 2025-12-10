@@ -49,7 +49,7 @@ variable "api_gateway" {
       rest_api_id = string
       region      = string
       vpc = object({
-        vpc_link_id   = string
+        link_id       = string
         load_balancer = string
       })
     }))
@@ -65,7 +65,7 @@ variable "api_gateway" {
       rest_api_id = string
       region      = string
       vpc = object({
-        vpc_link_id   = string
+        link_id       = string
         load_balancer = string
       })
     }))
@@ -81,7 +81,7 @@ variable "api_gateway" {
       rest_api_id = string
       region      = string
       vpc = object({
-        vpc_link_id   = string
+        link_id       = string
         load_balancer = string
       })
     }))
@@ -97,7 +97,7 @@ variable "api_gateway" {
       rest_api_id = string
       region      = string
       vpc = object({
-        vpc_link_id   = string
+        link_id       = string
         load_balancer = string
       })
     }))

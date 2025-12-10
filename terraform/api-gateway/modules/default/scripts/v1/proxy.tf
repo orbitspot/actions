@@ -7,7 +7,7 @@ module "proxy-get" {
   integration_response = local.proxy.integration_response
   method_response      = local.proxy.method_response
   resource_id          = var.resource_id
-  vpc_id               = var.vpc_id
+  vpc_link_id          = var.vpc_link_id
   region               = var.region
   load_balancer        = var.load_balancer
 }
@@ -21,7 +21,7 @@ module "proxy-post" {
   integration_response = local.proxy.integration_response
   method_response      = local.proxy.method_response
   resource_id          = var.resource_id
-  vpc_id               = var.vpc_id
+  vpc_link_id          = var.vpc_link_id
   region               = var.region
   load_balancer        = var.load_balancer
 }
@@ -35,7 +35,7 @@ module "proxy-put" {
   integration_response = local.proxy.integration_response
   resource_id          = var.resource_id
   method_response      = local.proxy.method_response
-  vpc_id               = var.vpc_id
+  vpc_link_id          = var.vpc_link_id
   region               = var.region
   load_balancer        = var.load_balancer
 }
@@ -49,7 +49,7 @@ module "proxy-patch" {
   integration_response = local.proxy.integration_response
   method_response      = local.proxy.method_response
   resource_id          = var.resource_id
-  vpc_id               = var.vpc_id
+  vpc_link_id          = var.vpc_link_id
   region               = var.region
   load_balancer        = var.load_balancer
 }
@@ -63,7 +63,7 @@ module "proxy-delete" {
   integration_response = local.proxy.integration_response
   method_response      = local.proxy.method_response
   resource_id          = var.resource_id
-  vpc_id               = var.vpc_id
+  vpc_link_id          = var.vpc_link_id
   region               = var.region
   load_balancer        = var.load_balancer
 }

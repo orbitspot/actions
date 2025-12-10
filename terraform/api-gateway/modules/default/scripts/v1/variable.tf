@@ -14,7 +14,7 @@ variable "resource_id" {
   type = string
 }
 
-variable "vpc_id" {
+variable "vpc_link_id" {
   type = string
 }
 

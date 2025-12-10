@@ -47,7 +47,7 @@ variable "timeout_milliseconds" {
   default = 29000
 }
 
-variable "vpc_id" {
+variable "vpc_link_id" {
   type    = string
   default = ""
 }
