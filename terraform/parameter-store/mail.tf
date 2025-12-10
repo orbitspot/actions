@@ -3,7 +3,7 @@ resource "aws_ssm_parameter" "vars" {
    for index, value in local.variables : index => value
  }
  name        = var.global ? "/${var.modulo}/environment/${each.key}" : "/${var.repository}/environment/${each.key}"
- description = substr(format("Environment %s from module %s", jsonencode(each.value), var.modulo), 0, 1023)
+ description = substr(format("Environment %s from module %s", jsonencode(each.key), var.modulo), 0, 1023)
  type        = "String"
  value       = trimspace(each.value)
  tier        = "Standard"
