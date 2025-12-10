@@ -11,7 +11,7 @@ locals {
       }
     }
     integration = {
-      uri  = "${var.load_balancer}/{proxy}"
+      uri  = "${var.uri}/{proxy}"
       type = "HTTP"
       request_parameters = {
         "integration.request.header.userid"          = "context.authorizer.userId"
@@ -54,7 +54,7 @@ locals {
       }
     }
     integration_get = {
-      uri  = "${var.load_balancer}/{proxy}"
+      uri  = "${var.uri}/{proxy}"
       type = "HTTP"
       request_parameters = {
         "integration.request.header.userid"                 = "context.authorizer.userId"

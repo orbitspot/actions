@@ -6,5 +6,5 @@ resource "aws_api_gateway_method" "default" {
   api_key_required   = var.method.request_method_api_key_required
   authorizer_id      = var.method.authorizer_id
   request_parameters = var.method.request_parameters
-  region             = "us-east-1"
+  region             = var.region
 }

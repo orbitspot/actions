@@ -2,7 +2,7 @@ variable "path" {
   type = string
 }
 
-variable "load_balancer" {
+variable "uri" {
   type = string
 }
 
@@ -12,8 +12,18 @@ variable "docs" {
 
 variable "api_data" {
   type = object({
-    parent_id         = string
-    rest_api_id       = string
-    custom_authorizer = string
+    parent_id   = string
+    rest_api_id = string
   })
+}
+
+variable "vpc" {
+  type = object({
+    link_id       = string
+    load_balancer = string
+  })
+}
+
+variable "region" {
+  type = string
 }

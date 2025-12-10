@@ -1,10 +1,10 @@
 module "default-get" {
-  source = "../api-gateway-resources"
-  depends_on = [
-    aws_api_gateway_resource.default
-  ]
-  rest_api_id = var.api_data.rest_api_id
-  http_method = "GET"
+  source        = "../api-gateway-resources"
+  rest_api_id   = var.api_data.rest_api_id
+  vpc_link_id   = var.vpc.link_id
+  load_balancer = var.vpc.load_balancer
+  region        = var.region
+  http_method   = "GET"
   method = {
     authorization                   = "NONE"
     authorizer_id                   = ""
@@ -12,7 +12,7 @@ module "default-get" {
     request_parameters              = {}
   }
   integration = {
-    uri                     = var.istio_enabled ? "${var.load_balancer}/" : var.load_balancer
+    uri                     = var.istio_enabled ? "${var.uri}/" : var.uri
     type                    = "HTTP"
     integration_http_method = "GET"
     request_parameters = {
@@ -39,12 +39,9 @@ module "default-get" {
 
 
 module "default-option" {
-  source = "../api-gateway-resources"
-  depends_on = [
-    aws_api_gateway_resource.default,
-    module.default-get
-  ]
+  source      = "../api-gateway-resources"
   rest_api_id = var.api_data.rest_api_id
+  region      = var.region
   http_method = "OPTIONS"
   method = {
     authorization                   = "NONE"

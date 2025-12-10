@@ -15,11 +15,6 @@ variable "hosts" {
   })
 }
 
-variable "ssl" {
-  type    = bool
-  default = true
-}
-
 variable "istio_enabled" {
   type    = bool
   default = true
@@ -53,6 +48,10 @@ variable "api_gateway" {
       })
       rest_api_id = string
       region      = string
+      vpc = object({
+        link_id       = string
+        load_balancer = string
+      })
     }))
     homolog = list(object({
       oauth2 = object({
@@ -65,6 +64,10 @@ variable "api_gateway" {
       })
       rest_api_id = string
       region      = string
+      vpc = object({
+        link_id       = string
+        load_balancer = string
+      })
     }))
     develop = list(object({
       oauth2 = object({
@@ -77,6 +80,10 @@ variable "api_gateway" {
       })
       rest_api_id = string
       region      = string
+      vpc = object({
+        link_id       = string
+        load_balancer = string
+      })
     }))
     test = list(object({
       oauth2 = object({
@@ -89,6 +96,10 @@ variable "api_gateway" {
       })
       rest_api_id = string
       region      = string
+      vpc = object({
+        link_id       = string
+        load_balancer = string
+      })
     }))
   })
 }

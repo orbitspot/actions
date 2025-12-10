@@ -3,10 +3,13 @@ module "proxy-get" {
   rest_api_id          = var.rest_api_id
   http_method          = "GET"
   method               = local.proxy.method
-  integration          = merge(local.proxy.integration_get, { integration_http_method = "POST" })
+  integration          = merge(local.proxy.integration_get, { integration_http_method = "GET" })
   integration_response = local.proxy.integration_response
   method_response      = local.proxy.method_response
   resource_id          = var.resource_id
+  vpc_link_id          = var.vpc_link_id
+  region               = var.region
+  load_balancer        = var.load_balancer
 }
 
 module "proxy-post" {
@@ -18,6 +21,9 @@ module "proxy-post" {
   integration_response = local.proxy.integration_response
   method_response      = local.proxy.method_response
   resource_id          = var.resource_id
+  vpc_link_id          = var.vpc_link_id
+  region               = var.region
+  load_balancer        = var.load_balancer
 }
 
 module "proxy-put" {
@@ -29,6 +35,9 @@ module "proxy-put" {
   integration_response = local.proxy.integration_response
   resource_id          = var.resource_id
   method_response      = local.proxy.method_response
+  vpc_link_id          = var.vpc_link_id
+  region               = var.region
+  load_balancer        = var.load_balancer
 }
 
 module "proxy-patch" {
@@ -40,6 +49,9 @@ module "proxy-patch" {
   integration_response = local.proxy.integration_response
   method_response      = local.proxy.method_response
   resource_id          = var.resource_id
+  vpc_link_id          = var.vpc_link_id
+  region               = var.region
+  load_balancer        = var.load_balancer
 }
 
 module "proxy-delete" {
@@ -51,6 +63,9 @@ module "proxy-delete" {
   integration_response = local.proxy.integration_response
   method_response      = local.proxy.method_response
   resource_id          = var.resource_id
+  vpc_link_id          = var.vpc_link_id
+  region               = var.region
+  load_balancer        = var.load_balancer
 }
 
 module "proxy-option" {
@@ -91,4 +106,5 @@ module "proxy-option" {
     }
   }
   resource_id = var.resource_id
+  region      = var.region
 }
