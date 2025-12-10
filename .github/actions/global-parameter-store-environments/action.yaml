@@ -1,4 +1,3 @@
-# TODO: Transformar em um arquivo python
 name: 'Global Parameter Store'
 description: 'Generate Global Parameter Store Enviroments for Backend Applications'
 inputs:
@@ -14,24 +13,38 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Configurar Python
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
-          python-version: '3.x'
-  
-    - uses: actions/checkout@v4
-      name: Checkout
-      with:
-          repository: 'orbitspot/actions'
-          ref: add-variaveis-globais-modulo
-          path: orbitspot-actions
+        python-version: 3.x
 
-    - name: Create global variables
-      shell: bash
-      env:
-          variables_json: ${{ inputs.environment_json }}
-          module: '${{ inputs.module }}'
-      run: python orbitspot-actions/.github/scripts/generate-global-environments.py
+    - name: Generate JSON and set output
+      shell: python
+      run: |
+          import json
+          import os
+
+          variables = ${{ inputs.environment_json }}
+          module = ${{ inputs.module }}
+
+          try:
+              variables = json.loads(variables_json)
+          except json.JSONDecodeError:
+              print("Invalid JSON input")
+              exit(1)
+
+          result_json = {}
+          # print("Variables: ", variables)
+          for key in variables.keys():
+            # print("Key: ", key)
+            value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
+            # print(key.split("_")[1])
+            if len(value) > 0 and key.split("_")[1] == module.upper(): # adiciona apenas as variáveis do módulo selecionado
+              result_json.update({key: value}) 
+
+          with open(f"${{ inputs.file_name }}.json", "a") as outfile:
+            print('Result JSON: ', result_json)
+            json.dump(result_json, outfile)
 
     - name: Upload encrypted artifact
       uses: actions/upload-artifact@v4
