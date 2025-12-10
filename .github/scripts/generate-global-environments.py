@@ -11,13 +11,14 @@ except json.JSONDecodeError:
     exit(1)
 
 result_json = {}
-print("Variables: ", variables)
+# print("Variables: ", variables)
 for key in variables.keys():
-  print("Key: ", key)
+  # print("Key: ", key)
   value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
-  print(key.split("_")[1])
+  # print(key.split("_")[1])
   if len(value) > 0 and key.split("_")[1] == module.upper(): # adiciona apenas as variáveis do módulo selecionado
     result_json.update({key: value}) 
 
-with open(f"${{ inputs.file_name }}.json", "w") as outfile:
+with open(f"${{ inputs.file_name }}.json", "a") as outfile:
+  print('Result JSON: ', result_json)
   json.dump(result_json, outfile)
