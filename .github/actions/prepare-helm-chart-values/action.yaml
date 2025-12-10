@@ -140,9 +140,10 @@ runs:
         VARS: ${{ env.VARS }}
         SECRETS: ${{ env.SECRETS }}
         REPOSITORY_NAME: ${{ github.event.repository.name }}
+        MODULE: ${{ inputs.module }}
       run: |
         pip install pyyaml
-        python orbitspot-actions/.github/scripts/generate-environment-yaml.py
+        python orbitspot-actions/.github/scripts/generate-environment-backend.py
         cat variables.yaml
         parameters=$(cat variables.yaml)
         echo "" >> .github/helm/${{ inputs.deployment_name }}/values.yaml
