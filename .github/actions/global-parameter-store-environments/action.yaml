@@ -27,12 +27,6 @@ runs:
           variables_json = ${{ inputs.environment_json }}
           module = '${{ inputs.module }}'
 
-          try:
-              variables = json.loads(variables_json)
-          except json.JSONDecodeError:
-              print("Invalid JSON input")
-              exit(1)
-
           result_json = {}
           # print("Variables: ", variables)
           for key in variables.keys():
