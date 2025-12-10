@@ -24,8 +24,8 @@ runs:
           import json
           import os
 
-          variables = ${{ inputs.environment_json }}
-          module = ${{ inputs.module }}
+          variables = '${{ inputs.environment_json }}'
+          module = '${{ inputs.module }}''
 
           try:
               variables = json.loads(variables_json)
