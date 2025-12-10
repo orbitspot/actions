@@ -8,6 +8,9 @@ inputs:
   file_name:
     description: 'file name'
     required: true
+  module:
+    description: 'module'
+    required: true
 runs:
   using: composite
   steps:
