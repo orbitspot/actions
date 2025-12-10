@@ -23,7 +23,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'v21'
+        ref: 'add-variaveis-globais-modulo'
 
     - name: Determinar chart_type
       id: set_chart_type
