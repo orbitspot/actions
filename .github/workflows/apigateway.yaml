@@ -69,7 +69,7 @@ jobs:
         uses: orbitspot/actions/.github/actions/api-gateway@v21
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
-          AWS_REGION: ${{ env.CLUSTER_REGION }}
+          AWS_REGION: ${{ vars._AWS_REGION }}
           AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}
           TF_VAR_branch: '${{ github.ref_name }}'
           TF_VAR_repository_name: '${{ github.event.repository.name }}'

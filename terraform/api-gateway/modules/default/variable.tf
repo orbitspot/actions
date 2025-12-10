@@ -28,7 +28,7 @@ variable "region" {
 
 variable "vpc" {
   type = object({
-    link_id       = string
+    vpc_link_id   = string
     load_balancer = string
   })
 }

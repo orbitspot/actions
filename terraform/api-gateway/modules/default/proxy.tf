@@ -7,7 +7,7 @@ module "v1" {
   custom_authorizer = var.api_data.custom_authorizer
   resource_id       = aws_api_gateway_resource.proxy.id
   rest_api_id       = aws_api_gateway_resource.proxy.rest_api_id
-  vpc_id            = var.vpc.link_id
+  vpc_id            = var.vpc.vpc_link_id
   region            = var.region
   uri               = var.uri
 }
@@ -21,7 +21,7 @@ module "v2" {
   custom_authorizer = var.api_data.custom_authorizer
   resource_id       = aws_api_gateway_resource.proxy.id
   rest_api_id       = aws_api_gateway_resource.proxy.rest_api_id
-  vpc_id            = var.vpc.link_id
+  vpc_id            = var.vpc.vpc_link_id
   region            = var.region
   uri               = var.uri
 }
