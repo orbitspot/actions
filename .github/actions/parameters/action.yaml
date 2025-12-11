@@ -18,14 +18,14 @@ runs:
         id: generate-environments-vars
         uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
         with:
-          environment_json: environment_vars
+          environment_json: '${{ inputs.environment_vars }}'
           file_name: variables
 
       - name: Generate Secrets
         id: generate-environments-secrets
         uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
         with:
-          environment_json: environment_secrets
+          environment_json: '${{ inputs.environment_secrets }}'
           file_name: secrets
 
       - name: Set up Node.js
