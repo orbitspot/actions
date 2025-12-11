@@ -90,9 +90,6 @@ jobs:
     name: Create parameters
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     needs: [setup-config]
-    permissions:
-      id-token: write
-      contents: read
     env:
       AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
       CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
@@ -102,8 +99,8 @@ jobs:
         uses: orbitspot/actions/.github/actions/parameters@add-variaveis-globais-modulo
         with:
           module: '${{ inputs.module }}'
-          environment_vars: ${{ toJson(vars) }}
-          environment_secrets: ${{ toJson(secrets) }}
+          environment_vars: '${{ toJson(vars) }}'
+          environment_secrets: '${{ toJson(secrets) }}'
 
   building:
     name: Building
