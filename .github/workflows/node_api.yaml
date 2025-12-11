@@ -93,6 +93,9 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    env:
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
+      CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
     steps:
       - name: Building
         uses: orbitspot/actions/.github/actions/parameters@add-variaveis-globais-modulo
