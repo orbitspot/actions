@@ -86,73 +86,18 @@ jobs:
               echo "EOF"
             } >> "$GITHUB_OUTPUT"
 
-  # TORNAR ACTION 
-  create-parameters-vars:
-      name: Create parameters
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
-      needs: [setup-config]
-      permissions:
-        id-token: write
-        contents: read
-      steps:
-        - name: Generate Envs
-          id: generate-environments-vars
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
-          with:
-            environment_json: ${{ toJson(vars) }}
-            file_name: variables
-
-  create-parameters-secrets:
-      name: Create parameters secrets
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
-      needs: [setup-config]
-      permissions:
-        id-token: write
-        contents: read
-      steps:
-        - name: Generate Envs
-          id: generate-environments-secrets
-          uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
-          with:
-            environment_json: ${{ toJson(secrets) }}
-            file_name: secrets
-
-  apply-parameters:
-      name: Apply parameters
-      runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
-      environment: ${{ github.ref_name }}
-      needs: [setup-config, create-parameters-vars, create-parameters-secrets]
-      env:
-        CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
-        AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
-        TERRAFORM_BUCKET: ${{ needs.setup-config.outputs.TERRAFORM_BUCKET }}
-      permissions:
-        id-token: write
-        contents: read
-      steps:
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+  create-parameters:
+    name: Create parameters
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    needs: [setup-config]
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Building
+        uses: orbitspot/actions/.github/actions/parameters@add-variaveis-globais-modulo
         with:
-          node-version: '20'
-
-      - uses: hashicorp/setup-terraform@v3
-        name: setup
-        with:
-          terraform_version: "1.5.0"
-              
-      - name: Start terraform
-        uses: orbitspot/actions/.github/actions/parameter-store@v21
-        with:
-          modulo: '${{ inputs.module }}'
-          repository: "${{ github.event.repository.name }}"
-          tag: 'v21'
-          terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
-        env:
-          AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
-          AWS_REGION: ${{ env.CLUSTER_REGION }}
-          AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}
+          module: '${{ inputs.module }}'
 
   building:
     name: Building
@@ -260,7 +205,7 @@ jobs:
     name: K8s Deploy api
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [setup-config, prepare-helm-replacements, apply-parameters]
+    needs: [setup-config, prepare-helm-replacements, create-parameters]
     permissions:
       id-token: write
       contents: read
@@ -306,7 +251,7 @@ jobs:
     if: ${{ needs.setup-config.outputs.scaledjob-matrix != '[]' }}
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
-    needs: [setup-config, prepare-helm-replacements, apply-parameters]
+    needs: [setup-config, prepare-helm-replacements, create-parameters]
     strategy:
       matrix:
         artifacts: ${{fromJson(needs.setup-config.outputs.scaledjob-matrix) }}
