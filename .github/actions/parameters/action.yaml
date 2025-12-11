@@ -4,6 +4,12 @@ inputs:
   module:
     description: "Nome do modulo"
     required: true
+  environment_vars:
+    description: "Environment variables for the module"
+    required: true
+  environment_secrets:
+    description: "Environment secrets for the module"
+    required: true
 
 runs:
   using: "composite"
@@ -12,14 +18,14 @@ runs:
         id: generate-environments-vars
         uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
         with:
-          environment_json: ${{ toJson(vars) }}
+          environment_json: environment_vars
           file_name: variables
 
       - name: Generate Secrets
         id: generate-environments-secrets
         uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
         with:
-          environment_json: ${{ toJson(secrets) }}
+          environment_json: environment_secrets
           file_name: secrets
 
       - name: Set up Node.js
