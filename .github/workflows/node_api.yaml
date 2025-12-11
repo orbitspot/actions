@@ -96,6 +96,7 @@ jobs:
     env:
       AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
       CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
+      TERRAFORM_BUCKET: ${{ needs.setup-config.outputs.TERRAFORM_BUCKET }}
     steps:
       - name: Building
         uses: orbitspot/actions/.github/actions/parameters@add-variaveis-globais-modulo
