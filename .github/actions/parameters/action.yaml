@@ -46,6 +46,6 @@ runs:
           tag: 'v21'
           terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
         env:
-          AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
+          AWS_ROLE_NAME: ${{ env.AWS_ROLE_NAME }}
           AWS_REGION: ${{ env.CLUSTER_REGION }}
           AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}
