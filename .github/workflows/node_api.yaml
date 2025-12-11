@@ -90,6 +90,7 @@ jobs:
     name: Create parameters
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     needs: [setup-config]
+    environment: ${{ github.ref_name }}
     env:
       AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
       CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
