@@ -188,6 +188,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - id: build-sets
+        name: Set Scheduler
         shell: bash
         run: |
           set_args="--set environment=${{ env.ENV }} \

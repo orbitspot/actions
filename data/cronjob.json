@@ -11,5 +11,6 @@
   },
   "keda": {
     "activeDeadlineSeconds": 7200
-  }
+  },
+  "scheduler": "\"*/5 * * * *\""
 }
