@@ -24,24 +24,24 @@ def flatten_json(data, parent_key="", sep="."):
   return items
 
 default_properties = {}
-with open(f"./orbitspot-actions/data/{chart_type}.json", "r") as prop_file:
-  default_properties = flatten_json(json.load(prop_file))
+with open(f"./orbitspot-actions/data/{chart_type}.json", "r") as f:
+  default_properties = flatten_json(json.load(f))
 
 print("Default")
 print(default_properties)
 
 properties = {}
-with open(properties_path, 'r') as prop_file:
-  properties_file = prop_file.read()
+with open(properties_path, 'r') as f:
+  properties_file = f.read()
 
-  for line in prop_file:
-    line = line.strip()
-    if line and not line.startswith('#'):
-      try:
-        key, value = line.split('=', 1)
-        properties[key.strip()] = value.strip()
-      except ValueError as e:
-        print(f"Erro ao processar linha: {line} - {e}")
+for line in properties_file:
+  line = line.strip()
+  if line and not line.startswith('#'):
+    try:
+      key, value = line.split('=', 1)
+      properties[key.strip()] = value.strip()
+    except ValueError as e:
+      print(f"Erro ao processar linha: {line} - {e}")
 
 print("Properties")
 print(properties)
@@ -55,5 +55,5 @@ for key, value in default_properties.items():
 print("Properties file")
 print(properties_file)
 
-with open(properties_path, 'r') as prop_file:
-  prop_file.write(properties_file)
+with open(properties_path, 'r') as f:
+  f.write(properties_file)
