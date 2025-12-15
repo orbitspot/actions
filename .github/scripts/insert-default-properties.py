@@ -50,7 +50,7 @@ print(properties)
 
 for key, value in default_properties.items():
   placeholder = f"{deployment}.{key}"
-  if not key in properties:
+  if not placeholder in properties:
     print(f"Inserindo valor default {placeholder}={value}")
     properties_file.append(f"{placeholder}={value}")
 
