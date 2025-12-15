@@ -78,7 +78,7 @@ jobs:
       TERRAFORM_BUCKET: ${{ needs.setup-config.outputs.TERRAFORM_BUCKET }}
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/update-parameter-store@add-variaveis-globais-modulo
+        uses: orbitspot/actions/.github/actions/update-parameter-store@v21
         with:
           module: '${{ inputs.module }}'
           environment_vars: '${{ toJson(vars) }}'

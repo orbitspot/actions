@@ -97,7 +97,7 @@ jobs:
       TERRAFORM_BUCKET: ${{ needs.setup-config.outputs.TERRAFORM_BUCKET }}
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/update-parameter-store@add-variaveis-globais-modulo
+        uses: orbitspot/actions/.github/actions/update-parameter-store@v21
         with:
           module: '${{ inputs.module }}'
           environment_vars: '${{ toJson(vars) }}'
@@ -192,7 +192,7 @@ jobs:
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@add-variaveis-globais-modulo
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21
         with:
           deployment_name: ${{ matrix.artifacts }}
           module: ${{ inputs.module }}

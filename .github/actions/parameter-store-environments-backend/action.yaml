@@ -1,4 +1,3 @@
-# TODO: Transformar em um arquivo python
 name: 'Parameter Store'
 description: 'Generate Parameter Store Enviroments for Backend Applications'
 inputs:
