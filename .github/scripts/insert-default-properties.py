@@ -37,7 +37,7 @@ with open(properties_path, 'r') as f:
 print("File")
 print(properties_file)
 
-for line in properties_file:
+for line in properties_file.splitlines():
   line = line.strip()
   if line and not line.startswith('#'):
     try:
