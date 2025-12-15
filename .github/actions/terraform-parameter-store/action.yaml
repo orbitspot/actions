@@ -1,5 +1,5 @@
-name: 'Parameter Store'
-description: 'Parameter store'
+name: 'Terraform Parameter Store'
+description: 'Terraform Parameter store'
 inputs:
   terraform_bucket_name:
     description: 'Bucket'

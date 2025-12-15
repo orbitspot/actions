@@ -103,7 +103,7 @@ jobs:
           terraform_version: "1.5.0"
               
       - name: Start terraform
-        uses: orbitspot/actions/.github/actions/parameter-store@add-variaveis-globais-modulo
+        uses: orbitspot/actions/.github/actions/terraform-parameter-store@add-variaveis-globais-modulo
         with:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
