@@ -1,10 +1,9 @@
 import os
-import re
 import json
 
 chart_type = os.getenv("CHART_TYPE", None)
 properties_path = os.getenv('PROPERTIES_PATH')
-prefix = os.getenv('PREFIX')
+deployment = os.getenv("DEPLOYMENT_NAME", None)
 
 def flatten_json(data, parent_key="", sep="."):
   items = {}
@@ -50,7 +49,7 @@ print("Properties")
 print(properties)
 
 for key, value in default_properties.items():
-  placeholder = f"${{{prefix}.{key}}}"
+  placeholder = f"{deployment}.{key}"
   if not key in properties:
     print(f"Inserindo valor default {placeholder}={value}")
     properties_file.append(f"{placeholder}={value}")
