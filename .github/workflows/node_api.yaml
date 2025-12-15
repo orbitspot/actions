@@ -67,7 +67,7 @@ jobs:
           PROJECT_ROOT=$(git rev-parse --show-toplevel)
           SCRIPT_DIR="$PROJECT_ROOT/.github/scripts"
           scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f -name "*.sh" -exec basename {} .sh \;))
-          matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs 'map(select(contains("cronjob") | not))')
+          matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs 'map(select(contains("cronjob", "migration") | not))')
           scaledjob_matrix=$(echo "$matrix" | jq -c '[.[] | select(. != "api")]')
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
           echo "scaledjob_matrix=$scaledjob_matrix" >> $GITHUB_OUTPUT
