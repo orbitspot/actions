@@ -10,6 +10,6 @@
 - ENVs de devops e outras que mais de um step precisar, setar à nível de job.
 
 ## TODO
-- [ ] helm personalizável
 - [ ] repo_vars => env
 - [ ] verificar secrets tbm no setup-config
+- [ ] padronizar nome de actions, revisar descrições
