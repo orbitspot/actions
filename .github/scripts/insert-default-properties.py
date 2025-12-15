@@ -26,15 +26,9 @@ default_properties = {}
 with open(f"./orbitspot-actions/data/{chart_type}.json", "r") as f:
   default_properties = flatten_json(json.load(f))
 
-print("Default")
-print(default_properties)
-
 properties = {}
 with open(properties_path, 'r') as f:
   properties_file = f.read()
-
-print("File")
-print(properties_file)
 
 for line in properties_file.splitlines():
   line = line.strip()
@@ -45,17 +39,12 @@ for line in properties_file.splitlines():
     except ValueError as e:
       print(f"Erro ao processar linha: {line} - {e}")
 
-print("Properties")
-print(properties)
-
-for key, value in default_properties.items():
+items = default_properties.items()
+for key, value in items:
   placeholder = f"{deployment}.{key}"
   if not placeholder in properties:
     print(f"Inserindo valor default {placeholder}={value}")
     properties_file.append(f"{placeholder}={value}")
-
-print("Properties file")
-print(properties_file)
 
 with open(properties_path, 'w') as f:
   f.write(properties_file)
