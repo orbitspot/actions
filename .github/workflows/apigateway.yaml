@@ -28,7 +28,7 @@ concurrency:
 
 jobs:
   setup-config:
-    name: Set up pipeline config  
+    name: Set Up Config
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     outputs:
