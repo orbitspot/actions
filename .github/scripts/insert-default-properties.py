@@ -44,7 +44,10 @@ for key, value in items:
   placeholder = f"{deployment}.{key}"
   if not placeholder in properties:
     print(f"Inserindo valor default {placeholder}={value}")
-    properties_file.append(f"{placeholder}={value}")
+    properties_file += f"\n{placeholder}={value}"
+
+print("values.properties")
+print(properties_file)
 
 with open(properties_path, 'w') as f:
   f.write(properties_file)
