@@ -23,7 +23,7 @@ def flatten_json(data, parent_key="", sep="."):
   return items
 
 default_properties = {}
-with open(f"./orbitspot-actions/data/{chart_type}.json", "r") as f:
+with open(f"./orbitspot-actions/data/default-properties/{chart_type}.json", "r") as f:
   default_properties = flatten_json(json.load(f))
 
 properties = {}

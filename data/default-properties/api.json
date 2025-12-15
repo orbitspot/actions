@@ -1,0 +1,16 @@
+{
+  "resources": {
+    "limits": {
+      "cpu": "100m",
+      "memory": "256Mi"
+    },
+    "requests": {
+      "cpu": "70m",
+      "memory": "128Mi"
+    }
+  },
+  "keda": {
+    "maxReplicaCount": 3,
+    "minReplicaCount": 1
+  }
+}
