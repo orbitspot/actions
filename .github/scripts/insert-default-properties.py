@@ -57,5 +57,5 @@ for key, value in default_properties.items():
 print("Properties file")
 print(properties_file)
 
-with open(properties_path, 'r') as f:
+with open(properties_path, 'w') as f:
   f.write(properties_file)
