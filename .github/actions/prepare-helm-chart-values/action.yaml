@@ -22,7 +22,7 @@ runs:
       with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'v21'
+        ref: 'feat/default-values'
 
     - name: Determinar chart_type
       id: set_chart_type
@@ -119,12 +119,14 @@ runs:
         REPOSITORY: ${{ github.event.repository.name }}
         DEPLOYMENT_NAME: ${{ inputs.deployment_name }}
         HELM_MASS_REPLACE: ${{ env.HELM_MASS_REPLACE }}
+        CHART_TYPE: ${{ env.chart_type }}
       run: |
         if [[ ! -f "$CUSTOM_HELM_VALUES_PATH" ]]; then
           CUSTOM_HELM_VALUES_PATH=""
         fi
 
         pip install pyyaml
+        python orbitspot-actions/.github/scripts/insert-default-properties.py
         python orbitspot-actions/.github/scripts/choose-node-selector.py
         python orbitspot-actions/.github/scripts/replace-properties.py
         python orbitspot-actions/.github/scripts/replace-helm.py
