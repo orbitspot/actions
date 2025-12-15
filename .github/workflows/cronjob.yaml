@@ -70,7 +70,24 @@ jobs:
           # Constrói JSON da matriz em formato compacto
           matrix=$(printf '%s\n' "${scripts[@]}" | jq -R . | jq -cs 'map(select(contains("cronjob")))')
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
-        
+
+  create-parameters:
+    name: Create parameters
+    runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
+    needs: [setup-config]
+    environment: ${{ github.ref_name }}
+    env:
+      AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
+      CLUSTER_REGION: ${{ needs.setup-config.outputs.CLUSTER_REGION }}
+      TERRAFORM_BUCKET: ${{ needs.setup-config.outputs.TERRAFORM_BUCKET }}
+    steps:
+      - name: Building
+        uses: orbitspot/actions/.github/actions/parameters@add-variaveis-globais-modulo
+        with:
+          module: '${{ inputs.module }}'
+          environment_vars: '${{ toJson(vars) }}'
+          environment_secrets: '${{ toJson(secrets) }}'
+
   building:
     name: Building
     runs-on: [ '${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
