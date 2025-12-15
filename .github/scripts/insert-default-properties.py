@@ -34,6 +34,9 @@ properties = {}
 with open(properties_path, 'r') as f:
   properties_file = f.read()
 
+print("File")
+print(properties_file)
+
 for line in properties_file:
   line = line.strip()
   if line and not line.startswith('#'):
