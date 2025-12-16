@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 
 chart_type = os.getenv("CHART_TYPE", None)
 properties_path = os.getenv('PROPERTIES_PATH')
@@ -22,8 +23,13 @@ def flatten_json(data, parent_key="", sep="."):
   
   return items
 
+default_properties_path = f"./orbitspot-actions/data/default-properties/{chart_type}.json"
+path = Path(default_properties_path)
+if not path.exists():
+  exit(0)
+
 default_properties = {}
-with open(f"./orbitspot-actions/data/default-properties/{chart_type}.json", "r") as f:
+with open(default_properties_path, "r") as f:
   default_properties = flatten_json(json.load(f))
 
 properties = {}
