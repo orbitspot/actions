@@ -17,5 +17,6 @@
     "activeDeadlineSeconds": 7200,
     "pollingInterval": 30,
     "rollout": "gradual"
-  }
+  },
+  "queue_min_messages": 1
 }
