@@ -11,6 +11,5 @@
   },
   "keda": {
     "activeDeadlineSeconds": 7200
-  },
-  "scheduler": "nao queria deixar default"
+  }
 }

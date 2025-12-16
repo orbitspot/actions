@@ -11,12 +11,11 @@
   },
   "keda": {
     "maxReplicaCount": 3,
-    "minReplicaCount": 1,
+    "minReplicaCount": null,
     "failedJobsHistoryLimit": 3,
     "successfulJobsHistoryLimit": 3,
     "activeDeadlineSeconds": 7200,
     "pollingInterval": 30,
     "rollout": "gradual"
-  },
-  "queue_name": "nao queria deixar default"
+  }
 }
