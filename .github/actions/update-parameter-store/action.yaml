@@ -45,6 +45,7 @@ runs:
           repository: "${{ github.event.repository.name }}"
           tag: 'v21'
           terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
+          global: false
         env:
           AWS_ROLE_NAME: ${{ env.AWS_ROLE_NAME }}
           AWS_REGION: ${{ env.CLUSTER_REGION }}
