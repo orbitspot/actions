@@ -15,14 +15,14 @@ def generate_yaml():
   for key in environments.keys():
     if len(environments[key]) > 0 and key not in devops_variables and not key.startswith("_"):
       result_environments["parameters"].append({"context": "ssmparameter", "name": f'/{repository_name}/environment/{key}'}) 
-    elif len(environments[key]) > 0 and key.split("_")[1] == module.upper():
+    elif len(environments[key]) > 0 and len(key.split("_")) > 1 and key.split("_")[1] == module.upper():
       result_environments["parameters"].append({"context": "ssmparameter", "name": f'/{module}/environment/{key.split("_", 2)[2]}'}) # pega o nome da variável sem o prefixo do módulo 
 
   result_secrets = []
   for key in secrets.keys():
     if len(secrets[key]) > 0 and key not in devops_variables and not key.startswith("_"):
       result_secrets.append({"context": "ssmparameter", "name": f'/{repository_name}/secret/{key}'}) 
-    elif len(secrets[key]) > 0 and key.split("_")[1] == module.upper():
+    elif len(secrets[key]) > 0 and len(key.split("_")) > 1 and key.split("_")[1] == module.upper():
       result_secrets.append({"context": "ssmparameter", "name": f'/{module}/secret/{key.split("_", 2)[2]}'}) # pega o nome da variável sem o prefixo do módulo 
 
   
