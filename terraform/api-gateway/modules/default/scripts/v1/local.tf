@@ -11,7 +11,7 @@ locals {
       }
     }
     integration = {
-      uri  = "${var.load_balancer}/{proxy}"
+      uri  = "${var.uri}/{proxy}"
       type = "HTTP"
       request_parameters = {
         "integration.request.header.userid"          = "context.authorizer.userId"
@@ -54,7 +54,7 @@ locals {
       }
     }
     integration_get = {
-      uri  = "${var.load_balancer}/{proxy}"
+      uri  = "${var.uri}/{proxy}"
       type = "HTTP"
       request_parameters = {
         "integration.request.header.userid"                 = "context.authorizer.userId"
@@ -101,6 +101,8 @@ locals {
       status_code = {
         "201" = "201",
         "204" = "204",
+        "403" = "403",
+        "404" = "404",
         "200" = "20[0-35-9]",
         "400" = "4(?!03|04)\\d{2}",
         "500" = "5.*"
@@ -119,6 +121,8 @@ locals {
       status_code = {
         "201" = "201",
         "204" = "204",
+        "403" = "403",
+        "404" = "404",
         "200" = "20[0-35-9]",
         "400" = "4(?!03|04)\\d{2}",
         "500" = "5.*"

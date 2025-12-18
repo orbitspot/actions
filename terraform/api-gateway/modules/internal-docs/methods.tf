@@ -1,10 +1,10 @@
 module "get" {
-  source = "../api-gateway-resources"
-  depends_on = [
-    aws_api_gateway_resource.internal_docs
-  ]
-  rest_api_id = var.api_data.rest_api_id
-  http_method = "GET"
+  source        = "../api-gateway-resources"
+  region        = var.region
+  rest_api_id   = var.api_data.rest_api_id
+  vpc_link_id   = var.vpc.link_id
+  load_balancer = var.vpc.load_balancer
+  http_method   = "GET"
   method = {
     authorization                   = "NONE"
     authorizer_id                   = ""
@@ -13,7 +13,7 @@ module "get" {
   }
   integration = {
     integration_http_method = "GET"
-    uri                     = "${var.load_balancer}/${var.docs}"
+    uri                     = "${var.uri}/${var.docs}"
     type                    = "HTTP"
     request_parameters = {
       "integration.request.header.target" = "'${var.path}'"
@@ -42,10 +42,8 @@ module "get" {
 }
 
 module "options" {
-  source = "../api-gateway-resources"
-  depends_on = [
-    aws_api_gateway_resource.internal_docs,
-  ]
+  source      = "../api-gateway-resources"
+  region      = var.region
   rest_api_id = var.api_data.rest_api_id
   http_method = "OPTIONS"
   method = {

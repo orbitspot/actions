@@ -32,8 +32,8 @@ env: # global env
 
 jobs:
   setup-config:
-    name: Set Up Config
-    runs-on: ubuntu-latest
+    name: Set up pipeline config  
+    runs-on: ['${{ github.ref_name }}', '${{ inputs.module }}', linux, self-hosted, x64]
     environment: ${{ github.ref_name }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -206,6 +206,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: '${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}'
     steps:
       - id: build-sets
+        name: Set Scheduler
         shell: bash
         run: |
           set_args="--set environment=${{ env.ENV }} \

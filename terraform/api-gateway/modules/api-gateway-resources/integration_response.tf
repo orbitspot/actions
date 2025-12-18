@@ -8,5 +8,5 @@ resource "aws_api_gateway_integration_response" "default" {
   selection_pattern   = each.value
   response_templates  = var.integration_response.response_templates
   response_parameters = var.integration_response.response_parameters
-  region              = "us-east-1"
+  region              = var.region
 }

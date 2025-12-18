@@ -1,7 +1,3 @@
-variable "load_balancer" {
-  type = string
-}
-
 variable "path" {
   type = string
 }
@@ -14,5 +10,21 @@ variable "rest_api_id" {
 }
 
 variable "resource_id" {
+  type = string
+}
+
+variable "vpc_link_id" {
+  type = string
+}
+
+variable "region" {
+  type = string
+}
+
+variable "load_balancer" {
+  type = string
+}
+
+variable "uri" {
   type = string
 }

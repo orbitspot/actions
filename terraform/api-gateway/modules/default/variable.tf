@@ -1,7 +1,7 @@
 variable "api_data" {
   type = object({
-    parent_id = string
-    rest_api_id = string
+    parent_id         = string
+    rest_api_id       = string
     custom_authorizer = string
   })
 }
@@ -10,7 +10,7 @@ variable "path" {
   type = string
 }
 
-variable "load_balancer" {
+variable "uri" {
   type = string
 }
 
@@ -21,3 +21,15 @@ variable "istio_enabled" {
 variable "apply_response_script" {
   type = bool
 }
+
+variable "region" {
+  type = string
+}
+
+variable "vpc" {
+  type = object({
+    link_id       = string
+    load_balancer = string
+  })
+}
+
