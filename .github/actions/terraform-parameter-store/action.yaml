@@ -16,7 +16,7 @@ inputs:
     required: true
   global:
     description: 'global'
-    required: false
+    required: true
 
 runs:
   using: composite
