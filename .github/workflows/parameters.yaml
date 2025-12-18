@@ -83,12 +83,13 @@ jobs:
           terraform_version: "1.5.0"
               
       - name: Start terraform
-        uses: orbitspot/actions/.github/actions/parameter-store@v21
+        uses: orbitspot/actions/.github/actions/terraform-parameter-store@v21
         with:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
           tag: 'v21'
           terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
+          global: false
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
           AWS_REGION: ${{ env.CLUSTER_REGION }}

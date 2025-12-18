@@ -43,7 +43,7 @@ runs:
     run: |
       set -e
       repo_name="${{ inputs.image }}"
-      echo "🔎 Verificando se o repositório $repo_name existe..."
+      echo "Verificando se o repositório $repo_name existe..."
       if ! aws ecr describe-repositories --repository-names "$repo_name" --region "$AWS_REGION" >/dev/null 2>&1; then
         echo "Repositório $repo_name não encontrado. Criando..."
         aws ecr create-repository --repository-name "$repo_name" --region "$AWS_REGION"

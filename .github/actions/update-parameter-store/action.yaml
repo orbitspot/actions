@@ -1,0 +1,51 @@
+name: "Update Parameters"
+description: "Updates parameters for the specified module"
+inputs:
+  module:
+    description: "Nome do modulo"
+    required: true
+  environment_vars:
+    description: "Environment variables for the module"
+    required: true
+  environment_secrets:
+    description: "Environment secrets for the module"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+      - name: Generate Vars
+        id: generate-environments-vars
+        uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
+        with:
+          environment_json: '${{ inputs.environment_vars }}'
+          file_name: variables
+
+      - name: Generate Secrets
+        id: generate-environments-secrets
+        uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
+        with:
+          environment_json: '${{ inputs.environment_secrets }}'
+          file_name: secrets
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: hashicorp/setup-terraform@v3
+        name: setup
+        with:
+          terraform_version: "1.5.0"
+              
+      - name: Start terraform
+        uses: orbitspot/actions/.github/actions/terraform-parameter-store@v21
+        with:
+          modulo: '${{ inputs.module }}'
+          repository: "${{ github.event.repository.name }}"
+          tag: 'v21'
+          terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
+        env:
+          AWS_ROLE_NAME: ${{ env.AWS_ROLE_NAME }}
+          AWS_REGION: ${{ env.CLUSTER_REGION }}
+          AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}

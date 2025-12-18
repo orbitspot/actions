@@ -1,0 +1,45 @@
+name: 'Global Parameter Store'
+description: 'Generate Global Parameter Store Enviroments for Backend Applications'
+inputs:
+  environment_json:
+    description: 'environment values'
+    required: true
+  file_name:
+    description: 'file name'
+    required: true
+  module:
+    description: 'module'
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.x
+
+    - name: Generate JSON and set output
+      shell: python
+      run: |
+          import json
+          import os
+
+          variables = ${{ inputs.environment_json }}
+          module = '${{ inputs.module }}'
+
+          result_json = {}
+          for key in variables.keys():
+            value = variables[key].replace("$", "$$") # no terraform $$ é o escapamento para o $ 
+            if len(value) > 0 and key.split("_")[1] == module.upper(): # adiciona apenas as variáveis do módulo selecionado
+              result_json.update({key.split("_", 2)[2]: value}) # pega o nome da variável sem o prefixo do módulo 
+
+          with open(f"${{ inputs.file_name }}.json", "a") as outfile:
+            print('Result JSON: ', result_json)
+            json.dump(result_json, outfile)
+
+    - name: Upload encrypted artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.file_name }}
+        path: ${{ inputs.file_name }}.json
+        retention-days: 1
