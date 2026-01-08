@@ -206,7 +206,7 @@ jobs:
           helm_values: helm-values-${{ matrix.artifacts }}
           release: ${{ matrix.artifacts }}
           chart_name: orbitspot/orbitspot-job
-          chart_version: 0.1.10
+          chart_version: 0.1.11
           sets: |
                 --set environment=${{env.ENV}} \
                 --set region=${{ env.CLUSTER_REGION }} \
