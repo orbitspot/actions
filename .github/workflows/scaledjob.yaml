@@ -211,7 +211,6 @@ jobs:
                 --set environment=${{env.ENV}} \
                 --set region=${{ env.CLUSTER_REGION }} \
                 --set 'containers[0].repository.image=${{ env.AWS_ACCOUNT_NUMBER }}.dkr.ecr.${{env.CLUSTER_REGION}}.amazonaws.com/${{ matrix.artifacts }}-${{ github.event.repository.name }}' \
-                --set 'keda.secrets.data.rabbitmq_http_host=${{ secrets.BROKER_AMQP_SCALEDJOB_BASE64 }}' \
                 --set 'containers[0].repository.tag=${{ github.sha }}' \
                 --set 'containers[0].environments.SERVICE_TYPE=${{ matrix.artifacts }}'
 
