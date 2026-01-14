@@ -23,6 +23,19 @@ def flatten_json(data, parent_key="", sep="."):
   
   return items
 
+def set_default_requests(default_properties: dict, properties: dict, properties_file):
+  requests_resources = ['resources.requests.cpu', 'resources.requests.memory']
+  
+  for item in requests_resources:
+    placeholder = f"{deployment}.{item}"
+  if not placeholder in properties:
+    print(f"{item} nao encontrado - utilizando valor default igual ao limits")
+    default_item = item.replace('requests', 'limits')
+    value = properties.get(
+      f"{deployment}.{default_item}",
+      default_properties[default_item])
+    properties_file += f"\n{placeholder}={value}"
+
 default_properties_path = f"./orbitspot-actions/data/default-properties/{chart_type}.json"
 path = Path(default_properties_path)
 if not path.exists():
@@ -54,6 +67,8 @@ for key, value in items:
 
 print("values.properties")
 print(properties_file)
+
+set_default_requests(default_properties, properties, properties_file)
 
 with open(properties_path, 'w') as f:
   f.write(properties_file)
