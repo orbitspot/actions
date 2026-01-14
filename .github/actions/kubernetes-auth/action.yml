@@ -32,12 +32,28 @@ runs:
   - name: Install Helm
     shell: bash
     run: |
+      HELM_VERSION="3.19.0"
+      
+      echo "Attempting binary installation..."
+      if curl -fsSL -o helm.tar.gz "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" 2>/dev/null; then
+        tar -xzf helm.tar.gz
+        sudo mv linux-amd64/helm /usr/local/bin/helm 2>/dev/null
+        rm -rf linux-amd64 helm.tar.gz 2>/dev/null
+      fi
+      
+      if command -v helm &>/dev/null && helm version --short &>/dev/null; then
+        echo "Helm installed via binary: $(helm version --short)"
+        exit 0
+      fi
+      
+      echo "Binary install failed, falling back to apt..."
+    
       sudo apt-get install curl gpg apt-transport-https --yes
       curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
       echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
       sudo apt-get update
       sudo apt-get install helm
-
+      
   - name: Cache Helm plugins
     id: cache-helm-plugins
     uses: actions/cache@v4
