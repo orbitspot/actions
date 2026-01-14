@@ -228,7 +228,7 @@ jobs:
               retention-days: 1
 
           - name: helm-apply
-            uses: orbitspot/actions/.github/actions/helm-deploy@v21
+            uses: orbitspot/actions/.github/actions/helm-deploy@feat/helm-fallback
             with:
               namespace: ${{ github.event.repository.name }}
               helm_values: helm-values
