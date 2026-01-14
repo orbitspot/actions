@@ -54,7 +54,7 @@ runs:
 
     - name: Fetch devops variables
       id: set-output
-      uses: orbitspot/actions/.github/actions/fetch-devops-variables@v21
+      uses: orbitspot/actions/.github/actions/fetch-devops-variables@feat/helm-fallback
       with:
         devops_config: '${{ inputs.devops_config }}'
         branch: '${{ github.ref_name }}'
