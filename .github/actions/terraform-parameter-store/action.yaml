@@ -47,13 +47,10 @@ runs:
         name: secrets
         path: orbitspot-actions/terraform/parameter-store
   
-  - name: Install Terraform
-    shell: bash
-    run: |
-      curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-      sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-      sudo apt-get update && sudo apt-get install terraform
-      terraform --version
+  - uses: hashicorp/setup-terraform@v3
+    name: setup
+    with:
+      terraform_version: 1.5.0
 
   - name: Verify Terraform Installation
     shell: bash
