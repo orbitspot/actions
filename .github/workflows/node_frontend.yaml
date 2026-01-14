@@ -1,4 +1,4 @@
-name: Push node
+name: Deploy Node frontend
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: Push node
+name: Deploy Node API
 
 on:
   workflow_call:
