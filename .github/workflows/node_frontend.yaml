@@ -120,6 +120,7 @@ jobs:
                 mkdir -p building
                 mv build building/build
                 mv package.json building/package.json
+                sudo apt install zip
                 zip -r building/node_modules.zip node_modules
 
           - name: Upload Artifacts
