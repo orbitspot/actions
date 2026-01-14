@@ -91,7 +91,6 @@ runs:
       shell: bash
       run: |
         cd building
-        sudo apt install zip
         zip node_modules.zip node_modules -r
         rm -rf node_modules
         ls
