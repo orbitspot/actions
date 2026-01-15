@@ -31,8 +31,9 @@ def set_default_requests(default_properties: dict, properties: dict, properties_
   if not placeholder in properties:
     print(f"{item} nao encontrado - utilizando valor default igual ao limits")
     default_item = item.replace('requests', 'limits')
+    placeholder = f"{deployment}.{default_item}"
     value = properties.get(
-      f"{deployment}.{default_item}",
+      placeholder,
       default_properties[default_item])
     properties_file += f"\n{placeholder}={value}"
 
