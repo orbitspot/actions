@@ -26,6 +26,11 @@ def flatten_json(data, parent_key="", sep="."):
 def set_default_requests(default_properties: dict, properties: dict, properties_file):
   requests_resources = ['resources.requests.cpu', 'resources.requests.memory']
   
+  print("default.properties")
+  print(default_properties)
+  print("properties")
+  print(properties)
+  
   for item in requests_resources:
     placeholder = f"{deployment}.{item}"
   if not placeholder in properties:
