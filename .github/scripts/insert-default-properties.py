@@ -31,11 +31,10 @@ def set_default_requests(default_properties: dict, properties: dict, properties_
   if not placeholder in properties:
     print(f"{placeholder} nao encontrado - utilizando valor default igual ao limits")
     default_item = item.replace('requests', 'limits')
-    placeholder = f"{deployment}.{default_item}"
     value = properties.get(
-      placeholder,
+      f"{deployment}.{default_item}",
       default_properties[default_item])
-    properties_file += f"\n{deployment}.{item}={value}"
+    properties_file += f"\n{placeholder}={value}"
 
 default_properties_path = f"./orbitspot-actions/data/default-properties/{chart_type}.json"
 path = Path(default_properties_path)
@@ -66,10 +65,10 @@ for key, value in items:
     print(f"Inserindo valor default {placeholder}={value}")
     properties_file += f"\n{placeholder}={value}"
 
+set_default_requests(default_properties, properties, properties_file)
+
 print("values.properties")
 print(properties_file)
-
-set_default_requests(default_properties, properties, properties_file)
 
 with open(properties_path, 'w') as f:
   f.write(properties_file)
