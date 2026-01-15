@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@v21
+        uses:  orbitspot/actions/.github/actions/setup-config@feat/default-requests
         with:
           setup: 'migration'
           repo_vars: '${{ toJson(vars) }}'
@@ -52,7 +52,7 @@ jobs:
       TERRAFORM_BUCKET: ${{ needs.setup-config.outputs.TERRAFORM_BUCKET }}
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/update-parameter-store@v21
+        uses: orbitspot/actions/.github/actions/update-parameter-store@feat/default-requests
         with:
           module: '${{ inputs.module }}'
           environment_vars: '${{ toJson(vars) }}'
@@ -70,7 +70,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Building
-        uses: orbitspot/actions/.github/actions/package-manager-install@v21
+        uses: orbitspot/actions/.github/actions/package-manager-install@feat/default-requests
         with:
           node_version: '20'
           customized_dockerfile: '${{ inputs.dockerfile_path  }}'
@@ -88,7 +88,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: Generate Docker
-        uses: orbitspot/actions/.github/actions/generate-docker@v21
+        uses: orbitspot/actions/.github/actions/generate-docker@feat/default-requests
         with:
           deployment_name: migration
           dockerfile_path: ${{ inputs.dockerfile_path }}
@@ -114,7 +114,7 @@ jobs:
     steps:
       - name: Preparar values.yaml
         id: prepare_helm
-        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@v21
+        uses: orbitspot/actions/.github/actions/prepare-helm-chart-values@feat/default-requests
         with:
           deployment_name: migration
           module: ${{ inputs.module }}
@@ -141,7 +141,7 @@ jobs:
       AWS_ACCOUNT_NUMBER: ${{ needs.setup-config.outputs.AWS_ACCOUNT_NUMBER }}
     steps:
       - name: helm-apply
-        uses: orbitspot/actions/.github/actions/helm-deploy@v21
+        uses: orbitspot/actions/.github/actions/helm-deploy@feat/default-requests
         with:
           namespace: '${{ github.event.repository.name }}'
           helm_values: helm-values-migration

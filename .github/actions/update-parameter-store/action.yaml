@@ -16,14 +16,14 @@ runs:
   steps:
       - name: Generate Vars
         id: generate-environments-vars
-        uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
+        uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@feat/default-requests
         with:
           environment_json: '${{ inputs.environment_vars }}'
           file_name: variables
 
       - name: Generate Secrets
         id: generate-environments-secrets
-        uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@v21
+        uses: orbitspot/actions/.github/actions/parameter-store-environments-backend@feat/default-requests
         with:
           environment_json: '${{ inputs.environment_secrets }}'
           file_name: secrets
@@ -39,11 +39,11 @@ runs:
           terraform_version: "1.5.0"
               
       - name: Start terraform
-        uses: orbitspot/actions/.github/actions/terraform-parameter-store@v21
+        uses: orbitspot/actions/.github/actions/terraform-parameter-store@feat/default-requests
         with:
           modulo: '${{ inputs.module }}'
           repository: "${{ github.event.repository.name }}"
-          tag: 'v21'
+          tag: 'feat/default-requests'
           terraform_bucket_name: ${{ env.TERRAFORM_BUCKET }}
           global: false
         env:
