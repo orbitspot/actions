@@ -76,7 +76,11 @@ for key, value in items:
     print(f"Inserindo valor default {placeholder}={value}")
     properties_file += f"\n{placeholder}={value}"
 
-properties_file = set_default_requests(default_properties, properties, properties_file)
+properties_file = set_default_requests(
+  default_properties, 
+  properties, 
+  properties_file,
+)
 
 print("values.properties")
 print(properties_file)
