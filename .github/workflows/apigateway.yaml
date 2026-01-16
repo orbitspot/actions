@@ -38,7 +38,7 @@ jobs:
     steps:
       - name: Set up
         id: set-output
-        uses:  orbitspot/actions/.github/actions/setup-config@feat/default-requests
+        uses:  orbitspot/actions/.github/actions/setup-config@v21
         with:
           repo_vars: '${{ toJson(vars) }}'
           devops_config: '${{ vars._DEVOPS_CONFIG }}'
@@ -66,7 +66,7 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Terraform
-        uses: orbitspot/actions/.github/actions/api-gateway@feat/default-requests
+        uses: orbitspot/actions/.github/actions/api-gateway@v21
         env:
           AWS_ROLE_NAME: ${{ vars.AWS_ROLE_NAME }}
           AWS_REGION: ${{ vars._AWS_REGION }}

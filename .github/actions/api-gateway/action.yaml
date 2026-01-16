@@ -21,7 +21,7 @@ runs:
     with:
         repository: 'orbitspot/actions'
         path: orbitspot-actions
-        ref: 'feat/default-requests'
+        ref: 'v21'
 
   - name: Terraform Init
     shell: bash

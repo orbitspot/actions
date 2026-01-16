@@ -35,7 +35,7 @@ runs:
         node-version: ${{ inputs.node_version }}
 
     - name: Authenticate
-      uses: orbitspot/actions/.github/actions/code-artifact-authenticate@feat/default-requests
+      uses: orbitspot/actions/.github/actions/code-artifact-authenticate@v21
 
     - name: Bash Co Login
       shell: bash
