@@ -3,10 +3,6 @@
     "limits": {
       "cpu": "100m",
       "memory": "256Mi"
-    },
-    "requests": {
-      "cpu": "70m",
-      "memory": "128Mi"
     }
   }
 }
